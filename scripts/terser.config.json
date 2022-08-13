@@ -1,0 +1,33 @@
+{
+  "compress": {
+    "toplevel": true,
+    "keep_fargs": false,
+    "passes": 200,
+    "pure_getters": true,
+    "arrows": true,
+    "unsafe": true,
+    "unsafe_arrows": true,
+    "unsafe_comps": true,
+    "unsafe_math": true,
+    "unsafe_methods": true,
+    "reduce_vars": true,
+    "hoist_props": true,
+    "collapse_vars": true,
+    "ecma": 2020,
+    "module": true
+  },
+  "mangle": {
+    "module": true,
+    "toplevel": true,
+    "properties": {
+      "regex": "^_.*"
+    }
+  },
+  "ecma": 2020,
+  "module": true,
+  "toplevel": true,
+  "keep_classnames": false,
+  "keep_fnames": false,
+  "ie8": false,
+  "safari10": false
+}

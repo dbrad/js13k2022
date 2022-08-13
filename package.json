@@ -1,0 +1,23 @@
+{
+  "name": "gamedev-js-jam-2022",
+  "version": "0.1.0",
+  "main": "index.html",
+  "author": {
+    "email": "davidbrad.015@gmail.com",
+    "name": "David Brad",
+    "url": "https://davidbrad.ca"
+  },
+  "license": "CC-BY-NC-SA-4.0",
+  "devDependencies": {
+    "express": "^4.17.1",
+    "path": "^0.12.7"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.13.13",
+    "html-inline": "^1.2.0",
+    "roadroller": "^2.1.0",
+    "terser": "^5.9.0",
+    "typescript": "^4.2.4"
+  }
+}

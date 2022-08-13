@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "module": "ES2020",
+    "target": "ES2020",
+    "noImplicitAny": true,
+    "noEmit": true,
+    "watch": true,
+    "strict": true,
+    "strictFunctionTypes": true,
+    "noUnusedLocals": true,
+    "typeRoots": ["../node_modules/@types"],
+    "types": [],
+    "paths": {
+      "@res/*": ["./src/res/*"],
+      "@debug/*": ["./src/ts/debug/*"],
+      "@graphics/*": ["./src/ts/graphics/*"],
+      "texture": ["./src/ts/graphics/texture/texture.ts"],
+      "gl": ["./src/ts/graphics/gl/gl.ts"],
+      "math": ["./src/ts/math/math.ts"],
+      "@math/*": ["./src/ts/math/*"],
+      "@input/*": ["./src/ts/input/*"],
+      "@scenes/*": ["./src/ts/scenes/*"],
+      "@root/*": ["./src/ts/*"],
+      "@project_root/*": ["./*"]
+    }
+  },
+  "exclude": ["node_modules", "node_modules/**/*"],
+  "include": ["./src/ts/**/*.ts", "files/tilemap.ts"]
+}

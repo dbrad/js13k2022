@@ -1,0 +1,19 @@
+{
+	"Blank Scene Template": {
+		"scope": "javascript,typescript",
+		"prefix": "scene",
+		"body": [
+			"import { get_next_scene_id, Scene } from \"@root/scene\";",
+			"export namespace $0",
+			"{",
+			"\tlet _setup_fn = () => { };",
+			"\tlet _reset_fn = () => { };",
+			"\tlet _update_fn = (now: number, delta: number) =>{};",
+			"\tlet _render_fn = () =>  {  };",
+			"\texport let _scene_id = get_next_scene_id();",
+			"\texport let _scene: Scene = { _scene_id, _setup_fn, _reset_fn, _update_fn, _render_fn };",
+			"}",
+		],
+		"description": "Create a new blank scene."
+	}
+}
