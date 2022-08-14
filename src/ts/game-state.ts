@@ -1,9 +1,58 @@
+import { V2 } from "@math/vector";
 import { window_reference } from "./screen";
 import { set_zzfx_mute } from "./zzfx";
 
-// TODO: Maybe change game state to indexed array using declared consts?
-export type GameState = {
-  e: number[]; // Events
+export type GameState = [
+  number[], // GAMESTATE_EVENTS
+  Level // GAMESTATE_CURRENT_DUNGEON
+];
+
+export type EquipmentSlots = [];
+export type SpellUnlocks = [];
+export type MetaPlayer = [
+  number, // META_PLAYER_LEVEL
+  number, // META_PLAYER_XP
+  number, // META_PLAYER_MAX_HP
+  number, // META_PLAYER_MAX_MP
+  number, // META_PLAYER_GOLD
+  number, // META_PLAYER_METALS
+  number, // META_PLAYER_GEMS
+  number, // META_PLAYER_BONES
+  number, // META_PLAYER_FLESH
+  number, // META_PLAYER_SOULS
+];
+
+type DungeonPlayer = {
+  _health: number,
+  _mana: number,
+};
+export type Enemy = {
+  _alive: boolean,
+  _health: number,
+  _maxHealth: number,
+  _attack: number,
+  _defense: number,
+  _abilities: number[];
+};
+export type Room = {
+  _seen: boolean,
+  _peeked: boolean,
+  _exit: boolean,
+  _enemy: {} | null,
+  _loot: [];
+  _events: [];
+};
+type Level = {
+  _difficulty: number,
+  _tile_map: Int8Array,
+  _player_position: V2,
+  _rooms: Room[],
+};
+const nullLevel: Level = {
+  _difficulty: 0,
+  _tile_map: new Int8Array(),
+  _player_position: [0, 0],
+  _rooms: [],
 };
 
 // Gamestate Object
@@ -16,9 +65,10 @@ export let setup_game_state = () =>
     events[i] = 0;
   }
 
-  game_state = {
-    e: events
-  };
+  game_state = [
+    events,
+    nullLevel
+  ];
 };
 
 // Save file handling

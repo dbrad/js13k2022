@@ -92,7 +92,7 @@ export let render_particle_system = () =>
     let life_progress = particle._lifetime_remaining / particle._lifetime;
 
     let colour_begin = particle._colour_begin;
-    let colour_end = particle._colour_begin;
+    let colour_end = particle._colour_end;
 
     let red = lerp(colour_end[0], colour_begin[0], life_progress);
     let green = lerp(colour_end[1], colour_begin[1], life_progress);

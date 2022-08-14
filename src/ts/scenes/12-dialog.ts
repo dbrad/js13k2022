@@ -13,7 +13,7 @@ export namespace Dialog
 
   let dialogTimer: number = 0;
   let blinkTimer: number = 0;
-  let showContinue: boolean = true;
+  let showContinue: boolean = false;
   let letterRate = 32;
   let talkSoundPlay: number = 0;
 
@@ -31,7 +31,7 @@ export namespace Dialog
       currentDialogTextIndex = 0;
 
       blinkTimer = 0;
-      showContinue = true;
+      showContinue = false;
       letterRate = 32;
 
       return true;
@@ -89,13 +89,14 @@ export namespace Dialog
   let _render_fn = () =>
   {
     let box_w = SCREEN_WIDTH;
+    let box_y = SCREEN_HEIGHT - 10;
     let box_h = 100;
-    push_quad(0, SCREEN_HEIGHT - box_h, box_w, box_h, 0xFFFFFFFF);
-    push_quad(2, SCREEN_HEIGHT - (box_h - 2), box_w - 4, box_h - 4, 0xFF000000);
-    push_text(currentDialogText, 5, SCREEN_HEIGHT - (box_h - 5), { _width: box_w - 10, _scale: 2 });
+    push_quad(0, box_y - box_h, box_w, box_h, 0xFFFFFFFF);
+    push_quad(2, box_y - (box_h - 2), box_w - 4, box_h - 4, 0xFF000000);
+    push_text(currentDialogText, 5, box_y - (box_h - 5), { _width: box_w - 10, _scale: 2 });
 
     if (showContinue)
-      push_text("touch the continue", SCREEN_WIDTH - 5, SCREEN_HEIGHT - 13, { _align: TEXT_ALIGN_RIGHT });
+      push_text("continue", SCREEN_WIDTH - 5, box_y - 13, { _align: TEXT_ALIGN_RIGHT });
 
   };
 

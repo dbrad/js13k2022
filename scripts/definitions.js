@@ -9,12 +9,6 @@ const TEXTURES = {
   TEXTURE_SINGLE_WHITE_PIXEL: texture_id++,
   TEXTURE_WHITE_CIRCLE: texture_id++,
   TEXTURE_D_PAD: texture_id++,
-  TEXTURE_LEFT_WALL: texture_id++,
-  TEXTURE_CENTER_WALL: texture_id++,
-  TEXTURE_RIGHT_WALL: texture_id++,
-  TEXTURE_FLOOR: texture_id++,
-  TEXTURE_PLAYER: texture_id++,
-  TEXTURE_TORCH: texture_id++,
 };
 
 const FONTS = {
@@ -58,4 +52,17 @@ const CONTROLS = {
   KEY_IS_DOWN: 2,
 };
 
-module.exports.DEFINITIONS = { ...TEXTURE_TYPES, ...TEXTURES, ...INTERPOLATION_IDS, ...FONTS, ...GL, ...CONTROLS };
+const INVENTORY = {
+  INV_WEAPON: 0,
+  INV_STAFF: 1,
+  INV_HEAD: 2,
+  INV_NECK: 3,
+  INV_RING: 4,
+};
+
+const GAMESTATE = {
+  GAMESTATE_EVENTS: 0,
+  GAMESTATE_CURRENT_DUNGEON: 1,
+};
+
+module.exports.DEFINITIONS = { ...TEXTURE_TYPES, ...TEXTURES, ...INTERPOLATION_IDS, ...FONTS, ...GL, ...CONTROLS, ...INVENTORY, ...GAMESTATE };

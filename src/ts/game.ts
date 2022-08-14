@@ -1,14 +1,20 @@
 import { initialize_fps_meter, performance_mark, tick_fps_meter } from "@debug/fps-meter";
 import { push_text } from "@graphics/text";
 import { load_options } from "@root/game-state";
-import { initialize_input, input_context, is_touch, render_mobile_controls, update_hardware_input } from "@root/input/controls";
+import { initialize_input, input_context, is_touch, render_controls, update_hardware_input } from "@root/input/controls";
 import { initialze_interpolation_system, update_interpolation_system } from "@root/interpolate";
 import { initialize_particle_system, render_particle_system, update_particle_system } from "@root/particle-system";
 import { register_scene, render_scene, update_scene } from "@root/scene";
 import { canvas_reference, initialize_page, SCREEN_CENTER_X, SCREEN_CENTER_Y, window_reference } from "@root/screen";
 import { zzfx_init } from "@root/zzfx";
-import { Dialog } from "@scenes/dialog";
-import { MainMenu } from "@scenes/main-menu";
+import { MainMenu } from "@scenes/00-main-menu";
+import { Hub } from "@scenes/01-hub";
+import { LevelSelect } from "@scenes/02-level-select";
+import { Dungeon } from "@scenes/03-dungeon";
+import { Combat } from "@scenes/04-combat";
+import { Inventory } from "@scenes/10-inventory";
+import { Options } from "@scenes/11-options";
+import { Dialog } from "@scenes/12-dialog";
 import { gl_clear, gl_flush, gl_get_context, gl_init, gl_set_clear_colour } from "gl";
 import { load_palette, load_textures } from "texture";
 
@@ -40,6 +46,12 @@ window_reference.addEventListener('load', async () =>
         initialize_particle_system(10000);
 
         register_scene(MainMenu._scene);
+        register_scene(Hub._scene);
+        register_scene(LevelSelect._scene);
+        register_scene(Dungeon._scene);
+        register_scene(Combat._scene);
+        register_scene(Inventory._scene);
+        register_scene(Options._scene);
         register_scene(Dialog._scene);
 
         zzfx_init();
@@ -85,7 +97,7 @@ window_reference.addEventListener('load', async () =>
       performance_mark("render_start");
       render_scene();
       render_particle_system();
-      render_mobile_controls();
+      render_controls();
       gl_flush();
       performance_mark("render_end");
 

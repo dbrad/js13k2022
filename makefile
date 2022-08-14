@@ -1,6 +1,3 @@
-itchio-user = fanlix
-itchio-project = untamed-lands
-
 install:
 	./tools/7z/7za x tools.7z -otools -y
 	mkdir build
@@ -24,7 +21,7 @@ release:
 	mkdir build/release
 	cp src/html/index.html build/release/index.html
 	node scripts/release-build.js | node_modules/.bin/terser --config-file scripts/terser.config.json -o build/release/game.js
-	yarn roadroller build\release\game.js -O1 -Zab0 -Zlr649 -Zmd10 -Zpr15 -S0,1,2,3,6,7,13,25,58,202,209,292 -o build\release\game.js
+	yarn roadroller build\release\game.js -O2 -o build\release\game.js
 	rm -rf dist
 	mkdir -p dist/src
 	yarn html-inline -i ./build/release/index.html -o ./dist/src/index.html

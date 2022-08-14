@@ -62,20 +62,25 @@ export let switch_to_scene = (sceneId: number, transitionDuration: number = 250,
 
 export let push_scene = (sceneId: number): void =>
 {
+    clear_input();
+
     let scene = scenes.get(sceneId);
     assert(scene !== undefined, `Unable to find scene #"${sceneId}"`);
     scene_stack.push(scene);
     current_scene = scene;
-    clear_input();
+    current_scene._reset_fn();
     save_game();
 };
 
 export let pop_scene = (): void =>
 {
+    clear_input();
+
     let old_scene = scene_stack[scene_stack.length - 1];
     scene_stack.pop();
     assert(old_scene !== undefined, `Unable to find scene #"${next_scene_id}"`);
     current_scene = scene_stack[scene_stack.length - 1];
+    current_scene._reset_fn();
     save_game();
 };
 

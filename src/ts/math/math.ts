@@ -22,17 +22,17 @@ export let random_float = (min: number, max: number): number =>
   return math.random() * (max - min + 1) + min;
 };
 
-export function shuffle<T>(array: T[]): T[]
+export let shuffle = <T>(array: T[]): T[] =>
 {
-  let currentIndex: number = array.length, temporaryValue: T, randomIndex: number;
+  let current_index: number = array.length, temporary_value: T, random_index: number;
   let arr: T[] = array.slice();
-  while (0 !== currentIndex)
+  while (0 !== current_index)
   {
-    randomIndex = math.floor(math.random() * currentIndex);
-    currentIndex -= 1;
-    temporaryValue = arr[currentIndex];
-    arr[currentIndex] = arr[randomIndex];
-    arr[randomIndex] = temporaryValue;
+    random_index = math.floor(math.random() * current_index);
+    current_index -= 1;
+    temporary_value = arr[current_index];
+    arr[current_index] = arr[random_index];
+    arr[random_index] = temporary_value;
   }
   return arr;
-}
+};

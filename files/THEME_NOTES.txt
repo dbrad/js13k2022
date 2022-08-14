@@ -1,0 +1,159 @@
+THEME: DEATH
+------------
+Ideas
+- Grim Reaper
+- Zombies
+- Un-DEATH
+- Unable to Die, trying to find a way to die.
+- perma death
+- accepting death
+- ghost hunting
+- lost souls
+- guiding the dead
+- river styx
+- afterlife
+- collaspe of society
+- becoming immortal
+- kingdom of death
+- necromancy
+- death cults
+- gambling with life / souls
+- souls as a resource
+
+Genres
+- Deck builder
+- roguelite
+- dungeon exploring
+- resource management
+- factory game
+- auto battler
+
+Things / Game I've been enjoing
+- Monster Hunter
+  - Resource Gathering
+  - Fun action gameplay
+  - Gear building and optimzing
+- Super Auto Pets
+  - Easy to pickup and play
+  - RNG heavy
+  - Decision making
+  - Team optimizing
+- Vampire Survivors
+  - Easy to pickup
+  - Lots of partibles
+  - Build optimizing
+  - Simple movement based controls
+- Just King
+  - Team optimizing
+  - Simple movement based controls
+  - Easy to pick up
+- LoL ARAM
+  - Easy to pick up
+  - Action gameplay
+  - RNG lowers the stakes
+- Powerwash Simulator
+  - Relaxing
+  - Simple controls
+  - Low / no stakes
+
+Things in common
+  - easy to pickup and play
+  - sense of ongoing progression
+  - optimizing builds / decision making
+  - low stakes on win / lost
+  - simple controls
+  - complexity is in the decision making over time
+  - meta progression keeps me invested
+  - 20-30 minute time investment at a time
+    - or ability to walk away and resume
+
+Necromany Survivor-Type Game?
+  Bone / Flesh / Soul themed abilities
+  collect resources for meta progression
+
+Reaper survivor type game
+
+necromany roguelite / dungeon crawler
+  - delve into crypts to gather meta resources
+
+River Styx Tower Defense 
+
+Necromancer Auto battler
+
+Hell/Afterlife "City Manager"
+
+Necromany Turn Based RPG Simplified Dungeon Explorer
+  - Progressively larger proc-gen dungeons
+    - Use BOI Dungeon Gen
+  - enemy type and difficulty changes with each stratos
+  - Meta-progress at home crypt
+  - Exploring an ancient, deep crypt
+  - Used magic via mana, weapon attacks, and summon skeletons, zombies, and spirits using enemy bodies
+  - Stratos:
+    - Tombs (Intro/Basic) - Undead, tomb robbers, villagers
+    - Hot Caves (Fire) - Burning Undead
+    - Ice Caverns (Ice) - Frost undead, Straggler Templars
+    - Templars Expedition (Holy) - Templar knights and clerics, holy undead
+    - The Abyss (Dark) - Strong undead, Templar Scouts
+    - The Deep Tomb - Mixed Enemy Parties
+    - Den of the Old God - Abomonations and Eldritch horrors
+  - Campaign lengths - 3, 5, 10 floors per stratos
+  - Floors are repeatable
+  - End of floor: can move on, or go back to the crypt
+  - If room has fight, fight is first and forced.
+  - Room is auto looted?
+  - After, options are to:
+    - Move
+    - Summon
+    - Status
+    - Use
+  - Magic
+    - Dark Healing
+    - Sacrifice
+  - Resources
+    - Gold
+    - Metals
+    - Gems
+    - Bones
+    - Flesh
+    - Souls
+  - Upgrades
+    - Upgrade Magic Levels (All start lvl 1: fire, ice, holy, shadow)
+      - Fire
+        - Flare
+        - Burn
+        - Nova
+      - Ice
+        - Icicle
+        - Freeze
+        - Blizzard
+      - Holy
+        - Smite
+        - Blind
+        - Holy Nova
+      - Shadow
+        - Weaken
+        - Curse
+        - Darkness
+    - Learn new necromancy spells
+      - Dark Mend
+      - Sacrifice (HP)
+      - Sacrifice (MP)
+  - Gear Slots
+    - Weapon
+    - Staff
+    - Crown
+    - Necklace
+    - Ring
+
+  - Camp Buildings
+    - Campfire - Spend Attribute Points (HP, MP, Summon Capacity)
+    - Study - Magic Upgrades (Spend level points)
+    - Smithy - Craft Gear (Needs Unlock)
+    - Skeleton Pile - Upgrade Skeleton Summons
+    - Flash Mound - Upgrade Zombie Summons
+    - Well of Souls - Upgrade Souls Summons
+
+Need Xp Curves
+  - cost of level
+  - xp gained base on lvl difference

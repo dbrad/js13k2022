@@ -59,7 +59,7 @@ export let load_textures = (): Promise<void> =>
         }
         else if (texture_type === TEXTURE_TYPE_FONT)
         {
-          for (let i: number = 33; i <= 122; i++)
+          for (let i: number = 33; i <= 90; i++)
           {
             character_code_map.set(String.fromCharCode(i), i);
             let offset_x = x + (i - 33) * texture_width;

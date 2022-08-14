@@ -227,7 +227,7 @@ export let update_input_system = (now: number, delta: number): void =>
 };
 
 let get_button_colour = (key: number): number => key_state.get(key) === KEY_IS_UP ? 0x993C3C3C : 0x99666666;
-export let render_mobile_controls = (): void =>
+export let render_controls = (): void =>
 {
     if (input_context._is_touch)
     {
@@ -253,6 +253,10 @@ export let render_mobile_controls = (): void =>
 
         push_quad(start_button_x, start_button_y, button_size, 20, get_button_colour(START_BUTTON));
         push_text("START", start_button_x + half_button_size, start_button_y + 7, { ...button_text_options, _scale: 1 });
+    }
+    else if (!gamepad)
+    {
+        push_text("Arrow Keys / X: Action / C: Cancel / Enter: Start", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 8, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL, _colour: 0x66FFFFFF });
     }
 
     if (false)

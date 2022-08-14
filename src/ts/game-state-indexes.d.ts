@@ -1,0 +1,2 @@
+declare const GAMESTATE_EVENTS: 0;
+declare const GAMESTATE_CURRENT_DUNGEON: 1;

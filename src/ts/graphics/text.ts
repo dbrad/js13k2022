@@ -76,6 +76,7 @@ export let push_text = (text: string, x: number, y: number, parameters: TextPara
   let scale = parameters._scale || 1;
   let width = parameters._width || SCREEN_WIDTH;
   let font: number = parameters._font || FONT_NORMAL;
+  text = text.toUpperCase();
 
   let letter_gap = font === FONT_SMALL ? 1 : 0;
   let font_size = font_sizes.get(font) || 8;

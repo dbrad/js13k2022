@@ -1,0 +1,89 @@
+The file is under the limit.
+USED: 64.08 % |  8530 BYTES
+LEFT: 35.92 % |  4782 BYTES
+
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+TypeScript                      40            370             28           2422
+HTML                             1              0              0              1
+-------------------------------------------------------------------------------
+SUM:                            41            370             28           2423
+-------------------------------------------------------------------------------
+
+
+Theme announced: Death
+- Coming up with game ideas
+
+That day a young, foolish mage stumbled into that old crypt...
+Unknowingly dooming not only himself, but most of humanity shortly after as well...
+// Character walks into the crpyt and a blue soul light ignites
+Scene is the hub menu:
+- Head into the crypt (Brings up level select screen)
+- Campfire (Spend level points)
+- Study (Spend skill points)
+- Smithy (Craft gear)
+- Skeleton Pile (Upgrade skeletons)
+- Flash Mound (Upgrade zombies)
+- Well of Souls (Upgrade spirits)
+
+Level Select:
+Go to next floor, or start from start of a stratos
+
+Gameplay
+Render player, map/ doodads, and options menu
+
+Combat
+Render player and current summons
+render enemies, their hp, and intents
+turn based
+Player Menu is:
+- Change target
+- Attack
+- Magic
+  - Fire
+    - Flare
+    - Burn
+    - Nova
+  - Ice
+    - Icicle
+    - Freeze
+    - Blizzard
+  - Holy
+    - Smite
+    - Blind
+    - Holy Nova
+  - Shadow
+    - Weaken
+    - Curse
+    - Darkness
+- Necromancy
+  - Summon
+  - Learnt Spells
+
+List of Sprites
+16x16
+  - Player
+  - Skeleton
+  - Zombie
+  - Spirit
+  - Bandits
+  - Knights
+  - Clerics
+  - Abomonations
+  - Eldritch Blobs
+  - Final Boss
+  - Floor(s)
+  - Wall(s)
+8x8
+  - Gold
+  - Metal
+  - Gems
+  - Bone
+  - Flesh
+  - Soul
+
+
+Player Needs Gear Slots and an Inventory
+Hub Scene
+  - Gonna need some magic to make this nice without a huge sprite budget
