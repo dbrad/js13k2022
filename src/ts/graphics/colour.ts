@@ -49,3 +49,6 @@ export let abgr_number_to_rgba_v4 = (abgr: number): V4 =>
   let a: number = ((abgr & 0xFF000000) >>> 24);
   return [r, g, b, a / 255];
 };
+
+export const WHITE = 0xFFFFFFFF;
+export const BLACK = 0xFF000000;

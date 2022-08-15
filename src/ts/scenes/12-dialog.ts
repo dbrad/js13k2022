@@ -1,3 +1,4 @@
+import { BLACK, WHITE } from "@graphics/colour";
 import { push_quad } from "@graphics/quad";
 import { push_text } from "@graphics/text";
 import { key_state } from "@input/controls";
@@ -39,7 +40,6 @@ export namespace Dialog
     return false;
   };
 
-  let _setup_fn = () => { };
   let _reset_fn = () => { };
   let _update_fn = (now: number, delta: number) =>
   {
@@ -60,12 +60,12 @@ export namespace Dialog
 
           showContinue = !showContinue;
         }
-        if (key_state.get(A_BUTTON) === KEY_WAS_DOWN)
+        if (key_state[A_BUTTON] === KEY_WAS_DOWN)
           targetDialogText = "";
       }
       else
       {
-        if (key_state.get(A_BUTTON) === KEY_WAS_DOWN)
+        if (key_state[A_BUTTON] === KEY_WAS_DOWN)
           letterRate = 16;
 
         dialogTimer += delta;
@@ -91,8 +91,8 @@ export namespace Dialog
     let box_w = SCREEN_WIDTH;
     let box_y = SCREEN_HEIGHT - 10;
     let box_h = 100;
-    push_quad(0, box_y - box_h, box_w, box_h, 0xFFFFFFFF);
-    push_quad(2, box_y - (box_h - 2), box_w - 4, box_h - 4, 0xFF000000);
+    push_quad(0, box_y - box_h, box_w, box_h, WHITE);
+    push_quad(2, box_y - (box_h - 2), box_w - 4, box_h - 4, BLACK);
     push_text(currentDialogText, 5, box_y - (box_h - 5), { _width: box_w - 10, _scale: 2 });
 
     if (showContinue)
@@ -101,5 +101,5 @@ export namespace Dialog
   };
 
   export let _scene_id = get_next_scene_id();
-  export let _scene: Scene = { _scene_id, _setup_fn, _reset_fn, _update_fn, _render_fn };
+  export let _scene: Scene = { _scene_id, _reset_fn, _update_fn, _render_fn };
 }

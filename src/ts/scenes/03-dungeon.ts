@@ -1,11 +1,27 @@
-import { push_quad } from "@graphics/quad";
+import { BLACK } from "@graphics/colour";
+import { push_quad, push_textured_quad } from "@graphics/quad";
 import { key_state } from "@input/controls";
-import { set_V2, V2 } from "@math/vector";
-import { game_state } from "@root/game-state";
-import { get_next_scene_id, Scene } from "@root/scene";
+import { V2 } from "@math/vector";
+import { game_state, Level } from "@root/game-state";
+import { add_interpolator, ease_out_quad, get_interpolation_data, linear } from "@root/interpolate";
+import { render_panel } from "@root/nodes/panel";
+import { render_player_status } from "@root/nodes/player-status";
+import { render_text_menu } from "@root/nodes/text-menu";
+import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
+import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
 import { math } from "math";
+import { Hub } from "./01-hub";
+import { Combat } from "./04-combat";
 export namespace Dungeon
 {
+  let selected_option_index = 0;
+  let number_of_options = 4;
+  let menu_options = [
+    "map",
+    "inventory",
+    "test",
+    "retreat"
+  ];
   let animationTimer = 0;
   let frame = 0;
 
@@ -14,13 +30,23 @@ export namespace Dungeon
   let camera_half_width = math.floor(camera_pixel_size[0] / 2);
   let camera_half_height = math.floor(camera_pixel_size[1] / 2);
 
-  let _setup_fn = () => { };
-  let _reset_fn = () => { };
+  let mode: number = 0;
+  let current_level: Level;
+  let player_position: V2;
+
+  let _reset_fn = () =>
+  {
+    mode = 1;
+    selected_option_index = 0;
+
+    current_level = game_state[GAMESTATE_CURRENT_DUNGEON];
+    player_position = current_level._player_position;
+
+    camera[0] = player_position[0];
+    camera[1] = player_position[1];
+  };
   let _update_fn = (now: number, delta: number) =>
   {
-    let current_level = game_state[GAMESTATE_CURRENT_DUNGEON];
-    let player_position = current_level._player_position;
-
     animationTimer += delta;
     if (animationTimer > 500)
     {
@@ -29,31 +55,87 @@ export namespace Dungeon
       frame = ++frame % 2;
     }
 
-    let target: number[] | null = null;
-    if (key_state.get(D_UP) === KEY_WAS_DOWN)
+    let camera_lerp = get_interpolation_data(INTERP_CAMERA_MOVEMENT);
+    if (camera_lerp)
     {
-      target = [player_position[0], player_position[1] - 16 * 9];
+      let values = camera_lerp._values;
+      camera[0] = math.floor(values[0]);
+      camera[1] = math.floor(values[1]);
     }
-    else if (key_state.get(D_DOWN) === KEY_WAS_DOWN)
+
+    let player_lerp = get_interpolation_data(INTERP_PLAYER_MOVEMENT);
+    if (player_lerp)
     {
-      target = [player_position[0], player_position[1] + 16 * 9];
+      let values = player_lerp._values;
+      player_position[0] = math.floor(values[0]);
+      player_position[1] = math.floor(values[1]);
     }
-    else if (key_state.get(D_LEFT) === KEY_WAS_DOWN)
+    else
     {
-      target = [player_position[0] - 16 * 11, player_position[1]];
-    }
-    else if (key_state.get(D_RIGHT) === KEY_WAS_DOWN)
-    {
-      target = [player_position[0] + 16 * 11, player_position[1]];
-    }
-    if (target)
-    {
-      const targetRoom: V2 = [Math.floor(target[0] / 16 / 11), Math.floor(target[1] / 16 / 9)];
-      const room = current_level._rooms[targetRoom[1] * 10 + targetRoom[0]];
-      if (room)
+      if (mode === 0)
       {
-        set_V2(camera, target[0], target[1]);
-        set_V2(player_position, target[0], target[1]);
+        if (key_state[D_UP] === KEY_WAS_DOWN)
+          selected_option_index = math.max(0, selected_option_index - 1);
+        else if (key_state[D_DOWN] === KEY_WAS_DOWN)
+          selected_option_index = math.min(number_of_options - 1, selected_option_index + 1);
+        else if (key_state[A_BUTTON] === KEY_WAS_DOWN)
+        {
+          if (selected_option_index === 0)
+          {
+            // Map
+            mode = 2;
+          }
+          else if (selected_option_index === 1)
+          {
+            // Inventory
+          }
+          else if (selected_option_index === 2)
+          {
+            // Summon
+            switch_to_scene(Combat._scene_id);
+          }
+          else if (selected_option_index === 3)
+          {
+            // Retreat
+            // TODO: Confirmation window / post level wrap up
+            switch_to_scene(Hub._scene_id);
+          }
+        }
+        else if (key_state[B_BUTTON] === KEY_WAS_DOWN)
+        {
+          selected_option_index = 0;
+          mode = 1;
+        }
+      }
+      else if (mode === 1)
+      {
+        if (key_state[A_BUTTON] === KEY_WAS_DOWN || key_state[B_BUTTON] === KEY_WAS_DOWN)
+          mode = 0;
+
+        let target: number[] | null = null;
+        if (key_state[D_UP] === KEY_WAS_DOWN)
+          target = [player_position[0], player_position[1] - 16 * 9];
+        else if (key_state[D_DOWN] === KEY_WAS_DOWN)
+          target = [player_position[0], player_position[1] + 16 * 9];
+        else if (key_state[D_LEFT] === KEY_WAS_DOWN)
+          target = [player_position[0] - 16 * 11, player_position[1]];
+        else if (key_state[D_RIGHT] === KEY_WAS_DOWN)
+          target = [player_position[0] + 16 * 11, player_position[1]];
+        if (target)
+        {
+          const targetRoom: V2 = [Math.floor(target[0] / 16 / 11), Math.floor(target[1] / 16 / 9)];
+          const room = current_level._rooms[targetRoom[1] * 10 + targetRoom[0]];
+          if (room)
+          {
+            add_interpolator(INTERP_CAMERA_MOVEMENT, 750, camera, target, null, ease_out_quad);
+            add_interpolator(INTERP_PLAYER_MOVEMENT, 1000, player_position, target, null, linear);
+          }
+        }
+      }
+      else if (mode === 2)
+      {
+        if (key_state[A_BUTTON] === KEY_WAS_DOWN || key_state[B_BUTTON] === KEY_WAS_DOWN)
+          mode = 0;
       }
     }
   };
@@ -61,10 +143,9 @@ export namespace Dungeon
   {
     let camera_top_left: V2 = [camera[0] - camera_half_width, camera[1] - camera_half_height];
     let camera_bottom_right: V2 = [camera[0] + camera_half_width, camera[1] + camera_half_height];
-    let current_level = game_state[GAMESTATE_CURRENT_DUNGEON];
 
-    let player_tile_x = math.floor(current_level._player_position[0] / 16);
-    let player_tile_y = math.floor(current_level._player_position[1] / 16);
+    let player_tile_x = math.floor(player_position[0] / 16);
+    let player_tile_y = math.floor(player_position[1] / 16);
 
     let player_room_x = math.floor(player_tile_x / 11);
     let player_room_y = math.floor(player_tile_y / 9);
@@ -91,17 +172,24 @@ export namespace Dungeon
           let renderX = tileX * 16 - camera_top_left[0] - 8;
           let renderY = tileY * 16 - camera_top_left[1] - 12;
 
-          // TODO: Add floor and wall variations based on tile Id
-          let colour = current_level._tile_map[tileY * 110 + tileX] <= 4 ? 0xFF222222 : 0xFF777777;
-          push_quad(renderX, renderY, 16, 16, colour);
+          let tile = current_level._tile_map[tileY * 110 + tileX];
+          if (tile > 1 && tile < 5)
+            push_textured_quad(tile - 2 + TEXTURE_WALL_0, renderX, renderY, { _palette_offset: 2 });
+          else if (tile > 4)
+            push_quad(renderX, renderY, 16, 16, 0xFF1f1f1f);
+          else
+            push_quad(renderX, renderY, 16, 16, BLACK);
+
+          if (tile > 5)
+            push_textured_quad(tile - 6 + TEXTURE_FLOOR_0, renderX, renderY);
 
           // Lighting
           let distance = math.sqrt((player_tile_x - tileX) ** 2 + (player_tile_y - tileY) ** 2);
-          if (distance >= 7)
-            push_quad(renderX, renderY, 16, 16, 0xDD000000);
-          else if (distance >= 5)
+          if (distance >= 8)
+            push_quad(renderX, renderY, 16, 16, BLACK);
+          else if (distance >= 6)
             push_quad(renderX, renderY, 16, 16, 0xBD000000);
-          else if (distance >= 3)
+          else if (distance >= 4)
             push_quad(renderX, renderY, 16, 16, 0x7F000000);
           else if (distance >= 2)
             push_quad(renderX, renderY, 16, 16, 0x40000000);
@@ -109,41 +197,45 @@ export namespace Dungeon
       }
     }
 
-    push_quad(current_level._player_position[0] - camera_top_left[0] - 8, current_level._player_position[1] - camera_top_left[1] - 12, 16, 16, 0xFFFFFFFF);
+    // Render Player
+    push_textured_quad(TEXTURE_ROBED_MAN_0 + frame, player_position[0] - camera_top_left[0] - 8, player_position[1] - camera_top_left[1] - 12, { _palette_offset: 5 });
 
-    for (let y = 0; y < 8; y++)
+    if (mode === 0)
     {
-      for (let x = 1; x <= 9; x++)
+      render_panel(SCREEN_WIDTH - 194, 0, 194, 154);
+      render_text_menu([SCREEN_WIDTH - 97, 15], menu_options, number_of_options, selected_option_index);
+    }
+    else if (mode === 2)
+    {
+      // Map Render
+      let x_offset = SCREEN_CENTER_X - 81;
+      let y_offset = SCREEN_CENTER_Y - 72;
+      render_panel(x_offset - 52, y_offset - 52, 266, 248);
+
+      for (let y = 0; y < 8; y++)
       {
-        const current_room = current_level._rooms[y * 10 + x];
-        if (player_room_x === x && player_room_y === y)
+        for (let x = 1; x <= 9; x++)
         {
-          if (frame)
-            push_quad(x * 18 + 1, y * 18 + 1 + 200, 16, 16, 0xFFEEEEEE);
-          else
-            push_quad(x * 18 + 1, y * 18 + 1 + 200, 16, 16, 0xFF666666);
-        }
-        else if (current_room?._seen)
-        {
-          push_quad(x * 18 + 1, y * 18 + 1 + 200, 16, 16, 0xFF666666);
-        }
-        else if (current_room?._peeked)
-        {
-          push_quad(x * 18 + 1, y * 18 + 1 + 200, 16, 16, 0xFF333333);
+          let render_x = x - 1;
+          const current_room = current_level._rooms[y * 10 + x];
 
-          if (current_room?._enemy && !current_room?._exit)
-          {
-            push_quad(x * 18 + 1, y * 18 + 1 + 200, 16, 16, 0xFF0000FF);
-          }
-        }
+          let colour: number = 0;
+          if (player_room_x === x && player_room_y === y)
+            colour = frame ? 0xFFEEEEEE : 0xFF666666;
+          else if ((current_room?._seen || current_room?._peeked) && current_room?._exit)
+            colour = 0xFF00FF00;
+          else if (current_room?._seen)
+            colour = 0xFF666666;
+          else if (current_room?._peeked)
+            colour = (current_room?._enemy) ? 0xFF0000FF : 0xFF333333;
 
-        if ((current_room?._seen || current_room?._peeked) && current_room?._exit)
-        {
-          push_quad(x * 18 + 1, y * 18 + 1 + 200, 16, 16, 0xFF00FF00);
-        }
+          if (colour)
+            push_quad(render_x * 18 + 1 + x_offset, y * 18 + 1 + y_offset, 16, 16, colour);
+        };
       }
     }
+    render_player_status();
   };
   export let _scene_id = get_next_scene_id();
-  export let _scene: Scene = { _scene_id, _setup_fn, _reset_fn, _update_fn, _render_fn };
+  export let _scene: Scene = { _scene_id, _reset_fn, _update_fn, _render_fn };
 }

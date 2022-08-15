@@ -1,4 +1,5 @@
 import { gl_push_textured_quad, gl_restore, gl_save, gl_scale, gl_translate } from "gl";
+import { WHITE } from "./colour";
 
 import { Texture, TEXTURES } from "./texture/texture";
 
@@ -22,7 +23,7 @@ let default_texture_quad_parameters = {
   _horizontal_flip: false,
   _vertical_flip: false,
   _scale: 1,
-  _colour: 0xFFFFFFFF
+  _colour: WHITE
 };
 export let push_textured_quad = (texture_id: number, x: number, y: number, parameters: TextureQuadParameters = default_texture_quad_parameters): void =>
 {
@@ -30,7 +31,7 @@ export let push_textured_quad = (texture_id: number, x: number, y: number, param
   let horizontal_flip = parameters._horizontal_flip || false;
   let vertical_flip = parameters._vertical_flip || false;
   let scale = parameters._scale || 1;
-  let colour = parameters._colour || 0xFFFFFFFF;
+  let colour = parameters._colour || WHITE;
 
   let texture = TEXTURES[texture_id];
   gl_save();

@@ -1,4 +1,4 @@
-import { abgr_number_to_abgr_v4, abgr_v4_to_abgr_number } from "@graphics/colour";
+import { abgr_number_to_abgr_v4, abgr_v4_to_abgr_number, BLACK } from "@graphics/colour";
 import { add_interpolator, get_interpolation_data, has_interpolation_data } from "@root/interpolate";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
 
@@ -10,7 +10,6 @@ import { save_game } from "@root/game-state";
 
 export type Scene = {
     _scene_id: number;
-    _setup_fn: () => void;
     _reset_fn: () => void;
     _update_fn: (now: number, delta: number) => void;
     _render_fn: () => void;
@@ -29,7 +28,6 @@ export let get_next_scene_id = (): number => next_scene_id++;
 export let register_scene = (scene: Scene): void =>
 {
     scenes.set(scene._scene_id, scene);
-    scene._setup_fn();
 
     if (!current_scene)
     {
@@ -39,7 +37,7 @@ export let register_scene = (scene: Scene): void =>
     }
 };
 
-export let switch_to_scene = (sceneId: number, transitionDuration: number = 250, fadeColor: number = 0xFF000000): void =>
+export let switch_to_scene = (sceneId: number, transitionDuration: number = 250, fadeColor: number = BLACK): void =>
 {
     let [_, b, g, r] = abgr_number_to_abgr_v4(fadeColor);
     bgr = [b, g, r];

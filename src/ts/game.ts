@@ -1,7 +1,8 @@
 import { initialize_fps_meter, performance_mark, tick_fps_meter } from "@debug/fps-meter";
+import { BLACK, WHITE } from "@graphics/colour";
 import { push_text } from "@graphics/text";
 import { load_options } from "@root/game-state";
-import { initialize_input, input_context, is_touch, render_controls, update_hardware_input } from "@root/input/controls";
+import { initialize_input, is_touch_event, render_controls, update_hardware_input } from "@root/input/controls";
 import { initialze_interpolation_system, update_interpolation_system } from "@root/interpolate";
 import { initialize_particle_system, render_particle_system, update_particle_system } from "@root/particle-system";
 import { register_scene, render_scene, update_scene } from "@root/scene";
@@ -32,12 +33,11 @@ window_reference.addEventListener('load', async () =>
   let playing = false;
   let initialize_game = (e: PointerEvent | TouchEvent) =>
   {
-    input_context._is_touch = is_touch(e);
-
     setTimeout(() =>
     {
       if (!playing)
       {
+        is_touch_event(e);
         canvas_reference.removeEventListener("pointerdown", initialize_game);
         canvas_reference.removeEventListener("touchstart", initialize_game);
         playing = true;
@@ -110,7 +110,7 @@ window_reference.addEventListener('load', async () =>
         colour_bit = !colour_bit;
         elasped_time = 0;
       }
-      push_text("touch to play", SCREEN_CENTER_X, SCREEN_CENTER_Y, { _align: TEXT_ALIGN_CENTER, _colour: colour_bit ? 0xFFFFFFFF : 0xFF000000 });
+      push_text("touch to play", SCREEN_CENTER_X, SCREEN_CENTER_Y, { _align: TEXT_ALIGN_CENTER, _colour: colour_bit ? WHITE : BLACK });
       gl_flush();
     }
   };

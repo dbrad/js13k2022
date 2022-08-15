@@ -27,4 +27,5 @@ release:
 	yarn html-inline -i ./build/release/index.html -o ./dist/src/index.html
 	tools/7z/7za a -tzip dist/game.zip ./dist/src/*
 	tools/ect-0.8.3.exe -9 -zip dist/game.zip
+	tools/cloc-1.86 ./src/ts
 	node scripts/check-file-size.js

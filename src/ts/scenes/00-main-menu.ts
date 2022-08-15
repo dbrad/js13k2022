@@ -16,7 +16,6 @@ export namespace MainMenu
     "options"
   ];
 
-  let _setup_fn = () => { };
   let _reset_fn = () =>
   {
     set_key_pulse_time([D_UP, D_DOWN], 250);
@@ -38,11 +37,11 @@ export namespace MainMenu
     if (DEBUG)
       remaining_seconds = timer_end - Date.now() / 1000;
 
-    if (key_state.get(D_UP) === KEY_WAS_DOWN)
+    if (key_state[D_UP] === KEY_WAS_DOWN)
       selected_option_index = math.max(0, selected_option_index - 1);
-    else if (key_state.get(D_DOWN) === KEY_WAS_DOWN)
+    else if (key_state[D_DOWN] === KEY_WAS_DOWN)
       selected_option_index = math.min(number_of_options - 1, selected_option_index + 1);
-    else if (key_state.get(A_BUTTON) === KEY_WAS_DOWN)
+    else if (key_state[A_BUTTON] === KEY_WAS_DOWN)
     {
       if (number_of_options == 3 && selected_option_index == 0)
       {
@@ -76,5 +75,5 @@ export namespace MainMenu
   };
 
   export let _scene_id = get_next_scene_id();
-  export let _scene: Scene = { _scene_id, _setup_fn, _reset_fn, _update_fn, _render_fn };
+  export let _scene: Scene = { _scene_id, _reset_fn, _update_fn, _render_fn };
 }

@@ -1,0 +1,81 @@
+The file is under the limit.
+USED: 72.89 % |  9703 BYTES
+LEFT: 27.11 % |  3609 BYTES
+
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+TypeScript                      44            394             43           2728
+-------------------------------------------------------------------------------
+SUM:                            44            394             43           2728
+-------------------------------------------------------------------------------
+
+
+keep numbers low
+small hp pools, small damage numbers
+Items
+  gems from bosses that add element to attack
+  weapon, make 1 per element, update from lvl 1 to 3?
+    does 1 dmg per lvl + 1 element dmg per level (weak enemies take double element, same element take 0 from element)
+  staff, + to spell level of choice (can exceed max of lvl 3?)
+  ring = + to attrib bonueses (can exceed max), or holy give +1 passive defense
+
+summon is no mp, just mats
+mp regen?
+
+- Tombs (Intro/Basic) - Undead, tomb robbers, villagers (lvl 5-10)
+- Hot Caves (Fire) - Burning Undead - get lvl 2 dagger  (lvl 10-20)
+- Ice Caverns (Ice) - Frost undead, Straggler Templars (lvl 20-30)
+- Templars Expedition (Holy) - Templar knights and clerics, holy undead - get level 3 dagger (lvl 30-40)
+- The Abyss (Dark) - Strong undead with shadow magic (Debuffs) (lvl 40-45)
+- Throne of the First Lich - Mixed Parties + Final Boss (lvl 45-50)
+
+Skeletons: Does Physical, Immune to Burn, weak vs physical, immune vs magic
+Zombie: Does Physical, Immune to Freeze, normal vs physical, normal vs magic
+Spirit: Does Magic, Immune to Blind, immune vs physical, weak vs magic
+
+Player
+  hp
+  max hp
+  mp
+  max MP
+  xp
+  level
+  pending_level
+  weapon_level
+  defense
+  magic_levels[]
+  summon_levels[]
+    hp
+    atk
+    def
+  summons[]
+  gems_unlock
+  gems_assigned
+  Bones
+  Flesh
+  Souls
+
+Summon
+  type
+  hp
+  max hp
+  attack
+  defense
+
+Enemy
+  type
+  hp
+  max hp
+  attack
+  defense
+  element
+  level()
+  ai stuff
+  intent
+
+Entity Types
+  Living
+  Skeleton
+  Zombie
+  Spirit

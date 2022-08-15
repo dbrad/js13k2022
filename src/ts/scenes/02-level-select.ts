@@ -13,19 +13,21 @@ export namespace LevelSelect
     "continue",
   ];
 
-  let _setup_fn = () => { };
-  let _reset_fn = () => { };
+  let _reset_fn = () =>
+  {
+    // TODO: update menu options based on game progress
+  };
   let _update_fn = (now: number, delta: number) =>
   {
-    if (key_state.get(D_UP) === KEY_WAS_DOWN)
+    if (key_state[D_UP] === KEY_WAS_DOWN)
       selected_option_index = math.max(0, selected_option_index - 1);
-    else if (key_state.get(D_DOWN) === KEY_WAS_DOWN)
+    else if (key_state[D_DOWN] === KEY_WAS_DOWN)
       selected_option_index = math.min(number_of_options - 1, selected_option_index + 1);
-    else if (key_state.get(A_BUTTON) === KEY_WAS_DOWN)
+    else if (key_state[A_BUTTON] === KEY_WAS_DOWN)
     {
       if (selected_option_index === 0)
       {
-        generate_level(9);
+        generate_level(8);
         switch_to_scene(Dungeon._scene_id);
       }
     }
@@ -35,5 +37,5 @@ export namespace LevelSelect
     render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y], menu_options, number_of_options, selected_option_index);
   };
   export let _scene_id = get_next_scene_id();
-  export let _scene: Scene = { _scene_id, _setup_fn, _reset_fn, _update_fn, _render_fn };
+  export let _scene: Scene = { _scene_id, _reset_fn, _update_fn, _render_fn };
 }

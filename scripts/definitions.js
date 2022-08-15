@@ -9,6 +9,21 @@ const TEXTURES = {
   TEXTURE_SINGLE_WHITE_PIXEL: texture_id++,
   TEXTURE_WHITE_CIRCLE: texture_id++,
   TEXTURE_D_PAD: texture_id++,
+  TEXTURE_ROBED_MAN_0: texture_id++,
+  TEXTURE_ROBED_MAN_1: texture_id++,
+  TEXTURE_BANDIT_0: texture_id++,
+  TEXTURE_BANDIT_1: texture_id++,
+  TEXTURE_SKELETON_0: texture_id++,
+  TEXTURE_SKELETON_1: texture_id++,
+  TEXTURE_ZOMBIE_0: texture_id++,
+  TEXTURE_ZOMBIE_1: texture_id++,
+  TEXTURE_WALL_0: texture_id++,
+  TEXTURE_WALL_1: texture_id++,
+  TEXTURE_WALL_2: texture_id++,
+  TEXTURE_WALL_3: texture_id++,
+  TEXTURE_FLOOR_0: texture_id++,
+  TEXTURE_FLOOR_1: texture_id++,
+  TEXTURE_FLOOR_2: texture_id++,
 };
 
 const FONTS = {
@@ -45,8 +60,7 @@ const CONTROLS = {
   D_DOWN: 3,
   A_BUTTON: 4,
   B_BUTTON: 5,
-  START_BUTTON: 6,
-  
+
   KEY_IS_UP: 0,
   KEY_WAS_DOWN: 1,
   KEY_IS_DOWN: 2,

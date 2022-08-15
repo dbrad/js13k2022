@@ -3,6 +3,7 @@ import { SCREEN_WIDTH } from "@root/screen";
 import { gl_push_textured_quad, gl_restore, gl_save, gl_scale, gl_translate } from "gl";
 import { math } from "math";
 import { TEXTURES } from "texture";
+import { WHITE } from "./colour";
 
 const font_sizes: Map<number, number> = new Map([[FONT_NORMAL, 8], [FONT_SMALL, 5]]);
 
@@ -16,7 +17,7 @@ export type TextParameters =
   };
 
 let default_text_parameters = {
-  _colour: 0xFFFFFFFF,
+  _colour: WHITE,
   _align: TEXT_ALIGN_LEFT,
   _scale: 1,
   _width: SCREEN_WIDTH,
@@ -71,7 +72,7 @@ export let character_code_map: Map<string, number> = new Map();
 
 export let push_text = (text: string, x: number, y: number, parameters: TextParameters = default_text_parameters): void =>
 {
-  let colour = parameters._colour || 0xFFFFFFFF;
+  let colour = parameters._colour || WHITE;
   let align = parameters._align || TEXT_ALIGN_LEFT;
   let scale = parameters._scale || 1;
   let width = parameters._width || SCREEN_WIDTH;

@@ -7,33 +7,48 @@ export type GameState = [
   Level // GAMESTATE_CURRENT_DUNGEON
 ];
 
-export type EquipmentSlots = [];
-export type SpellUnlocks = [];
-export type MetaPlayer = [
-  number, // META_PLAYER_LEVEL
-  number, // META_PLAYER_XP
-  number, // META_PLAYER_MAX_HP
-  number, // META_PLAYER_MAX_MP
-  number, // META_PLAYER_GOLD
-  number, // META_PLAYER_METALS
-  number, // META_PLAYER_GEMS
-  number, // META_PLAYER_BONES
-  number, // META_PLAYER_FLESH
-  number, // META_PLAYER_SOULS
+export type Player = [
+  number, // PLAYER_XP
+  number, // PLAYER_LEVEL
+  boolean, // PLAYER_LEVEL_PENDING
+  number, // PLAYER_HP
+  number, // PLAYER_MAX_HP
+  number, // PLAYER_MP
+  number, // PLAYER_MAX_MP
+  number, // PLAYER_WEAPON_LEVEL
+  number, // PLAYER_DEFENSE
+  boolean[], // PLAYER_DEBUFFS
+  number[], // PLAYER_MAGIC_LEVELS
+  number[], // PLAYER_SKELETON_LEVELS
+  number[], // PLAYER_ZOMBIE_LEVELS
+  number[], // PLAYER_SPIRIT_LEVELS
+  Summon[], // PLAYER_ACTIVE_SUMMONS
+  boolean[], // PLAYER_GEM_UNLOCKED
+  number[], // PLAYER_GEM_EQUIPED
+  number, // PLAYER_BONES
+  number, // PLAYER_FLESH
+  number, // PLAYER_SOULS
 ];
 
-type DungeonPlayer = {
-  _health: number,
-  _mana: number,
-};
-export type Enemy = {
-  _alive: boolean,
-  _health: number,
-  _maxHealth: number,
-  _attack: number,
-  _defense: number,
-  _abilities: number[];
-};
+export type Summon = [
+  number, // SUMMON_TYPE
+  number, // SUMMON_HP
+  boolean[], // SUMMON_DEBUFFS
+];
+
+export type Enemy = [
+  number, // ENEMY_TYPE
+  boolean, // ENEMY_ALIVE
+  number, // ENEMY_HP
+  boolean[], // ENEMY_DEBUFFS
+  Intent, // ENEMY_INTENT
+];
+
+type Intent = [
+  number, // INTENT_TYPE
+  number, // INTENT_VALUE
+];
+
 export type Room = {
   _seen: boolean,
   _peeked: boolean,
@@ -42,12 +57,14 @@ export type Room = {
   _loot: [];
   _events: [];
 };
-type Level = {
+
+export type Level = {
   _difficulty: number,
   _tile_map: Int8Array,
   _player_position: V2,
   _rooms: Room[],
 };
+
 const nullLevel: Level = {
   _difficulty: 0,
   _tile_map: new Int8Array(),

@@ -4,25 +4,23 @@ import { V2 } from "@math/vector";
 import { canvas_reference, document_reference, request_fullscreen, SCREEN_HEIGHT, SCREEN_WIDTH, window_reference } from "@root/screen";
 import { is_point_in_circle, is_point_in_rect, math } from "math";
 
-let hardware_key_state: Map<number, number> = new Map([
-    [D_LEFT, KEY_IS_UP],
-    [D_UP, KEY_IS_UP],
-    [D_RIGHT, KEY_IS_UP],
-    [D_DOWN, KEY_IS_UP],
-    [A_BUTTON, KEY_IS_UP],
-    [B_BUTTON, KEY_IS_UP],
-    [START_BUTTON, KEY_IS_UP],
-]);
+let hardware_key_state: number[] = [
+    KEY_IS_UP, // D_LEFT
+    KEY_IS_UP, // D_UP
+    KEY_IS_UP, // D_RIGHT
+    KEY_IS_UP, // D_DOWN
+    KEY_IS_UP, // A_BUTTON
+    KEY_IS_UP, // B_BUTTON
+];
 
-export let key_state: Map<number, number> = new Map([
-    [D_LEFT, KEY_IS_UP],
-    [D_UP, KEY_IS_UP],
-    [D_RIGHT, KEY_IS_UP],
-    [D_DOWN, KEY_IS_UP],
-    [A_BUTTON, KEY_IS_UP],
-    [B_BUTTON, KEY_IS_UP],
-    [START_BUTTON, KEY_IS_UP],
-]);
+export let key_state: number[] = [
+    KEY_IS_UP, // D_LEFT
+    KEY_IS_UP, // D_UP
+    KEY_IS_UP, // D_RIGHT
+    KEY_IS_UP, // D_DOWN
+    KEY_IS_UP, // A_BUTTON
+    KEY_IS_UP, // B_BUTTON
+];
 
 let key_map: Record<string, number> = {
     "ArrowLeft": D_LEFT,
@@ -31,24 +29,16 @@ let key_map: Record<string, number> = {
     "ArrowDown": D_DOWN,
     "KeyX": A_BUTTON,
     "KeyC": B_BUTTON,
-    "Enter": START_BUTTON,
 };
 
 let gamepad: Gamepad | null = null;
 
-export type InputContext = {
-    _is_touch: boolean;
-};
-
-export let input_context: InputContext = {
-    _is_touch: false
-};
-
+let is_touch: boolean = false;
 let touches: V2[] = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
 
-export let is_touch = (e: Event | PointerEvent | TouchEvent): e is TouchEvent =>
+export let is_touch_event = (e: Event | PointerEvent | TouchEvent): void =>
 {
-    return (e.type[0] === "t");
+    is_touch = (e.type[0] === "t");
 };
 
 let set_touch_position = (e: TouchEvent): void =>
@@ -56,7 +46,7 @@ let set_touch_position = (e: TouchEvent): void =>
     if (!document_reference.fullscreenElement) request_fullscreen();
 
     let canvas_bounds = canvas_reference.getBoundingClientRect();
-    input_context._is_touch = input_context._is_touch || is_touch(e);
+    is_touch_event(e);
     for (let i = 0; i < 7; i++)
     {
         let touch = e.touches[i];
@@ -90,7 +80,7 @@ export let initialize_input = (): void =>
         if (is_mapped_key(key))
         {
             e.preventDefault();
-            hardware_key_state.set(key, KEY_IS_DOWN);
+            hardware_key_state[key] = KEY_IS_DOWN;
         }
     });
     document_reference.addEventListener("keyup", (e: KeyboardEvent) =>
@@ -99,7 +89,7 @@ export let initialize_input = (): void =>
         if (is_mapped_key(key))
         {
             e.preventDefault();
-            hardware_key_state.set(key, KEY_IS_UP);
+            hardware_key_state[key] = KEY_IS_UP;
         }
     });
     window_reference.addEventListener("gamepadconnected", () =>
@@ -125,21 +115,19 @@ let button_text_options: TextParameters = { _scale: 3, _colour: 0X99A0A0A0, _fon
 
 let [a_button_x, a_button_y] = [SCREEN_WIDTH - button_size - 80, SCREEN_HEIGHT - button_size - 100];
 let [b_button_x, b_button_y] = [SCREEN_WIDTH - button_size - 20, SCREEN_HEIGHT - button_size - 120];
-let [start_button_x, start_button_y] = [SCREEN_WIDTH - button_size - 20, SCREEN_HEIGHT - button_size - 200];
 
 export let update_hardware_input = (): void =>
 {
-    if (gamepad || input_context._is_touch)
+    if (gamepad || is_touch)
     {
-        hardware_key_state.set(A_BUTTON, KEY_IS_UP);
-        hardware_key_state.set(B_BUTTON, KEY_IS_UP);
-        hardware_key_state.set(START_BUTTON, KEY_IS_UP);
-        hardware_key_state.set(D_UP, KEY_IS_UP);
-        hardware_key_state.set(D_DOWN, KEY_IS_UP);
-        hardware_key_state.set(D_LEFT, KEY_IS_UP);
-        hardware_key_state.set(D_RIGHT, KEY_IS_UP);
+        hardware_key_state[A_BUTTON] = KEY_IS_UP;
+        hardware_key_state[B_BUTTON] = KEY_IS_UP;
+        hardware_key_state[D_UP] = KEY_IS_UP;
+        hardware_key_state[D_DOWN] = KEY_IS_UP;
+        hardware_key_state[D_LEFT] = KEY_IS_UP;
+        hardware_key_state[D_RIGHT] = KEY_IS_UP;
     }
-    if (input_context._is_touch)
+    if (is_touch)
     {
         for (let i = 0; i < 7; i++)
         {
@@ -147,26 +135,23 @@ export let update_hardware_input = (): void =>
 
             // D-pad Checks
             if (is_point_in_rect([x, y], [dpad_x, dpad_y, dpad_size, dpad_touch_center]))
-                hardware_key_state.set(D_UP, KEY_IS_DOWN);
+                hardware_key_state[D_UP] = KEY_IS_DOWN;
 
             if (is_point_in_rect([x, y], [dpad_x, dpad_y + dpad_touch_center * 2, dpad_size, dpad_touch_center]))
-                hardware_key_state.set(D_DOWN, KEY_IS_DOWN);
+                hardware_key_state[D_DOWN] = KEY_IS_DOWN;
 
             if (is_point_in_rect([x, y], [dpad_x, dpad_y, dpad_touch_center, dpad_size]))
-                hardware_key_state.set(D_LEFT, KEY_IS_DOWN);
+                hardware_key_state[D_LEFT] = KEY_IS_DOWN;
 
             if (is_point_in_rect([x, y], [dpad_x + dpad_touch_center * 2, dpad_y, dpad_touch_center, dpad_size]))
-                hardware_key_state.set(D_RIGHT, KEY_IS_DOWN);
+                hardware_key_state[D_RIGHT] = KEY_IS_DOWN;
 
             // Button Checks
             if (is_point_in_circle([x, y], [a_button_x + half_button_size, a_button_y + half_button_size], half_button_size))
-                hardware_key_state.set(A_BUTTON, KEY_IS_DOWN);
+                hardware_key_state[A_BUTTON] = KEY_IS_DOWN;
 
             if (is_point_in_circle([x, y], [b_button_x + half_button_size, b_button_y + half_button_size], half_button_size))
-                hardware_key_state.set(B_BUTTON, KEY_IS_DOWN);
-
-            if (is_point_in_rect([x, y], [start_button_x, start_button_y, button_size, 20]))
-                hardware_key_state.set(START_BUTTON, KEY_IS_DOWN);
+                hardware_key_state[B_BUTTON] = KEY_IS_DOWN;
         }
     }
     if (gamepad)
@@ -175,35 +160,33 @@ export let update_hardware_input = (): void =>
         let axes = gamepad.axes;
 
         if (buttons[12].pressed || axes[1] < -0.1)
-            hardware_key_state.set(D_UP, KEY_IS_DOWN);
+            hardware_key_state[D_UP] = KEY_IS_DOWN;
 
         if (buttons[13].pressed || axes[1] > 0.1)
-            hardware_key_state.set(D_DOWN, KEY_IS_DOWN);
+            hardware_key_state[D_DOWN] = KEY_IS_DOWN;
 
         if (buttons[14].pressed || axes[0] > 0.1)
-            hardware_key_state.set(D_LEFT, KEY_IS_DOWN);
+            hardware_key_state[D_LEFT] = KEY_IS_DOWN;
 
         if (buttons[15].pressed || axes[0] < -0.1)
-            hardware_key_state.set(D_RIGHT, KEY_IS_DOWN);
+            hardware_key_state[D_RIGHT] = KEY_IS_DOWN;
 
         if (buttons[0].pressed)
-            hardware_key_state.set(A_BUTTON, KEY_IS_DOWN);
+            hardware_key_state[A_BUTTON] = KEY_IS_DOWN;
 
         if (buttons[1].pressed)
-            hardware_key_state.set(B_BUTTON, KEY_IS_DOWN);
-
-        if (buttons[9].pressed)
-            hardware_key_state.set(START_BUTTON, KEY_IS_DOWN);
+            hardware_key_state[B_BUTTON] = KEY_IS_DOWN;
     }
 };
 
 export let update_input_system = (now: number, delta: number): void =>
 {
-    for (let [key, hardware_key_value] of hardware_key_state)
+    for (let key = 0; key <= 5; key++) 
     {
+        let hardware_key_value = hardware_key_state[key];
         if (hardware_key_value === KEY_IS_DOWN)
         {
-            key_state.set(key, KEY_IS_DOWN);
+            key_state[key] = KEY_IS_DOWN;
 
             if (interval_durations[key] > 0)
             {
@@ -211,38 +194,38 @@ export let update_input_system = (now: number, delta: number): void =>
                 if (interval_timers[key] >= interval_durations[key])
                 {
                     interval_timers[key] = 0;
-                    key_state.set(key, KEY_WAS_DOWN);
+                    key_state[key] = KEY_WAS_DOWN;
                 }
             }
         }
         else
         {
             interval_timers[key] = 0;
-            if (key_state.get(key) === KEY_IS_DOWN)
-                key_state.set(key, KEY_WAS_DOWN);
-            else if (key_state.get(key) === KEY_WAS_DOWN)
-                key_state.set(key, KEY_IS_UP);
+            if (key_state[key] === KEY_IS_DOWN)
+                key_state[key] = KEY_WAS_DOWN;
+            else if (key_state[key] === KEY_WAS_DOWN)
+                key_state[key] = KEY_IS_UP;
         }
     }
 };
 
-let get_button_colour = (key: number): number => key_state.get(key) === KEY_IS_UP ? 0x993C3C3C : 0x99666666;
+let get_button_colour = (key: number): number => key_state[key] === KEY_IS_UP ? 0x993C3C3C : 0x99666666;
 export let render_controls = (): void =>
 {
-    if (input_context._is_touch)
+    if (is_touch)
     {
         push_textured_quad(TEXTURE_D_PAD, dpad_x, dpad_y, { _scale: dpad_scale, _colour: 0x99FFFFFF });
 
-        if (key_state.get(D_UP) !== KEY_IS_UP)
+        if (key_state[D_UP] !== KEY_IS_UP)
             push_quad(dpad_x, dpad_y, dpad_size, dpad_touch_center, 0x55FFFFFF);
 
-        if (key_state.get(D_DOWN) !== KEY_IS_UP)
+        if (key_state[D_DOWN] !== KEY_IS_UP)
             push_quad(dpad_x, dpad_y + dpad_touch_center * 2, dpad_size, dpad_touch_center, 0x55FFFFFF);
 
-        if (key_state.get(D_LEFT) !== KEY_IS_UP)
+        if (key_state[D_LEFT] !== KEY_IS_UP)
             push_quad(dpad_x, dpad_y, dpad_touch_center, dpad_size, 0x55FFFFFF);
 
-        if (key_state.get(D_RIGHT) !== KEY_IS_UP)
+        if (key_state[D_RIGHT] !== KEY_IS_UP)
             push_quad(dpad_x + dpad_touch_center * 2, dpad_y, dpad_touch_center, dpad_size, 0x55FFFFFF);
 
         push_textured_quad(TEXTURE_WHITE_CIRCLE, b_button_x, b_button_y, { ...button_options, _colour: get_button_colour(B_BUTTON) });
@@ -250,24 +233,20 @@ export let render_controls = (): void =>
 
         push_textured_quad(TEXTURE_WHITE_CIRCLE, a_button_x, a_button_y, { ...button_options, _colour: get_button_colour(A_BUTTON) });
         push_text("A", a_button_x + half_button_size, a_button_y + half_button_size - 7, button_text_options);
-
-        push_quad(start_button_x, start_button_y, button_size, 20, get_button_colour(START_BUTTON));
-        push_text("START", start_button_x + half_button_size, start_button_y + 7, { ...button_text_options, _scale: 1 });
     }
     else if (!gamepad)
     {
-        push_text("Arrow Keys / X: Action / C: Cancel / Enter: Start", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 8, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL, _colour: 0x66FFFFFF });
+        push_text("Arrow Keys / X: Action / C: Cancel", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 8, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL, _colour: 0x66FFFFFF });
     }
 
     if (false)
     {
-        push_text(`U: ${key_state.get(D_UP)}`, 0, 0, { _font: FONT_SMALL });
-        push_text(`D: ${key_state.get(D_DOWN)}`, 0, 6, { _font: FONT_SMALL });
-        push_text(`L: ${key_state.get(D_LEFT)}`, 0, 12, { _font: FONT_SMALL });
-        push_text(`R: ${key_state.get(D_RIGHT)}`, 0, 18, { _font: FONT_SMALL });
-        push_text(`A: ${key_state.get(A_BUTTON)}`, 0, 30, { _font: FONT_SMALL });
-        push_text(`B: ${key_state.get(B_BUTTON)}`, 0, 36, { _font: FONT_SMALL });
-        push_text(`S: ${key_state.get(START_BUTTON)}`, 0, 42, { _font: FONT_SMALL });
+        push_text(`U: ${key_state[D_UP]}`, 0, 0, { _font: FONT_SMALL });
+        push_text(`D: ${key_state[D_DOWN]}`, 0, 6, { _font: FONT_SMALL });
+        push_text(`L: ${key_state[D_LEFT]}`, 0, 12, { _font: FONT_SMALL });
+        push_text(`R: ${key_state[D_RIGHT]}`, 0, 18, { _font: FONT_SMALL });
+        push_text(`A: ${key_state[A_BUTTON]}`, 0, 30, { _font: FONT_SMALL });
+        push_text(`B: ${key_state[B_BUTTON]}`, 0, 36, { _font: FONT_SMALL });
     }
 };
 
@@ -285,11 +264,11 @@ export let set_key_pulse_time = (keys: number[], interval_duration: number): voi
 
 export let clear_input = (): void =>
 {
-    for (let [key, _] of key_state)
+    for (let key = 0; key <= 5; key++) 
     {
         interval_timers[key] = 0;
         interval_durations[key] = 0;
-        hardware_key_state.set(key, KEY_IS_UP);
-        key_state.set(key, KEY_IS_UP);
+        hardware_key_state[key] = KEY_IS_UP;
+        key_state[key] = KEY_IS_UP;
     }
 };
