@@ -4,7 +4,28 @@ import { set_zzfx_mute } from "./zzfx";
 
 export type GameState = [
   number[], // GAMESTATE_EVENTS
-  Level // GAMESTATE_CURRENT_DUNGEON
+  Level, // GAMESTATE_CURRENT_DUNGEON
+  Player, // GAMESTATE_PLAYER
+];
+
+type MagicLevels = [
+  number, // MAGIC_FIRE
+  number, // MAGIC_ICE
+  number, // MAGIC_HOLY
+  number, // MAGIC_SHADOW
+  number, // MAGIC_NECROMANCY
+];
+
+type SummonLevels = [
+  number, // SUMMON_MAX_HP
+  number, // SUMMON_ATTACK
+  number, // SUMMON_DEFENSE
+];
+
+export type Summon = [
+  number, // SUMMON_TYPE
+  number, // SUMMON_HP
+  boolean[], // SUMMON_DEBUFFS
 ];
 
 export type Player = [
@@ -18,10 +39,8 @@ export type Player = [
   number, // PLAYER_WEAPON_LEVEL
   number, // PLAYER_DEFENSE
   boolean[], // PLAYER_DEBUFFS
-  number[], // PLAYER_MAGIC_LEVELS
-  number[], // PLAYER_SKELETON_LEVELS
-  number[], // PLAYER_ZOMBIE_LEVELS
-  number[], // PLAYER_SPIRIT_LEVELS
+  MagicLevels, // PLAYER_MAGIC_LEVELS
+  SummonLevels[], // PLAYER_SUMMON_LEVELS
   Summon[], // PLAYER_ACTIVE_SUMMONS
   boolean[], // PLAYER_GEM_UNLOCKED
   number[], // PLAYER_GEM_EQUIPED
@@ -30,43 +49,61 @@ export type Player = [
   number, // PLAYER_SOULS
 ];
 
-export type Summon = [
-  number, // SUMMON_TYPE
-  number, // SUMMON_HP
-  boolean[], // SUMMON_DEBUFFS
-];
+let default_player: Player =
+  [
+    0,
+    1,
+    false,
+    10,
+    10,
+    5,
+    5,
+    1,
+    0,
+    [],
+    [1, 1, 1, 1, 1],
+    [[1, 1, 1], [1, 1, 1], [1, 1, 1]],
+    [],
+    [false, false, false, false],
+    [0, 0, 0, 0],
+    0,
+    0,
+    0,
+  ];
 
 export type Enemy = [
   number, // ENEMY_TYPE
+  number, // ENEMY_ELEMENT
   boolean, // ENEMY_ALIVE
+  number, // ENEMY_MAX_HP
   number, // ENEMY_HP
+  number, // ENEMY_ATTACK
+  number, // ENEMY_DEFENSE
   boolean[], // ENEMY_DEBUFFS
-  Intent, // ENEMY_INTENT
+  Enemy_Intent, // ENEMY_INTENT
 ];
 
-type Intent = [
-  number, // INTENT_TYPE
-  number, // INTENT_VALUE
+type Enemy_Intent = [
+  number, // ENEMY_INTENT_TYPE
+  number, // ENEMY_INTENT_VALUE
 ];
 
 export type Room = {
   _seen: boolean,
   _peeked: boolean,
   _exit: boolean,
-  _enemy: {} | null,
+  _enemies: Enemy[],
   _loot: [];
   _events: [];
 };
 
 export type Level = {
-  _difficulty: number,
   _tile_map: Int8Array,
   _player_position: V2,
   _rooms: Room[],
 };
 
-const nullLevel: Level = {
-  _difficulty: 0,
+const null_level: Level = {
   _tile_map: new Int8Array(),
   _player_position: [0, 0],
   _rooms: [],
@@ -84,7 +121,8 @@ export let setup_game_state = () =>
 
   game_state = [
     events,
-    nullLevel
+    null_level,
+    default_player
   ];
 };
 

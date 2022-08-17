@@ -20,6 +20,7 @@
       "@math/*": ["./src/ts/math/*"],
       "@input/*": ["./src/ts/input/*"],
       "@scenes/*": ["./src/ts/scenes/*"],
+      "@gameplay/*": ["./src/ts/gameplay/*"],
       "@root/*": ["./src/ts/*"],
       "@project_root/*": ["./*"]
     }

@@ -22,13 +22,12 @@ Items
 
 summon is no mp, just mats
 mp regen?
-
 - Tombs (Intro/Basic) - Undead, tomb robbers, villagers (lvl 5-10)
-- Hot Caves (Fire) - Burning Undead - get lvl 2 dagger  (lvl 10-20)
-- Ice Caverns (Ice) - Frost undead, Straggler Templars (lvl 20-30)
-- Templars Expedition (Holy) - Templar knights and clerics, holy undead - get level 3 dagger (lvl 30-40)
-- The Abyss (Dark) - Strong undead with shadow magic (Debuffs) (lvl 40-45)
-- Throne of the First Lich - Mixed Parties + Final Boss (lvl 45-50)
+- Hot Caves (Fire) - Burning Undead - get lvl 2 dagger  (lvl 10-15)
+- Ice Caverns (Ice) - Frost undead, Straggler Templars (lvl 15-20)
+- Templars Expedition (Holy) - Templar knights and clerics, holy undead - get level 3 dagger (lvl 20-25)
+- The Abyss (Dark) - Strong undead with shadow magic (Debuffs) (lvl 25-30)
+- Throne of the First Lich - Mixed Parties + Final Boss (lvl 30-35)
 
 Skeletons: Does Physical, Immune to Burn, weak vs physical, immune vs magic
 Zombie: Does Physical, Immune to Freeze, normal vs physical, normal vs magic

@@ -1,23 +1,24 @@
 Data
-  Player Data
-    Add Summon structure
   Currencies
-  Inventory
-  Items
+
+Summon System
+
+Gem Assign System
 
 Combat Scene
   - Tooltips for menus
   - Render Summons
 
-  - Render Enemies
-    - Make Enemy Node
-      HP Bar, Intent, Name, Sprite
-  
   Turn based
     Player selects action
     Player targets
     Defenders go first
     Player Attacks first, followed by Summons, followed by enemies in array order
+
+  Enemy AI??
+    Each enemy will have a pool of actions, shuffle, pop top as an Intent
+    Need the pool builder for each type
+    Will Attack Random Targets (target particle line?)
 
 Enemy placement in room: Remember direction of entrance?
 
@@ -35,3 +36,12 @@ Level Up Screen
   pops up on map after level up
   every level player assinged an Attribute (hp, mp, summon cap)
   every other level they also assing a spell point into fire, ice, holy, shadow, or necromancy
+
+Dialog
+  Add a Choice System
+
+Add events to event rooms
+
+Summon Level Up System
+
+Fixed unefined element bug

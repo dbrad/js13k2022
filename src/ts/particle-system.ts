@@ -81,6 +81,17 @@ export let update_particle_system = (now: number, delta: number): void =>
   }
 };
 
+export let clear_particle_system = (): void =>
+{
+  for (let i = 0; i < particle_pool_size; i++)
+  {
+    let particle = particle_pool[i];
+    if (!particle._active)
+      continue;
+    particle._active = false;
+  }
+};
+
 export let render_particle_system = () =>
 {
   for (let i = 0; i < particle_pool_size; i++)

@@ -1,5 +1,5 @@
+import { generate_level } from "@gameplay/level-gen";
 import { key_state } from "@input/controls";
-import { generate_level } from "@root/level-gen";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y } from "@root/screen";
@@ -27,7 +27,7 @@ export namespace LevelSelect
     {
       if (selected_option_index === 0)
       {
-        generate_level(8);
+        generate_level(1, 0);
         switch_to_scene(Dungeon._scene_id);
       }
     }

@@ -1,6 +1,7 @@
 import { assert } from "@debug/assert";
 import { math, random_int, shuffle } from "math";
-import { game_state, Room } from "./game-state";
+import { Enemy, game_state, Room } from "../game-state";
+import { get_enemy } from "./enemy-builder";
 
 let base_room_tiles = "122222222211555555555115555555551155555555511555555555115555555551155555555511555555555111111111111".split("").map(n => +n);
 
@@ -16,7 +17,6 @@ let room_tile_height = 9;
 let map_tile_width = 110;
 let map_tile_height = 72;
 
-let difficulty_muliplier = 0;
 
 let wall_deck: number[] = [];
 let get_next_wall_id = (): number =>
@@ -34,12 +34,12 @@ let get_next_floor_id = (): number =>
   return floor_deck.pop() ?? 5;
 };
 
-export let generate_level = (difficulty: number = 0): void =>
+export let generate_level = (chapter: number = 1, floor: number = 0): void =>
 {
-  difficulty_muliplier = difficulty;
+  let enemy_level = (chapter * 5) + (floor * 2);
 
   // Generate Room Layout
-  let number_of_rooms = math.floor(random_int(0, 2) + 5 + difficulty_muliplier * 2.6);
+  let number_of_rooms = math.floor(random_int(0, 2) + 5 + chapter * 2.6);
   let room_layout: number[] = [];
   let dead_end_rooms: number[] = [];
 
@@ -91,9 +91,7 @@ export let generate_level = (difficulty: number = 0): void =>
           room_count++;
         }
         if (!room_added)
-        {
           dead_end_rooms.push(room);
-        }
       }
     } while (room_queue.length > 0);
   }
@@ -164,9 +162,9 @@ export let generate_level = (difficulty: number = 0): void =>
     }
   }
 
-  // Generate Room Locations
+  // Generate Room Contents
   let rooms: Room[] = [];
-  let room_deck: Room[] = create_room_deck(number_of_rooms, dead_end_rooms.length);
+  let room_deck: Room[] = create_room_deck(number_of_rooms, dead_end_rooms.length, chapter, enemy_level);
   let shuffled_dead_end_rooms = shuffle(dead_end_rooms);
   for (let index of shuffled_dead_end_rooms)
   {
@@ -181,11 +179,11 @@ export let generate_level = (difficulty: number = 0): void =>
   {
     for (let rx = 1; rx <= map_room_width; rx++)
     {
-      let roomIndex = ry * 10 + rx;
-      if (room_layout[roomIndex] === 1 && roomIndex != 35)
+      let room_index = ry * 10 + rx;
+      if (room_layout[room_index] === 1 && room_index != 35)
       {
-        room_layout[roomIndex] = 2;
-        rooms[roomIndex] = room_deck.shift() || create_empty_room();
+        room_layout[room_index] = 2;
+        rooms[room_index] = room_deck.shift() || create_empty_room();
       }
     }
   }
@@ -193,64 +191,53 @@ export let generate_level = (difficulty: number = 0): void =>
   rooms[35]._seen = true;
 
   game_state[GAMESTATE_CURRENT_DUNGEON] = {
-    _difficulty: difficulty_muliplier,
     _player_position: [60 * 16, 31 * 16],
     _tile_map: tile_map,
     _rooms: rooms,
   };
 };
 
-let create_room_deck = (numberOfRooms: number, numberOfDeadEnds: number): Room[] =>
+let create_room_deck = (number_of_roooms: number, number_of_dead_ends: number, chapter: number, enemy_level: number): Room[] =>
 {
-  let roomDeck: Room[] = [];
-  numberOfDeadEnds -= 1;
-  roomDeck.push(create_boss_room(numberOfRooms));
+  let room_deck: Room[] = [];
+  number_of_dead_ends -= 1;
+  room_deck.push(create_boss_room());
 
-  let deadEndRooms: Room[] = [];
-  let numberOfChoices = math.max(0, math.ceil(numberOfDeadEnds * 0.5));
-  for (let i = 0; i < numberOfChoices; i++)
-  {
-    deadEndRooms.push(create_choice_room(numberOfRooms));
-  }
+  let dead_end_rooms: Room[] = [];
 
-  let numberOfBoonsOrCurses = math.max(0, math.ceil((numberOfDeadEnds - numberOfChoices) * 0.8));
-  for (let i = 0; i < numberOfBoonsOrCurses; i++)
-  {
-    deadEndRooms.push(create_event_room(numberOfRooms));
-  }
+  let number_of_choice_rooms = math.max(0, math.ceil(number_of_dead_ends * 0.5));
+  for (let i = 0; i < number_of_choice_rooms; i++)
+    dead_end_rooms.push(create_choice_room());
 
-  let numberOfDialogs = math.max(0, numberOfDeadEnds - numberOfChoices - numberOfBoonsOrCurses);
-  for (let i = 0; i < numberOfDialogs; i++)
-  {
-    deadEndRooms.push(create_empty_room());
-  }
+  let number_of_event_rooms = math.max(0, math.ceil((number_of_dead_ends - number_of_choice_rooms) * 0.8));
+  for (let i = 0; i < number_of_event_rooms; i++)
+    dead_end_rooms.push(create_event_room());
 
-  roomDeck.push(...shuffle(deadEndRooms));
+  let number_of_dead_end_combat = math.max(0, number_of_dead_ends - number_of_choice_rooms - number_of_event_rooms);
+  for (let i = 0; i < number_of_dead_end_combat; i++)
+    dead_end_rooms.push(create_combat_room(chapter, enemy_level));
 
-  let numberOfRoomsRemaining = numberOfRooms - numberOfChoices - numberOfBoonsOrCurses - numberOfDialogs;
-  let numberOfCombat = math.max(0, math.ceil(numberOfRoomsRemaining * 0.5));
-  let regularRooms: Room[] = [];
-  for (let i = 0; i < numberOfCombat; i++)
-  {
-    regularRooms.push(create_combat_room(numberOfRoomsRemaining));
-  }
+  room_deck.push(...shuffle(dead_end_rooms));
 
-  let numberOfMoney = math.max(0, math.ceil((numberOfRoomsRemaining - numberOfCombat) * 0.6));
-  for (let i = 0; i < numberOfMoney; i++)
-  {
-    regularRooms.push(create_empty_room());
-  }
+  let hallway_rooms: Room[] = [];
 
-  let numberOfTreasures = math.max(0, numberOfRoomsRemaining - numberOfCombat - numberOfMoney);
-  for (let i = 0; i < numberOfTreasures; i++)
-  {
-    regularRooms.push(create_loot_room(numberOfRoomsRemaining));
-  }
+  let rooms_remaining = number_of_roooms - number_of_choice_rooms - number_of_event_rooms - number_of_dead_end_combat;
+  let number_of_combat = math.max(0, math.ceil(rooms_remaining * 0.5));
+  for (let i = 0; i < number_of_combat; i++)
+    hallway_rooms.push(create_combat_room(chapter, enemy_level));
 
-  roomDeck.push(...shuffle(regularRooms));
+  let number_of_empty = math.max(0, math.ceil((rooms_remaining - number_of_combat) * 0.6));
+  for (let i = 0; i < number_of_empty; i++)
+    hallway_rooms.push(create_empty_room());
 
-  assert(numberOfRooms <= roomDeck.length, "Level generator did not make enough rooms!");
-  return roomDeck;
+  let number_of_hallway_events = math.max(0, rooms_remaining - number_of_combat - number_of_empty);
+  for (let i = 0; i < number_of_hallway_events; i++)
+    hallway_rooms.push(create_event_room());
+
+  room_deck.push(...shuffle(hallway_rooms));
+
+  assert(number_of_roooms <= room_deck.length, "Level generator did not make enough rooms!");
+  return room_deck;
 };
 
 let create_empty_room = (): Room =>
@@ -258,91 +245,62 @@ let create_empty_room = (): Room =>
   return {
     _seen: false,
     _peeked: false,
-    _enemy: null,
+    _enemies: [],
     _exit: false,
     _loot: [],
     _events: []
   };
 };
 
-let create_boss_room = (numberOfRooms: number): Room =>
+let create_choice_room = (): Room =>
 {
-  let hp = random_int(5 + difficulty_muliplier, 10 + difficulty_muliplier);
-  let atk = random_int(1, difficulty_muliplier);
-  let def = random_int(1, difficulty_muliplier);
+  return {
+    _seen: false,
+    _peeked: false,
+    _enemies: [],
+    _exit: false,
+    _loot: [],
+    _events: []
+  };
+};
+
+let create_event_room = (): Room =>
+{
+  return {
+    _seen: false,
+    _peeked: false,
+    _enemies: [],
+    _exit: false,
+    _loot: [],
+    _events: []
+  };
+};
+
+let create_combat_room = (chapter: number, enemy_level: number): Room =>
+{
+  let number_of_enemies = random_int(1, math.ceil(enemy_level / 10) + 1);
+  let level = number_of_enemies === 1 ? enemy_level + 1 : enemy_level;
+  let enemies: Enemy[] = [];
+  for (let i = 0; i < number_of_enemies; i++)
+    enemies.push(get_enemy(chapter, level));
 
   return {
     _seen: false,
     _peeked: false,
-    _enemy: {
-      alive: true,
-      health: hp,
-      maxHealth: hp,
-      attack: atk,
-      defense: def,
-      type: 0
-    },
+    _enemies: enemies,
+    _exit: false,
+    _loot: [],
+    _events: []
+  };
+};
+
+let create_boss_room = (): Room =>
+{
+  return {
+    _seen: false,
+    _peeked: false,
+    _enemies: [],
     _exit: true,
-    _loot: [],
-    _events: []
-  };
-};
-
-let create_choice_room = (numberOfRooms: number): Room =>
-{
-  return {
-    _seen: false,
-    _peeked: false,
-    _enemy: null,
-    _exit: false,
-    _loot: [],
-    _events: []
-  };
-};
-
-let create_event_room = (numberOfRooms: number): Room =>
-{
-  return {
-    _seen: false,
-    _peeked: false,
-    _enemy: null,
-    _exit: false,
-    _loot: [],
-    _events: []
-  };
-};
-
-let create_combat_room = (numberOfRooms: number): Room =>
-{
-  let hp = random_int(3 + difficulty_muliplier, 6 + difficulty_muliplier);
-  let atk = random_int(1, math.max(1, difficulty_muliplier - 1));
-  let def = random_int(0, difficulty_muliplier);
-
-  return {
-    _seen: false,
-    _peeked: false,
-    _enemy:
-    {
-      alive: true,
-      health: hp,
-      maxHealth: hp,
-      attack: atk,
-      defense: def,
-      type: 0
-    },
-    _exit: false,
-    _loot: [],
-    _events: []
-  };
-};
-
-let create_loot_room = (numberOfRooms: number): Room =>
-{
-  return {
-    _seen: false,
-    _peeked: false,
-    _enemy: null,
-    _exit: false,
     _loot: [],
     _events: []
   };
