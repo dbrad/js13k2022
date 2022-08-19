@@ -1,26 +1,22 @@
-Data
-  Currencies
-
 Summon System
 
-Gem Assign System
-
 Combat Scene
-  - Tooltips for menus
-  - Render Summons
-
   Turn based
     Player selects action
     Player targets
     Defenders go first
     Player Attacks first, followed by Summons, followed by enemies in array order
+    defend = 0
+    player = 1
+    summons = 2
+    enemy = 3
 
   Enemy AI??
     Each enemy will have a pool of actions, shuffle, pop top as an Intent
     Need the pool builder for each type
     Will Attack Random Targets (target particle line?)
 
-Enemy placement in room: Remember direction of entrance?
+NICE TO HAVE: Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
 
 XP Curves
   Paper Mario Style
@@ -38,10 +34,15 @@ Level Up Screen
   every other level they also assing a spell point into fire, ice, holy, shadow, or necromancy
 
 Dialog
-  Add a Choice System
+  Add a Choice System??
 
 Add events to event rooms
 
-Summon Level Up System
+Summon Level Up Systems
 
-Fixed unefined element bug
+COIL BONUS???
+
+Nice to Haves: Options, Inventory
+
+Palette based walls and floor variations
+custom font range loader to reduce character set

@@ -32,8 +32,10 @@ declare const SUMMON_ATTACK: 1;
 declare const SUMMON_DEFENSE: 2;
 
 declare const SUMMON_TYPE: 0;
-declare const SUMMON_HP: 1;
-declare const SUMMON_DEBUFFS: 2;
+declare const SUMMON_SLOT_ACTIVE: 1;
+declare const SUMMON_ALIVE: 2;
+declare const SUMMON_HP: 3;
+declare const SUMMON_DEBUFFS: 4;
 
 declare const SUMMON_TYPE_SKELETON: 0;
 declare const SUMMON_TYPE_ZOMBIE: 1;
@@ -45,24 +47,3 @@ declare const DEBUFF_BLIND: 2;
 declare const DEBUFF_ATTACK_DOWN: 3;
 declare const DEBUFF_DEFENSE_DOWN: 4;
 declare const DEBUFF_DEATH: 5;
-
-declare const ENEMY_TYPE: 0;
-declare const ENEMY_ELEMENT: 1;
-declare const ENEMY_ALIVE: 2;
-declare const ENEMY_MAX_HP: 3;
-declare const ENEMY_HP: 4;
-declare const ENEMY_ATTACK: 5;
-declare const ENEMY_DEFENSE: 6;
-declare const ENEMY_DEBUFFS: 7;
-declare const ENEMY_INTENT: 8;
-
-declare const ENEMY_INTENT_TYPE: 0;
-declare const ENEMY_INTENT_VALUE: 1;
-
-declare const ENEMY_INTENT_TYPE_NONE: 0;
-declare const ENEMY_INTENT_TYPE_ATTACK: 1;
-declare const ENEMY_INTENT_TYPE_BLOCK: 2;
-declare const ENEMY_INTENT_TYPE_FIRE: 3;
-declare const ENEMY_INTENT_TYPE_ICE: 4;
-declare const ENEMY_INTENT_TYPE_HOLY: 5;
-declare const ENEMY_INTENT_TYPE_SHADOW: 6;

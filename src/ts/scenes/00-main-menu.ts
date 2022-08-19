@@ -2,10 +2,11 @@ import { push_text } from "@graphics/text";
 import { key_state, set_key_pulse_time } from "@input/controls";
 import { has_save_file, load_game, setup_game_state } from "@root/game-state";
 import { render_text_menu } from "@root/nodes/text-menu";
-import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
+import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT } from "@root/screen";
 import { math } from "math";
 import { Hub } from "./01-hub";
+import { Dialog } from "./20-dialog";
 
 export namespace MainMenu
 {
@@ -53,6 +54,11 @@ export namespace MainMenu
         setup_game_state();
         switch_to_scene(Hub._scene_id);
       }
+      if (selected_option_index == number_of_options - 1)
+      {
+        Dialog._push_dialog_text("no options yet champ.");
+        push_scene(Dialog._scene_id);
+      }
     }
   };
 
@@ -68,9 +74,9 @@ export namespace MainMenu
       push_text(`Submission Deadline: ${days}:${hours}:${minutes}:${seconds}`, SCREEN_CENTER_X, SCREEN_HEIGHT - 40, { _font: FONT_SMALL, _align: TEXT_ALIGN_CENTER });
     }
 
-    push_text("The Forgotten Depths", SCREEN_CENTER_X, SCREEN_CENTER_Y - 110, { _align: TEXT_ALIGN_CENTER, _scale: 3 });
-    push_text("birth of a necromancer", SCREEN_CENTER_X, SCREEN_CENTER_Y - 60, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL });
-    render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y], menu_options, number_of_options, selected_option_index);
+    push_text("the forgotten depths", SCREEN_CENTER_X, SCREEN_CENTER_Y - 110, { _align: TEXT_ALIGN_CENTER, _scale: 3 });
+    push_text("birth of a necromancer", SCREEN_CENTER_X, SCREEN_CENTER_Y - 70, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL });
+    render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y - 20], menu_options, number_of_options, selected_option_index);
     push_text(`entry by david brad`, SCREEN_CENTER_X, SCREEN_HEIGHT - 30, { _font: FONT_SMALL, _align: TEXT_ALIGN_CENTER });
   };
 

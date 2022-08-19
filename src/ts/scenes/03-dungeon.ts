@@ -1,5 +1,6 @@
 import { BLACK } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
+import { push_text } from "@graphics/text";
 import { key_state } from "@input/controls";
 import { V2 } from "@math/vector";
 import { animation_frame } from "@root/animation";
@@ -7,20 +8,20 @@ import { game_state, Level, Room } from "@root/game-state";
 import { add_interpolator, ease_out_quad, get_interpolation_data, linear } from "@root/interpolate";
 import { render_panel } from "@root/nodes/panel";
 import { render_player_status } from "@root/nodes/player-status";
+import { render_resources } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
-import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
+import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
 import { math } from "math";
 import { Hub } from "./01-hub";
 import { Combat } from "./04-combat";
 export namespace Dungeon
 {
   let selected_option_index = 0;
-  let number_of_options = 4;
+  let number_of_options = 3;
   let menu_options = [
     "map",
-    "inventory",
-    "test",
+    "status",
     "retreat"
   ];
 
@@ -41,6 +42,55 @@ export namespace Dungeon
   let mode: number = 0;
   let current_level: Level;
   let player_position: V2;
+
+  let render_minimap = (x: number, y: number, from_x: number, to_x: number, from_y: number, to_y: number) =>
+  {
+    let map_width = (to_x - from_x) * 18 + 16;
+    let map_height = (to_y - from_y) * 18 + 16;
+
+    let x_offset = x - map_width / 2;
+    let y_offset = y - map_height / 2;
+
+    let panel_border = 16;
+    render_panel(x_offset - panel_border, y_offset - panel_border, map_width + panel_border * 2, map_height + panel_border * 2);
+
+    for (let y = from_y; y <= to_y; y++)
+    {
+      for (let x = from_x; x <= to_x; x++)
+      {
+        if (x < 1 || y < 0 || x > 9 || y > 7) continue;
+        const current_room = current_level._rooms[y * 10 + x];
+
+        let colour: number = 0;
+        let special_colour = 0;
+
+        if (player_room_x === x && player_room_y === y)
+          colour = animation_frame ? 0xFFEEEEEE : 0xFF666666;
+        else if (current_room?._seen)
+          colour = 0xFF666666;
+        else if (current_room?._peeked)
+        {
+          colour = 0xFF333333;
+          if (current_room?._events.length > 0)
+            special_colour = 0xFF00FFFF;
+          else if (current_room?._enemies.length > 0)
+            special_colour = 0xFF0000FF;
+        }
+
+        let render_x = (x - from_x) * 18 + x_offset;
+        let render_y = (y - from_y) * 18 + y_offset;
+
+        if (colour)
+          push_quad(render_x, render_y, 16, 16, colour);
+
+        if (special_colour)
+          push_text("!", render_x + 4, render_y + 4, { _colour: special_colour, _scale: 1 });
+
+        if ((current_room?._seen || current_room?._peeked) && current_room?._exit)
+          push_textured_quad(TEXTURE_STAIR, render_x + 4, render_y + 4);
+      };
+    }
+  };
 
   let _reset_fn = () =>
   {
@@ -216,39 +266,20 @@ export namespace Dungeon
 
     if (mode === 0)
     {
-      render_panel(SCREEN_WIDTH - 194, 0, 194, 154);
-      render_text_menu([SCREEN_WIDTH - 97, 15], menu_options, number_of_options, selected_option_index);
+      render_panel(SCREEN_WIDTH - 194, 40, 194, 100);
+      render_text_menu([SCREEN_WIDTH - 97, 55], menu_options, number_of_options, selected_option_index);
     }
     else if (mode === 2)
     {
       // Map Render
-      let x_offset = SCREEN_CENTER_X - 81;
-      let y_offset = SCREEN_CENTER_Y - 72;
-      render_panel(x_offset - 52, y_offset - 52, 266, 248);
-
-      for (let y = 0; y < 8; y++)
-      {
-        for (let x = 1; x <= 9; x++)
-        {
-          let render_x = x - 1;
-          const current_room = current_level._rooms[y * 10 + x];
-
-          let colour: number = 0;
-          if (player_room_x === x && player_room_y === y)
-            colour = animation_frame ? 0xFFEEEEEE : 0xFF666666;
-          else if ((current_room?._seen || current_room?._peeked) && current_room?._exit)
-            colour = 0xFF00FF00;
-          else if (current_room?._seen)
-            colour = 0xFF666666;
-          else if (current_room?._peeked)
-            colour = (current_room?._enemies.length > 0) ? 0xFF0000FF : 0xFF333333;
-
-          if (colour)
-            push_quad(render_x * 18 + 1 + x_offset, y * 18 + 1 + y_offset, 16, 16, colour);
-        };
-      }
+      render_minimap(SCREEN_CENTER_X, SCREEN_CENTER_Y, 1, 9, 0, 7);
+    }
+    else
+    {
+      render_minimap(50, SCREEN_HEIGHT - 50, player_room_x - 1, player_room_x + 1, player_room_y - 1, player_room_y + 1);
     }
     render_player_status();
+    render_resources(SCREEN_WIDTH - 160, 5);
   };
   export let _scene_id = get_next_scene_id();
   export let _scene: Scene = { _scene_id, _reset_fn, _update_fn, _render_fn };

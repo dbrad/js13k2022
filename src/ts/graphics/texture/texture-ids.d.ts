@@ -6,6 +6,7 @@ declare const TEXTURE_FIRE: number;
 declare const TEXTURE_ICE: number;
 declare const TEXTURE_HOLY: number;
 declare const TEXTURE_SHADOW: number;
+declare const TEXTURE_STAIR: number;
 
 declare const TEXTURE_WHITE_CIRCLE: number;
 declare const TEXTURE_D_PAD: number;

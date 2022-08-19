@@ -105,7 +105,7 @@ export let initialize_input = (): void =>
 let dpad_scale = 7;
 let dpad_size = 16 * dpad_scale;
 let dpad_touch_center = math.floor(dpad_size / 3);
-let [dpad_x, dpad_y] = [20, SCREEN_HEIGHT - dpad_size - 80];
+let [dpad_x, dpad_y] = [20, SCREEN_HEIGHT - dpad_size - 100];
 
 let button_scale = 3;
 let button_size = 16 * button_scale;
@@ -113,8 +113,8 @@ let half_button_size = button_size / 2;
 let button_options: TextureQuadParameters = { _scale: button_scale, _colour: 0x993C3C3C };
 let button_text_options: TextParameters = { _scale: 3, _colour: 0X99A0A0A0, _font: FONT_SMALL, _align: TEXT_ALIGN_CENTER };
 
-let [a_button_x, a_button_y] = [SCREEN_WIDTH - button_size - 80, SCREEN_HEIGHT - button_size - 100];
-let [b_button_x, b_button_y] = [SCREEN_WIDTH - button_size - 20, SCREEN_HEIGHT - button_size - 120];
+let [a_button_x, a_button_y] = [SCREEN_WIDTH - button_size - 80, SCREEN_HEIGHT - button_size - 120];
+let [b_button_x, b_button_y] = [SCREEN_WIDTH - button_size - 20, SCREEN_HEIGHT - button_size - 140];
 
 export let update_hardware_input = (): void =>
 {
@@ -212,6 +212,7 @@ export let update_input_system = (now: number, delta: number): void =>
 let get_button_colour = (key: number): number => key_state[key] === KEY_IS_UP ? 0x993C3C3C : 0x99666666;
 export let render_controls = (): void =>
 {
+    let help_text = "";
     if (is_touch)
     {
         push_textured_quad(TEXTURE_D_PAD, dpad_x, dpad_y, { _scale: dpad_scale, _colour: 0x99FFFFFF });
@@ -229,15 +230,17 @@ export let render_controls = (): void =>
             push_quad(dpad_x + dpad_touch_center * 2, dpad_y, dpad_touch_center, dpad_size, 0x55FFFFFF);
 
         push_textured_quad(TEXTURE_WHITE_CIRCLE, b_button_x, b_button_y, { ...button_options, _colour: get_button_colour(B_BUTTON) });
-        push_text("B", b_button_x + half_button_size, b_button_y + half_button_size - 7, button_text_options);
+        push_text("b", b_button_x + half_button_size, b_button_y + half_button_size - 7, button_text_options);
 
         push_textured_quad(TEXTURE_WHITE_CIRCLE, a_button_x, a_button_y, { ...button_options, _colour: get_button_colour(A_BUTTON) });
-        push_text("A", a_button_x + half_button_size, a_button_y + half_button_size - 7, button_text_options);
+        push_text("a", a_button_x + half_button_size, a_button_y + half_button_size - 7, button_text_options);
     }
-    else if (!gamepad)
-    {
-        push_text("Arrow Keys / X: Action / C: Cancel", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 8, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL, _colour: 0x66FFFFFF });
-    }
+    else if (!gamepad && !is_touch)
+        help_text = "arrow keys / x: action / c: cancel";
+    else
+        help_text = "dpad / a: action / b: cancel";
+
+    push_text(help_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 8, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL, _colour: 0x66FFFFFF });
 
     if (false)
     {

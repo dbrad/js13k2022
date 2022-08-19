@@ -24,6 +24,8 @@ type SummonLevels = [
 
 export type Summon = [
   number, // SUMMON_TYPE
+  boolean, // SUMMON_SLOT_ACTIVE
+  boolean, // SUMMON_ALIVE
   number, // SUMMON_HP
   boolean[], // SUMMON_DEBUFFS
 ];
@@ -63,7 +65,7 @@ let default_player: Player =
     [],
     [1, 1, 1, 1, 1],
     [[1, 1, 1], [1, 1, 1], [1, 1, 1]],
-    [],
+    [[0, true, true, 1, []], [1, true, true, 1, []], [2, true, true, 1, []], [2, true, true, 1, []], [2, true, true, 1, []]],
     [false, false, false, false],
     [0, 0, 0, 0],
     0,
@@ -71,22 +73,23 @@ let default_player: Player =
     0,
   ];
 
-export type Enemy = [
-  number, // ENEMY_TYPE
-  number, // ENEMY_ELEMENT
-  boolean, // ENEMY_ALIVE
-  number, // ENEMY_MAX_HP
-  number, // ENEMY_HP
-  number, // ENEMY_ATTACK
-  number, // ENEMY_DEFENSE
-  boolean[], // ENEMY_DEBUFFS
-  Enemy_Intent, // ENEMY_INTENT
-];
+export type Enemy = {
+  _type: number,
+  _element: number,
+  _alive: boolean,
+  _max_hp: number,
+  _hp: number,
+  _attack: number,
+  _block_value: number,
+  _debuffs: boolean[],
+  _intent_pool: Enemy_Intent[],
+  _current_intent: Enemy_Intent,
+};
 
-type Enemy_Intent = [
-  number, // ENEMY_INTENT_TYPE
-  number, // ENEMY_INTENT_VALUE
-];
+export type Enemy_Intent = {
+  _type: number,
+  _value: number,
+};
 
 export type Room = {
   _seen: boolean,

@@ -49,7 +49,7 @@ let parse_text = (text: string, width: number = SCREEN_WIDTH, font: number = FON
         let last_word = result_line.pop();
         assert(last_word !== undefined, "No last word to pop found.");
         let line = result_line.join(" ");
-        let line_length = line.length;
+        let line_length = line.replace(/[A-Z]/g, "").length;
         result_lines.push([line, line_length]);
         result_line = [last_word];
       }
@@ -73,11 +73,11 @@ export let character_code_map: Map<string, number> = new Map();
 export let push_text = (text: string, x: number, y: number, parameters: TextParameters = default_text_parameters): void =>
 {
   let colour = parameters._colour || WHITE;
+  let original_colour = colour;
   let align = parameters._align || TEXT_ALIGN_LEFT;
   let scale = parameters._scale || 1;
   let width = parameters._width || SCREEN_WIDTH;
   let font: number = parameters._font || FONT_NORMAL;
-  text = text.toUpperCase();
 
   let letter_gap = font === FONT_SMALL ? 1 : 0;
   let font_size = font_sizes.get(font) || 8;
@@ -114,6 +114,11 @@ export let push_text = (text: string, x: number, y: number, parameters: TextPara
     {
       for (let letter of word.split(""))
       {
+        if (letter === "R")
+        {
+          colour = 0xFF0000FF;
+          continue;
+        }
         let character_index = character_code_map.get(letter);
         assert(character_index !== undefined, `Undefined character ${letter} used.`);
         let t = TEXTURES[font + character_index];
@@ -125,6 +130,7 @@ export let push_text = (text: string, x: number, y: number, parameters: TextPara
         gl_restore();
         x_offset += letter_size + letter_gap;
       }
+      colour = original_colour;
       x_offset += letter_size + letter_gap;
     }
     y += letter_size + (scale * 2);

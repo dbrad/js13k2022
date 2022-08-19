@@ -1,7 +1,7 @@
-import { BLACK, WHITE } from "@graphics/colour";
-import { push_quad } from "@graphics/quad";
 import { push_text } from "@graphics/text";
 import { key_state } from "@input/controls";
+import { animation_frame } from "@root/animation";
+import { render_panel } from "@root/nodes/panel";
 import { get_next_scene_id, pop_scene, Scene } from "@root/scene";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
 import { zzfx } from "@root/zzfx";
@@ -13,12 +13,10 @@ export namespace Dialog
   let currentDialogTextIndex: number = 0;
 
   let dialogTimer: number = 0;
-  let blinkTimer: number = 0;
-  let showContinue: boolean = false;
   let letterRate = 32;
   let talkSoundPlay: number = 0;
 
-  export let push_dialog_text = (text: string): void =>
+  export let _push_dialog_text = (text: string): void =>
   {
     dialogQueue.push(text);
   };
@@ -31,8 +29,6 @@ export namespace Dialog
       currentDialogText = "";
       currentDialogTextIndex = 0;
 
-      blinkTimer = 0;
-      showContinue = false;
       letterRate = 32;
 
       return true;
@@ -50,16 +46,6 @@ export namespace Dialog
     {
       if (currentDialogTextIndex >= targetDialogText.length)
       {
-        blinkTimer += delta;
-        if (blinkTimer > 500)
-        {
-          if (blinkTimer > 1000)
-            blinkTimer = 0;
-          else
-            blinkTimer -= 500;
-
-          showContinue = !showContinue;
-        }
         if (key_state[A_BUTTON] === KEY_WAS_DOWN)
           targetDialogText = "";
       }
@@ -91,13 +77,11 @@ export namespace Dialog
     let box_w = SCREEN_WIDTH;
     let box_y = SCREEN_HEIGHT - 10;
     let box_h = 100;
-    push_quad(0, box_y - box_h, box_w, box_h, WHITE);
-    push_quad(2, box_y - (box_h - 2), box_w - 4, box_h - 4, BLACK);
+    render_panel(0, box_y - box_h, box_w, box_h);
     push_text(currentDialogText, 5, box_y - (box_h - 5), { _width: box_w - 10, _scale: 2 });
 
-    if (showContinue)
+    if (currentDialogTextIndex >= targetDialogText.length && animation_frame)
       push_text("continue", SCREEN_WIDTH - 5, box_y - 13, { _align: TEXT_ALIGN_RIGHT });
-
   };
 
   export let _scene_id = get_next_scene_id();

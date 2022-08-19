@@ -61,7 +61,7 @@ export let load_textures = (): Promise<void> =>
         {
           for (let i: number = 33; i <= 90; i++)
           {
-            character_code_map.set(String.fromCharCode(i), i);
+            character_code_map.set(String.fromCharCode(i).toLowerCase(), i);
             let offset_x = x + (i - 33) * texture_width;
             TEXTURES[texture_id[0] + i] = {
               _w: texture_width,
