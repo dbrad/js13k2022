@@ -1,16 +1,3 @@
-Summon System
-
-Combat Scene
-  Turn based
-    Player selects action
-    Player targets
-    Defenders go first
-    Player Attacks first, followed by Summons, followed by enemies in array order
-    defend = 0
-    player = 1
-    summons = 2
-    enemy = 3
-
   Enemy AI??
     Each enemy will have a pool of actions, shuffle, pop top as an Intent
     Need the pool builder for each type
@@ -18,31 +5,31 @@ Combat Scene
 
 NICE TO HAVE: Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
 
-XP Curves
-  Paper Mario Style
-  100 xp to level
-  ceil((player level - enemy level) / 2)
-  level maybe 1 + hp + (2xatk) + (2xdef) + (special mods)
-  player get +5 hp, +5 mana, or +1 summon cap per levels
-  player gets 1 spell point every 2 level ups (3,5,7,9,11,13,15)
-  cap is 15?  (4 cap + 6 mana + 5 hp) (35/35/5)
-  enemy cap should be like 50?
+Special Cards:
+  Necrotic Power (+1 attack, -1 defense on all)
+  Necrotic Vigor (-1 attack, +1 defense on all)
+  The Bone Zone (+3 attack, -1 defense on skeletons)
+  Wall of Flesh (-1 attack, +3 defense on zombies)
+  Haunting Hour (+2 attack, +0 defense on spirits)
 
-Level Up Screen
-  pops up on map after level up
-  every level player assinged an Attribute (hp, mp, summon cap)
-  every other level they also assing a spell point into fire, ice, holy, shadow, or necromancy
+LEVEL GEN
+ Can I put boss at furthest deadend somehow?
+ More combats
 
 Dialog
   Add a Choice System??
+  Prevent reset scene on dialog onyl
 
 Add events to event rooms
 
-Summon Level Up Systems
+Card Crafting Screen
+
+Deck Management Screen
+  List of cards player has on the left, list of deck on the right
 
 COIL BONUS???
+  Special cards
 
-Nice to Haves: Options, Inventory
+Nice to Haves: Options
 
-Palette based walls and floor variations
-custom font range loader to reduce character set
+Custom font range loader to reduce character set

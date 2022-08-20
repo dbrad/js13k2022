@@ -1,9 +1,8 @@
 import { key_state } from "@input/controls";
 import { render_player_status } from "@root/nodes/player-status";
-import { render_resources } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
-import { SCREEN_CENTER_X, SCREEN_WIDTH } from "@root/screen";
+import { SCREEN_CENTER_X } from "@root/screen";
 import { math } from "math";
 import { MainMenu } from "./00-main-menu";
 import { LevelSelect } from "./02-level-select";
@@ -44,7 +43,6 @@ export namespace Hub
   {
     render_text_menu([SCREEN_CENTER_X, 100], menu_options, number_of_options, selected_option_index);
     render_player_status();
-    render_resources(SCREEN_WIDTH - 160, 5);
   };
   export let _scene_id = get_next_scene_id();
   export let _scene: Scene = { _scene_id, _reset_fn, _update_fn, _render_fn };

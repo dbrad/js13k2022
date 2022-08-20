@@ -30,7 +30,7 @@ let floor_deck: number[] = [];
 let get_next_floor_id = (): number =>
 {
   if (floor_deck.length === 0)
-    floor_deck = shuffle([5, 5, 5, 5, 5, 5, 5, 6, 7, 8]);
+    floor_deck = shuffle([5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 7, 8]);
   return floor_deck.pop() ?? 5;
 };
 

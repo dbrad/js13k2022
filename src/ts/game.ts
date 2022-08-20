@@ -13,7 +13,6 @@ import { Hub } from "@scenes/01-hub";
 import { LevelSelect } from "@scenes/02-level-select";
 import { Dungeon } from "@scenes/03-dungeon";
 import { Combat } from "@scenes/04-combat";
-import { Inventory } from "@scenes/10-inventory";
 import { Dialog } from "@scenes/20-dialog";
 import { Options } from "@scenes/21-options";
 import { gl_clear, gl_flush, gl_get_context, gl_init, gl_set_clear_colour } from "gl";
@@ -51,8 +50,6 @@ window_reference.addEventListener('load', async () =>
         register_scene(LevelSelect._scene);
         register_scene(Dungeon._scene);
         register_scene(Combat._scene);
-
-        register_scene(Inventory._scene);
 
         register_scene(Dialog._scene);
         register_scene(Options._scene);

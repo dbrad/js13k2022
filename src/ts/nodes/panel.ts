@@ -1,8 +1,8 @@
 import { BLACK, WHITE } from "@graphics/colour";
 import { push_quad } from "@graphics/quad";
 
-export let render_panel = (x: number, y: number, width: number, height: number) =>
+export let render_panel = (x: number, y: number, width: number, height: number, outline_colour: number = WHITE) =>
 {
-  push_quad(x, y, width, height, WHITE);
-  push_quad(x + 2, y + 2, width - 4, height - 4, BLACK);
+  push_quad(x, y, width, height, outline_colour);
+  push_quad(x + 1, y + 1, width - 2, height - 2, BLACK);
 };

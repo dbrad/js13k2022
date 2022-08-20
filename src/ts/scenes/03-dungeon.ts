@@ -1,4 +1,4 @@
-import { BLACK } from "@graphics/colour";
+import { BLACK, floor_palettes, wall_palettes } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
 import { push_text } from "@graphics/text";
 import { key_state } from "@input/controls";
@@ -8,7 +8,6 @@ import { game_state, Level, Room } from "@root/game-state";
 import { add_interpolator, ease_out_quad, get_interpolation_data, linear } from "@root/interpolate";
 import { render_panel } from "@root/nodes/panel";
 import { render_player_status } from "@root/nodes/player-status";
-import { render_resources } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
@@ -38,6 +37,7 @@ export namespace Dungeon
   let player_room_y: number;
   let player_room_index: number;
   let player_room: Room;
+  let player_hflip = false;
 
   let mode: number = 0;
   let current_level: Level;
@@ -186,16 +186,22 @@ export namespace Dungeon
         else if (key_state[D_DOWN] === KEY_WAS_DOWN)
           target = [player_position[0], player_position[1] + 16 * 9];
         else if (key_state[D_LEFT] === KEY_WAS_DOWN)
+        {
           target = [player_position[0] - 16 * 11, player_position[1]];
+          player_hflip = true;
+        }
         else if (key_state[D_RIGHT] === KEY_WAS_DOWN)
+        {
           target = [player_position[0] + 16 * 11, player_position[1]];
+          player_hflip = false;
+        }
         if (target)
         {
           const targetRoom: V2 = [Math.floor(target[0] / 16 / 11), Math.floor(target[1] / 16 / 9)];
           const room = current_level._rooms[targetRoom[1] * 10 + targetRoom[0]];
           if (room)
           {
-            add_interpolator(INTERP_CAMERA_MOVEMENT, 750, camera, target, null, ease_out_quad);
+            add_interpolator(INTERP_CAMERA_MOVEMENT, 500, camera, target, null, ease_out_quad);
             add_interpolator(INTERP_PLAYER_MOVEMENT, 1000, player_position, target, null, linear);
             mode = 3;
           }
@@ -221,48 +227,53 @@ export namespace Dungeon
       }
     }
   };
+
   let _render_fn = () =>
   {
     for (let y = camera_top_left[1]; y <= camera_bottom_right[1]; y += 16)
     {
       for (let x = camera_top_left[0]; x <= camera_bottom_right[0]; x += 16)
       {
-        let tileX = math.floor(x / 16);
-        let tileY = math.floor(y / 16);
+        let tile_x = math.floor(x / 16);
+        let tile_y = math.floor(y / 16);
 
-        if (tileX > 0 && tileX < 110 && tileY >= 0 && tileY < 72)
+        if (tile_x > 0 && tile_x < 110 && tile_y >= 0 && tile_y < 72)
         {
-          let renderX = tileX * 16 - camera_top_left[0] - 8;
-          let renderY = tileY * 16 - camera_top_left[1] - 12;
+          let render_x = tile_x * 16 - camera_top_left[0] - 8;
+          let render_y = tile_y * 16 - camera_top_left[1] - 12;
 
-          let tile_id = current_level._tile_map[tileY * 110 + tileX];
+          let tile_id = current_level._tile_map[tile_y * 110 + tile_x];
 
           if (tile_id > 4)
-            push_quad(renderX, renderY, 16, 16, 0xFF1f1f1f);
+            push_quad(render_x, render_y, 16, 16, 0xff2a1f1c); // 1c1f2a
           else
-            push_quad(renderX, renderY, 16, 16, BLACK);
+            push_quad(render_x, render_y, 16, 16, BLACK);
 
           if (tile_id > 5)
-            push_textured_quad(tile_id - 6 + TEXTURE_FLOOR_0, renderX, renderY);
+            push_textured_quad(TEXTURE_FLOOR, render_x, render_y, { _palette_offset: floor_palettes[tile_id - 6] });
           else if (tile_id > 1 && tile_id < 5)
-            push_textured_quad(tile_id - 2 + TEXTURE_WALL_0, renderX, renderY, { _palette_offset: 2 });
+            push_textured_quad(TEXTURE_WALL, render_x, render_y, { _palette_offset: wall_palettes[tile_id - 2] });
 
           // Lighting
-          let distance = math.sqrt((player_tile_x - tileX) ** 2 + (player_tile_y - tileY) ** 2);
+          let distance = math.sqrt((player_tile_x - tile_x) ** 2 + (player_tile_y - tile_y) ** 2);
           if (distance >= 8)
-            push_quad(renderX, renderY, 16, 16, BLACK);
+            push_quad(render_x, render_y, 16, 16, BLACK);
           else if (distance >= 6)
-            push_quad(renderX, renderY, 16, 16, 0xBD000000);
+            push_quad(render_x, render_y, 16, 16, 0xBD000000);
           else if (distance >= 4)
-            push_quad(renderX, renderY, 16, 16, 0x7F000000);
+            push_quad(render_x, render_y, 16, 16, 0x7F000000);
           else if (distance >= 2)
-            push_quad(renderX, renderY, 16, 16, 0x40000000);
+            push_quad(render_x, render_y, 16, 16, 0x40000000);
         }
       }
     }
 
     // Render Player
-    push_textured_quad(TEXTURE_ROBED_MAN_0, player_position[0] - camera_top_left[0] - 8, player_position[1] - camera_top_left[1] - 12, { _palette_offset: 5, _animated: true });
+    let p_x = player_position[0] - camera_top_left[0] - 8,
+      p_y = player_position[1] - camera_top_left[1] - 12;
+
+    push_quad(p_x + 3, p_y + 15, 10, 3, 0x99000000);
+    push_textured_quad(TEXTURE_ROBED_MAN, p_x, p_y, { _palette_offset: PALETTE_PLAYER, _animated: true, _horizontal_flip: player_hflip });
 
     if (mode === 0)
     {
@@ -279,7 +290,6 @@ export namespace Dungeon
       render_minimap(50, SCREEN_HEIGHT - 50, player_room_x - 1, player_room_x + 1, player_room_y - 1, player_room_y + 1);
     }
     render_player_status();
-    render_resources(SCREEN_WIDTH - 160, 5);
   };
   export let _scene_id = get_next_scene_id();
   export let _scene: Scene = { _scene_id, _reset_fn, _update_fn, _render_fn };

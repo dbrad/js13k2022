@@ -1,0 +1,85 @@
+USED: 80.31 % | 10691 BYTES
+LEFT: 19.69 % |  2621 BYTES
+
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+TypeScript                      51            463             53           3140
+-------------------------------------------------------------------------------
+SUM:                            51            463             53           3140
+-------------------------------------------------------------------------------
+
+Combat Ideas
+
+- Cards of summons across the bottom of the screen
+- hand is always 5 each turn
+- can play as many of those 5 as desired
+- pick Attack! or Protect Me!
+- Action Event modifies damage or block value
+- enemies always attack the player only
+- still intent system
+
+Draw 5 cards, discard and redraw up to all 5
+play as many cards as desired
+select Attack! or Protect Me!?
+Or have both stats act and do both action checks?
+Or assign each card as you play it, Attack! or Protect Me! as you play minion cards
+Buff cards are just played
+Should buffs have a cost? HP cost? Negative to go with the positive?
+
+are there ways to make this more interesting without taking a ton of assets?
+Paper Mario used Badges to change stats and add attacks...
+
+Cards come in basic (free)
+
+- Basic Skeleton (2/1)
+- Basic Zombie (1/2)
+- Basic Spirit (3/0)
+  lvl 1 (cost)
+- Basic Card + 1 extra stat or effect
+- Some special cards are unmergable (buffs)
+  lvl 2 (merge 3 lvl 1)
+  lvl 3 (merge 3 lvl 2)
+
+- Merged card get all bonuses of component cards
+
+- Need other reagents to add effects...
+
+  - Snake Fangs? (weaken)
+  - Bat Wings? (curse / buff cards)
+  -
+
+- Curse, does 1 damage per turn at end of turn
+- Weaken, lower enemy attack
+- +1 to all attacks rest of combat (Necrotic Power)
+- +1 to all defense rest of combat (Necrotic Vigor)
+
+- Fight more 'cultists' and other humans?
+
+- Deck has a minimum size
+
+What doe StS have?
+
+- Attacks
+- Defense
+- Buffs
+- Debuffs
+- Card Draw (I don't think I want card draw)
+
+With this I need to add
+Card Crafting
+Deck Manager
+Card Info
+More Resources
+Action Events (Tap A, Press A at right time)
+A bat and snake sprite
+
+But I can removed
+Magic Levels
+Minion Leveling
+Minion AI
+Multi Target Enemy AI
+The Whole Combat Menu System
+Tooltips are gone
+Summons only have attack, defense, and effects
+Getting rid of element stuff probably

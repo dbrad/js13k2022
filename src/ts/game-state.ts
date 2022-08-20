@@ -1,3 +1,4 @@
+import { skeleton, spirit, zombie } from "@gameplay/card-builders";
 import { V2 } from "@math/vector";
 import { window_reference } from "./screen";
 import { set_zzfx_mute } from "./zzfx";
@@ -6,28 +7,9 @@ export type GameState = [
   number[], // GAMESTATE_EVENTS
   Level, // GAMESTATE_CURRENT_DUNGEON
   Player, // GAMESTATE_PLAYER
-];
-
-type MagicLevels = [
-  number, // MAGIC_FIRE
-  number, // MAGIC_ICE
-  number, // MAGIC_HOLY
-  number, // MAGIC_SHADOW
-  number, // MAGIC_NECROMANCY
-];
-
-type SummonLevels = [
-  number, // SUMMON_MAX_HP
-  number, // SUMMON_ATTACK
-  number, // SUMMON_DEFENSE
-];
-
-export type Summon = [
-  number, // SUMMON_TYPE
-  boolean, // SUMMON_SLOT_ACTIVE
-  boolean, // SUMMON_ALIVE
-  number, // SUMMON_HP
-  boolean[], // SUMMON_DEBUFFS
+  number[], // GAMESTATE_RESOURCES
+  Card[], // GAMESTATE_CARD_COLLECTION
+  Card[], // GAMESTATE_DECK
 ];
 
 export type Player = [
@@ -36,19 +18,7 @@ export type Player = [
   boolean, // PLAYER_LEVEL_PENDING
   number, // PLAYER_HP
   number, // PLAYER_MAX_HP
-  number, // PLAYER_MP
-  number, // PLAYER_MAX_MP
-  number, // PLAYER_WEAPON_LEVEL
-  number, // PLAYER_DEFENSE
   boolean[], // PLAYER_DEBUFFS
-  MagicLevels, // PLAYER_MAGIC_LEVELS
-  SummonLevels[], // PLAYER_SUMMON_LEVELS
-  Summon[], // PLAYER_ACTIVE_SUMMONS
-  boolean[], // PLAYER_GEM_UNLOCKED
-  number[], // PLAYER_GEM_EQUIPED
-  number, // PLAYER_BONES
-  number, // PLAYER_FLESH
-  number, // PLAYER_SOULS
 ];
 
 let default_player: Player =
@@ -58,20 +28,23 @@ let default_player: Player =
     false,
     10,
     10,
-    5,
-    5,
-    1,
-    0,
-    [],
-    [1, 1, 1, 1, 1],
-    [[1, 1, 1], [1, 1, 1], [1, 1, 1]],
-    [[0, true, true, 1, []], [1, true, true, 1, []], [2, true, true, 1, []], [2, true, true, 1, []], [2, true, true, 1, []]],
     [false, false, false, false],
-    [0, 0, 0, 0],
-    0,
-    0,
-    0,
   ];
+
+export type Card = [
+  number, // TYPE
+  number, // LEVEL
+  number, // ATTACK
+  number, // DEFENSE
+  Effect[], // EFFECTS
+];
+
+export type Effect = [
+  number, // TYPE
+  string, // DESCRIPTION
+  number, // LEVEL
+  (target: Enemy | null) => void, // APPLY_EFFECT_FUNCTION
+];
 
 export type Enemy = {
   _type: number,
@@ -122,10 +95,21 @@ export let setup_game_state = () =>
     events[i] = 0;
   }
 
+  let deck: Card[] = [];
+  for (let i = 0; i < 15; i += 3)
+  {
+    deck[i] = skeleton();
+    deck[i + 1] = zombie();
+    deck[i + 2] = spirit();
+  }
+
   game_state = [
     events,
     null_level,
-    default_player
+    default_player,
+    [0, 0, 0, 0, 0],
+    [],
+    deck
   ];
 };
 

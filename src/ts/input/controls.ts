@@ -235,7 +235,7 @@ export let render_controls = (): void =>
         push_textured_quad(TEXTURE_WHITE_CIRCLE, a_button_x, a_button_y, { ...button_options, _colour: get_button_colour(A_BUTTON) });
         push_text("a", a_button_x + half_button_size, a_button_y + half_button_size - 7, button_text_options);
     }
-    else if (!gamepad && !is_touch)
+    if (!gamepad && !is_touch)
         help_text = "arrow keys / x: action / c: cancel";
     else
         help_text = "dpad / a: action / b: cancel";

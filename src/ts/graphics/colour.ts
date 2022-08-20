@@ -52,3 +52,6 @@ export let abgr_number_to_rgba_v4 = (abgr: number): V4 =>
 
 export const WHITE = 0xFFFFFFFF;
 export const BLACK = 0xFF000000;
+
+export let wall_palettes = [3, 6, 9];
+export let floor_palettes = [12, 15, 18];
