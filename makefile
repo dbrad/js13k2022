@@ -21,11 +21,11 @@ release:
 	mkdir build/release
 	cp src/html/index.html build/release/index.html
 	node scripts/release-build.js | node_modules/.bin/terser --config-file scripts/terser.config.json -o build/release/game.js
-	yarn roadroller build\release\game.js -O2 -o build\release\game.js
+	yarn --silent roadroller build/release/game.js -O2 -Zab9 -Zlr930 -Zmc4 -Zmd21 -S0,1,2,3,7,13,21,42,57,204,321,338 -o build/release/game.js
 	rm -rf dist
 	mkdir -p dist/src
 	yarn html-inline -i ./build/release/index.html -o ./dist/src/index.html
 	tools/7z/7za a -tzip dist/game.zip ./dist/src/*
 	tools/ect-0.8.3.exe -9 -zip dist/game.zip
-	tools/cloc-1.86 ./src/ts
 	node scripts/check-file-size.js
+	tools/cloc-1.86 ./src/ts

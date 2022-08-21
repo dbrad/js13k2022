@@ -1,11 +1,25 @@
-  Enemy AI??
-    Each enemy will have a pool of actions, shuffle, pop top as an Intent
-    Need the pool builder for each type
-    Will Attack Random Targets (target particle line?)
+Enemy AI
+  Each enemy will have a pool of actions, shuffle, pop top as an Intent
+  Need the pool builder for each type
 
-NICE TO HAVE: Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
+Apply debuffs to Enemies
+Render Minions
+Render Attack and defense
+Add Mini games
+End of Combat Loot Screen
 
-Special Cards:
+Combat Juice
+  Animate the hoard attack
+  Animate enemy basic attack
+  Animate enemy magic attack
+  Animate cards more
+
+Cards:
+  Skeleton (lvl 1,2,3)
+  Zombie (lvl 1,2,3)
+  Spirit (lvl 1,2,3)
+  Minor Death Coil (1 dmg, 1 heal) (Coil only)
+  Death Coil (2 dmg, 1 heal)
   Necrotic Power (+1 attack, -1 defense on all)
   Necrotic Vigor (-1 attack, +1 defense on all)
   The Bone Zone (+3 attack, -1 defense on skeletons)
@@ -14,22 +28,39 @@ Special Cards:
 
 LEVEL GEN
  Can I put boss at furthest deadend somehow?
- More combats
+ More combats?
+ Add events to event rooms
+  Resource Trade?
+  Resource Get?
+  Heal Player
+  Get a Card?
+    Should there be a way to scrap cards?
+  Chance events? 
+    Chance to gain resources or lose hp?
+  Hard optional fight for more resources or a special card
+    Level of fight is current level + 10 or 20?
 
 Dialog
   Add a Choice System??
   Prevent reset scene on dialog onyl
 
-Add events to event rooms
-
 Card Crafting Screen
+  Combine Bones, Flesh, Souls, Bat Wings, and Snake Fangs into cards
+  Merge 3 Minion cards of the same level to the next level. 3 level 1's into a 2, 3 level 2's into a 3
+    Add together all effects
+    Add stats together, divide by 2, take the ceiling?
 
 Deck Management Screen
   List of cards player has on the left, list of deck on the right
+  Show highlighted card in center or bottom
 
 COIL BONUS???
   Special cards
+  1 level 1 card of each minion with their special effect + 1 Minor Death Coil? (1 dmg +  1 heal)
 
-Nice to Haves: Options
+Nice to Haves
+  Options
+  Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
 
-Custom font range loader to reduce character set
+Optimizations
+  Custom font range loader to reduce character set

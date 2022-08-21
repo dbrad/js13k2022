@@ -11,7 +11,7 @@ import { render_player_status } from "@root/nodes/player-status";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
-import { math } from "math";
+import { math, safe_add, safe_subtract } from "math";
 import { Hub } from "./01-hub";
 import { Combat } from "./04-combat";
 export namespace Dungeon
@@ -103,6 +103,7 @@ export namespace Dungeon
     camera[0] = player_position[0];
     camera[1] = player_position[1];
   };
+
   let _update_fn = (now: number, delta: number) =>
   {
     camera_top_left = [camera[0] - camera_half_width, camera[1] - camera_half_height];
@@ -139,36 +140,39 @@ export namespace Dungeon
     }
     else
     {
+      let UP_PRESSED = key_state[D_UP] === KEY_WAS_DOWN;
+      let DOWN_PRESSED = key_state[D_DOWN] === KEY_WAS_DOWN;
+      let LEFT_PRESSED = key_state[D_LEFT] === KEY_WAS_DOWN;
+      let RIGHT_PRESSED = key_state[D_RIGHT] === KEY_WAS_DOWN;
+      let A_PRESSED = key_state[A_BUTTON] === KEY_WAS_DOWN;
+      let B_PRESSED = key_state[B_BUTTON] === KEY_WAS_DOWN;
+
       if (mode === 0)
       {
         // MENU MODE
-        if (key_state[D_UP] === KEY_WAS_DOWN)
-          selected_option_index = math.max(0, selected_option_index - 1);
-        else if (key_state[D_DOWN] === KEY_WAS_DOWN)
-          selected_option_index = math.min(number_of_options - 1, selected_option_index + 1);
-        else if (key_state[A_BUTTON] === KEY_WAS_DOWN)
+        if (UP_PRESSED)
+          selected_option_index = safe_subtract(selected_option_index, 1);
+        else if (DOWN_PRESSED)
+          selected_option_index = safe_add(number_of_options - 1, selected_option_index, 1);
+        else if (A_PRESSED)
         {
           if (selected_option_index === 0)
           {
-            // Map
+            // FULL MAP
             mode = 2;
           }
           else if (selected_option_index === 1)
           {
-            // Inventory
+            // STATUS
           }
           else if (selected_option_index === 2)
-          {
-            // Summon
-          }
-          else if (selected_option_index === 3)
           {
             // Retreat
             // TODO: Confirmation window / post level wrap up
             switch_to_scene(Hub._scene_id);
           }
         }
-        else if (key_state[B_BUTTON] === KEY_WAS_DOWN)
+        else if (B_PRESSED)
         {
           selected_option_index = 0;
           mode = 1;
@@ -177,32 +181,32 @@ export namespace Dungeon
       else if (mode === 1)
       {
         // MOVE MODE
-        if (key_state[A_BUTTON] === KEY_WAS_DOWN || key_state[B_BUTTON] === KEY_WAS_DOWN)
+        if (A_PRESSED || B_PRESSED)
           mode = 0;
 
-        let target: number[] | null = null;
-        if (key_state[D_UP] === KEY_WAS_DOWN)
-          target = [player_position[0], player_position[1] - 16 * 9];
-        else if (key_state[D_DOWN] === KEY_WAS_DOWN)
-          target = [player_position[0], player_position[1] + 16 * 9];
-        else if (key_state[D_LEFT] === KEY_WAS_DOWN)
+        let movement_target: number[] | null = null;
+        if (UP_PRESSED)
+          movement_target = [player_position[0], player_position[1] - 16 * 9];
+        else if (DOWN_PRESSED)
+          movement_target = [player_position[0], player_position[1] + 16 * 9];
+        else if (LEFT_PRESSED)
         {
-          target = [player_position[0] - 16 * 11, player_position[1]];
+          movement_target = [player_position[0] - 16 * 11, player_position[1]];
           player_hflip = true;
         }
-        else if (key_state[D_RIGHT] === KEY_WAS_DOWN)
+        else if (RIGHT_PRESSED)
         {
-          target = [player_position[0] + 16 * 11, player_position[1]];
+          movement_target = [player_position[0] + 16 * 11, player_position[1]];
           player_hflip = false;
         }
-        if (target)
+        if (movement_target)
         {
-          const targetRoom: V2 = [Math.floor(target[0] / 16 / 11), Math.floor(target[1] / 16 / 9)];
+          const targetRoom: V2 = [Math.floor(movement_target[0] / 16 / 11), Math.floor(movement_target[1] / 16 / 9)];
           const room = current_level._rooms[targetRoom[1] * 10 + targetRoom[0]];
           if (room)
           {
-            add_interpolator(INTERP_CAMERA_MOVEMENT, 500, camera, target, null, ease_out_quad);
-            add_interpolator(INTERP_PLAYER_MOVEMENT, 1000, player_position, target, null, linear);
+            add_interpolator(INTERP_CAMERA_MOVEMENT, 500, camera, movement_target, null, ease_out_quad);
+            add_interpolator(INTERP_PLAYER_MOVEMENT, 1000, player_position, movement_target, null, linear);
             mode = 3;
           }
         }
@@ -210,20 +214,22 @@ export namespace Dungeon
       else if (mode === 2)
       {
         // MAP MODE
-        if (key_state[A_BUTTON] === KEY_WAS_DOWN || key_state[B_BUTTON] === KEY_WAS_DOWN)
+        if (A_PRESSED || B_PRESSED)
           mode = 0;
       }
       else if (mode === 3)
       {
-        if (player_room._enemies.length === 0)
-        {
-          mode = 1;
-        }
-        else
+        // TRIGGER EVENTS / COMBAT
+        let enemies_alive = false;
+        for (let enemy of player_room._enemies)
+          enemies_alive = enemies_alive || enemy._alive;
+        if (enemies_alive)
         {
           switch_to_scene(Combat._scene_id);
           mode = 9;
         }
+        else
+          mode = 1;
       }
     }
   };
@@ -293,4 +299,4 @@ export namespace Dungeon
   };
   export let _scene_id = get_next_scene_id();
   export let _scene: Scene = { _scene_id, _reset_fn, _update_fn, _render_fn };
-}
+};

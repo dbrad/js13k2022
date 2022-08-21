@@ -1,4 +1,5 @@
-import { skeleton, spirit, zombie } from "@gameplay/card-builders";
+import { buff, skeleton, spell, spirit, zombie } from "@gameplay/card-builders";
+import { build_attack_modifier, build_defense_modifier, build_heal } from "@gameplay/effects";
 import { V2 } from "@math/vector";
 import { window_reference } from "./screen";
 import { set_zzfx_mute } from "./zzfx";
@@ -10,6 +11,7 @@ export type GameState = [
   number[], // GAMESTATE_RESOURCES
   Card[], // GAMESTATE_CARD_COLLECTION
   Card[], // GAMESTATE_DECK
+  CombatData, // GAMESTATE_COMBAT
 ];
 
 export type Player = [
@@ -31,24 +33,31 @@ let default_player: Player =
     [false, false, false, false],
   ];
 
+export type CombatData = [
+  number, // ATTACK_MODIFIER
+  number, // DEFENSE_MODIFIER
+  V2, // SKELETON_MODIFIERS
+  V2, // ZOMBIE_MODIFIERS
+  V2, // SPIRIT_MODIFIERS
+];
+
 export type Card = [
-  number, // TYPE
-  number, // LEVEL
-  number, // ATTACK
-  number, // DEFENSE
-  Effect[], // EFFECTS
+  string, // CARD_NAME
+  number, // CARD_TYPE
+  number, // CARD_LEVEL
+  number, // CARD_ATTACK
+  number, // CARD_DEFENSE
+  Effect[], // CARD_EFFECTS
 ];
 
 export type Effect = [
-  number, // TYPE
-  string, // DESCRIPTION
-  number, // LEVEL
-  (target: Enemy | null) => void, // APPLY_EFFECT_FUNCTION
+  string, // EFFECT_DESCRIPTION
+  number, // EFFECT_VALUE
+  number, // EFFECT_APPLY_FUNCTION
 ];
 
 export type Enemy = {
   _type: number,
-  _element: number,
   _alive: boolean,
   _max_hp: number,
   _hp: number,
@@ -102,6 +111,8 @@ export let setup_game_state = () =>
     deck[i + 1] = zombie();
     deck[i + 2] = spirit();
   }
+  deck[15] = buff("necrotic\npower", [build_attack_modifier(1), build_defense_modifier(-1)]);
+  deck[16] = spell("minor death\ncoil", 1, build_heal(1));
 
   game_state = [
     events,
@@ -109,7 +120,8 @@ export let setup_game_state = () =>
     default_player,
     [0, 0, 0, 0, 0],
     [],
-    deck
+    deck,
+    [0, 0, [0, 0], [0, 0], [0, 0]]
   ];
 };
 

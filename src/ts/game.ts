@@ -68,8 +68,6 @@ window_reference.addEventListener('load', async () =>
   let elasped_time: number = 0;
   let loop = (now: number): void =>
   {
-    requestAnimationFrame(loop);
-
     performance_mark("start_of_frame");
     gl_clear();
 
@@ -108,6 +106,7 @@ window_reference.addEventListener('load', async () =>
       push_text("touch to play", SCREEN_CENTER_X, SCREEN_CENTER_Y, { _align: TEXT_ALIGN_CENTER, _colour: animation_frame ? WHITE : BLACK });
       gl_flush();
     }
+    requestAnimationFrame(loop);
   };
 
   gl_set_clear_colour(0, 0, 0);

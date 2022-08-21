@@ -12,7 +12,7 @@ esbuild.serve({
   sourcemap: true,
   outfile: "build/debug/game.js",
   define: {
-    "DEBUG": false,
+    "DEBUG": true,
     ...DEFINITIONS
   },
   loader: {

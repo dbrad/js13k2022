@@ -3,7 +3,7 @@ import { render_player_status } from "@root/nodes/player-status";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X } from "@root/screen";
-import { math } from "math";
+import { safe_add, safe_subtract } from "math";
 import { MainMenu } from "./00-main-menu";
 import { LevelSelect } from "./02-level-select";
 export namespace Hub
@@ -24,9 +24,9 @@ export namespace Hub
   let _update_fn = (now: number, delta: number) =>
   {
     if (key_state[D_UP] === KEY_WAS_DOWN)
-      selected_option_index = math.max(0, selected_option_index - 1);
+      selected_option_index = safe_subtract(selected_option_index, 1);
     else if (key_state[D_DOWN] === KEY_WAS_DOWN)
-      selected_option_index = math.min(number_of_options - 1, selected_option_index + 1);
+      selected_option_index = safe_add(number_of_options - 1, selected_option_index, 1);
     else if (key_state[A_BUTTON] === KEY_WAS_DOWN)
     {
       if (selected_option_index === 0)

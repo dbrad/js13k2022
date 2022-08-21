@@ -1,0 +1,36 @@
+USED: 84.28 % | 11219 BYTES
+LEFT: 15.72 % |  2093 BYTES
+
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+TypeScript                      51            495             49           3376
+-------------------------------------------------------------------------------
+SUM:                            51            495             49           3376
+-------------------------------------------------------------------------------
+
+events
+  Resource Trade?
+  Resource Get?
+  Heal Player
+  Get a Card?
+    Should there be a way to scrap cards?
+  Chance events? 
+    Chance to gain resources or lose hp?
+  Hard optional fight for more resources or a special card
+    Level of fight is current level + 10 or 20?
+
+Coil Bonus:
+  - 1 level 1 card of each minion + Minor Death Coil? (1 dmg +  1 heal)
+
+Levels are now:
+  The Catacombs
+    - 1-1 to 1-3, boss is a cultist, reward are Necrotic Power (+1/-1) and Necrotic Vigor(-1/+1) card
+  The Bone Zone
+    - 2-1 to 2-3, boss is a skeleton necromancer, reward is the bone zone card
+  The Flesh Mound
+    - 3-1 to 3-3, boss is a zombie necromancer, reward is the wall of flesh card
+  The Forgotten Haunt
+    - 4-1 to 4-3, boss is a spirit necromancer, reward is the Haunting Hour card
+  The Throne of the First Lich
+    - 5-1 to 5-3, boss is a First Lich, reward is the Lord of Death card, and winning the game

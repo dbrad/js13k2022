@@ -4,7 +4,7 @@ import { has_save_file, load_game, setup_game_state } from "@root/game-state";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT } from "@root/screen";
-import { math } from "math";
+import { safe_add, safe_subtract } from "math";
 import { Hub } from "./01-hub";
 import { Dialog } from "./20-dialog";
 
@@ -39,9 +39,9 @@ export namespace MainMenu
       remaining_seconds = timer_end - Date.now() / 1000;
 
     if (key_state[D_UP] === KEY_WAS_DOWN)
-      selected_option_index = math.max(0, selected_option_index - 1);
+      selected_option_index = safe_subtract(selected_option_index, 1);
     else if (key_state[D_DOWN] === KEY_WAS_DOWN)
-      selected_option_index = math.min(number_of_options - 1, selected_option_index + 1);
+      selected_option_index = safe_add(number_of_options - 1, selected_option_index, 1);
     else if (key_state[A_BUTTON] === KEY_WAS_DOWN)
     {
       if (number_of_options == 3 && selected_option_index == 0)
@@ -71,7 +71,7 @@ export namespace MainMenu
       let minutes = (Math.floor((remaining_seconds % 86400) % 3600 / 60) + "").padStart(2, "0");
       let seconds = (Math.floor(remaining_seconds % 60) + "").padStart(2, "0");
 
-      push_text(`Submission Deadline: ${days}:${hours}:${minutes}:${seconds}`, SCREEN_CENTER_X, SCREEN_HEIGHT - 40, { _font: FONT_SMALL, _align: TEXT_ALIGN_CENTER });
+      push_text(`submission deadline: ${days}:${hours}:${minutes}:${seconds}`, SCREEN_CENTER_X, SCREEN_HEIGHT - 40, { _font: FONT_SMALL, _align: TEXT_ALIGN_CENTER });
     }
 
     push_text("the forgotten depths", SCREEN_CENTER_X, SCREEN_CENTER_Y - 110, { _align: TEXT_ALIGN_CENTER, _scale: 3 });
