@@ -1,5 +1,5 @@
 import { push_text } from "@graphics/text";
-import { key_state, set_key_pulse_time } from "@input/controls";
+import { A_PRESSED, DOWN_PRESSED, set_key_pulse_time, UP_PRESSED } from "@input/controls";
 import { has_save_file, load_game, setup_game_state } from "@root/game-state";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
@@ -38,11 +38,11 @@ export namespace MainMenu
     if (DEBUG)
       remaining_seconds = timer_end - Date.now() / 1000;
 
-    if (key_state[D_UP] === KEY_WAS_DOWN)
+    if (UP_PRESSED)
       selected_option_index = safe_subtract(selected_option_index, 1);
-    else if (key_state[D_DOWN] === KEY_WAS_DOWN)
+    else if (DOWN_PRESSED)
       selected_option_index = safe_add(number_of_options - 1, selected_option_index, 1);
-    else if (key_state[A_BUTTON] === KEY_WAS_DOWN)
+    else if (A_PRESSED)
     {
       if (number_of_options == 3 && selected_option_index == 0)
       {
@@ -77,7 +77,7 @@ export namespace MainMenu
     push_text("the forgotten depths", SCREEN_CENTER_X, SCREEN_CENTER_Y - 110, { _align: TEXT_ALIGN_CENTER, _scale: 3 });
     push_text("birth of a necromancer", SCREEN_CENTER_X, SCREEN_CENTER_Y - 70, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL });
     render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y - 20], menu_options, number_of_options, selected_option_index);
-    push_text(`entry by david brad`, SCREEN_CENTER_X, SCREEN_HEIGHT - 30, { _font: FONT_SMALL, _align: TEXT_ALIGN_CENTER });
+    push_text(`js13k 2022 entry by david brad`, SCREEN_CENTER_X, SCREEN_HEIGHT - 30, { _align: TEXT_ALIGN_CENTER });
   };
 
   export let _scene_id = get_next_scene_id();

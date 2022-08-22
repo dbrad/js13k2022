@@ -13,31 +13,23 @@ export let unit_sprite = [
   0,
   TEXTURE_BANDIT,
   TEXTURE_ROBED_MAN,
-  TEXTURE_ROBED_MAN,
-];
-
-export let intent_type_sprite = [
-  0,
-  TEXTURE_SWORD,
-  TEXTURE_SHEILD,
-];
-
-export let intent_type_palette = [
-  PALETTE_BANDIT + 2,
-  0,
-  0,
 ];
 
 export let unit_palette_map: number[] = [
   PALETTE_SKELETON,
   PALETTE_ZOMBIE,
   0,
-  PALETTE_BANDIT,
-  PALETTE_MAGE,
+  PALETTE_PLAYER,
   PALETTE_PLAYER,
 ];
 
-export let unit_name_map = ["skeleton", "zombie", "spirit", "bandit", "mage", "lich"];
+let intent_type_sprite = [
+  0,
+  TEXTURE_SWORD,
+  TEXTURE_SHEILD,
+];
+
+export let unit_name_map = ["skeleton", "zombie", "spirit", "cultist", "lich"];
 
 export let render_enemy = (enemy: Enemy, x: number, y: number) =>
 {
@@ -54,19 +46,22 @@ export let render_enemy = (enemy: Enemy, x: number, y: number) =>
   push_text(unit_name_map[enemy_type], x + 16, y + 38, { _font: FONT_SMALL, _align: TEXT_ALIGN_CENTER });
 
   let intent = enemy._current_intent;
-  let intent_type = intent._type;
+  let intent_type = intent;
   if (intent_type !== ENEMY_INTENT_TYPE_NONE)
   {
-    let intent_value = intent._type;
-    push_textured_quad(intent_type_sprite[intent_type], x + 16, y - 10, { _palette_offset: intent_type_palette[intent_type] });
-    push_text(intent_value === 0 ? "" : intent_value + "", x + 8, y - 10);
+    push_textured_quad(intent_type_sprite[intent_type], x + 16, y - 10, { _palette_offset: !intent_type ? 19 : 0 });
+    push_text(enemy._attack === 0 ? "" : enemy._attack + "", x + 8, y - 10);
   }
 };
 
 let spirit_colours: [V4, V4] = [abgr_number_to_rgba_v4(0xFFFFFFFF), abgr_number_to_rgba_v4(0x40FFCCCC)];
-export let render_spirit = (x: number, y: number) =>
+export let render_spirit = (x: number, y: number, scale: number = 1) =>
 {
   let [begin, end] = spirit_colours;
+  spirit_particle._size_begin = 1 * scale;
+  spirit_particle._size_end = 0.1 * scale;
+  spirit_particle._size_variation = 0.5 * scale;
+  set_V2(spirit_particle._velocity_variation, 30 * scale, 30 * scale);
   set_V2(spirit_particle._position, x, y);
   set_V4(spirit_particle._colour_begin, begin[0], begin[1], begin[2], begin[3]);
   set_V4(spirit_particle._colour_end, end[0], end[1], end[2], end[3]);

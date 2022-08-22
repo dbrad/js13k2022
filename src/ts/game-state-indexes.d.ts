@@ -1,10 +1,11 @@
 declare const GAMESTATE_EVENTS: 0;
 declare const GAMESTATE_CURRENT_DUNGEON: 1;
 declare const GAMESTATE_PLAYER: 2;
-declare const GAMESTATE_RESOURCES: 3;
-declare const GAMESTATE_CARD_COLLECTION: 4;
-declare const GAMESTATE_DECK: 5;
-declare const GAMESTATE_COMBAT: 6;
+declare const GAMESTATE_RESOURCES_GATHERED: 3;
+declare const GAMESTATE_RESOURCES: 4;
+declare const GAMESTATE_CARD_COLLECTION: 5;
+declare const GAMESTATE_DECK: 6;
+declare const GAMESTATE_COMBAT: 7;
 
 declare const ATTACK_MODIFIER: 0;
 declare const DEFENSE_MODIFIER: 1;

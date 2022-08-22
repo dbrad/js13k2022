@@ -10,6 +10,8 @@ import { canvas_reference, initialize_page, SCREEN_CENTER_X, SCREEN_CENTER_Y, wi
 import { zzfx_init } from "@root/zzfx";
 import { MainMenu } from "@scenes/00-main-menu";
 import { Hub } from "@scenes/01-hub";
+import { Craft } from "@scenes/01a-craft";
+import { ManageDeck } from "@scenes/01b-manaage-deck";
 import { LevelSelect } from "@scenes/02-level-select";
 import { Dungeon } from "@scenes/03-dungeon";
 import { Combat } from "@scenes/04-combat";
@@ -47,6 +49,8 @@ window_reference.addEventListener('load', async () =>
 
         register_scene(MainMenu._scene);
         register_scene(Hub._scene);
+        register_scene(Craft._scene);
+        register_scene(ManageDeck._scene);
         register_scene(LevelSelect._scene);
         register_scene(Dungeon._scene);
         register_scene(Combat._scene);

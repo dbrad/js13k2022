@@ -1,0 +1,59 @@
+USED: 91.52 % | 12183 BYTES
+LEFT:  8.48 % |  1129 BYTES
+
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+TypeScript                      56            522             58           3619
+-------------------------------------------------------------------------------
+SUM:                            56            522             58           3619
+-------------------------------------------------------------------------------
+
+Crafting Screen
+  Resources
+    Bones
+    Rotting Flesh
+    Souls
+    Human Hearts
+    Congealed Blood
+    Lich Hearts
+  Left Side
+    List of craftable cards, cards with never collected resources are ???
+  Right Side
+    shows costs, card preview and bonus options
+
+Deck Management Screen
+  Left side is list of available cards
+  right side is list of cards in deck
+  middle shows card highlighted
+
+Drop
+  skeletons
+    bones
+  zombies
+    rotting flesh
+  spirits
+    souls
+  cultists
+    souls
+    human hearts
+  wight
+    bones
+  ghouls
+    rotting flesh
+    congealed blood
+  will-o-wisps
+    souls
+  liches
+    bones
+    rotting flesh
+    souls
+    congealed blood
+    lich heart
+
+Combat Moves for Enemies...
+  Attack
+  Block?
+  Buff Attack
+  Heal?
+  Attack and Heal (Zombie)

@@ -1,7 +1,7 @@
 import { BLACK, floor_palettes, wall_palettes } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
 import { push_text } from "@graphics/text";
-import { key_state } from "@input/controls";
+import { A_PRESSED, B_PRESSED, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
 import { V2 } from "@math/vector";
 import { animation_frame } from "@root/animation";
 import { game_state, Level, Room } from "@root/game-state";
@@ -140,13 +140,6 @@ export namespace Dungeon
     }
     else
     {
-      let UP_PRESSED = key_state[D_UP] === KEY_WAS_DOWN;
-      let DOWN_PRESSED = key_state[D_DOWN] === KEY_WAS_DOWN;
-      let LEFT_PRESSED = key_state[D_LEFT] === KEY_WAS_DOWN;
-      let RIGHT_PRESSED = key_state[D_RIGHT] === KEY_WAS_DOWN;
-      let A_PRESSED = key_state[A_BUTTON] === KEY_WAS_DOWN;
-      let B_PRESSED = key_state[B_BUTTON] === KEY_WAS_DOWN;
-
       if (mode === 0)
       {
         // MENU MODE

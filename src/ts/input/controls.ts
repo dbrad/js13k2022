@@ -13,7 +13,7 @@ let hardware_key_state: number[] = [
     KEY_IS_UP, // B_BUTTON
 ];
 
-export let key_state: number[] = [
+let key_state: number[] = [
     KEY_IS_UP, // D_LEFT
     KEY_IS_UP, // D_UP
     KEY_IS_UP, // D_RIGHT
@@ -21,6 +21,13 @@ export let key_state: number[] = [
     KEY_IS_UP, // A_BUTTON
     KEY_IS_UP, // B_BUTTON
 ];
+
+export let UP_PRESSED: boolean = false;
+export let DOWN_PRESSED: boolean = false;
+export let LEFT_PRESSED: boolean = false;
+export let RIGHT_PRESSED: boolean = false;
+export let A_PRESSED: boolean = false;
+export let B_PRESSED: boolean = false;
 
 let key_map: Record<string, number> = {
     "ArrowLeft": D_LEFT,
@@ -206,7 +213,15 @@ export let update_input_system = (now: number, delta: number): void =>
             else if (key_state[key] === KEY_WAS_DOWN)
                 key_state[key] = KEY_IS_UP;
         }
+
     }
+    UP_PRESSED = key_state[D_UP] === KEY_WAS_DOWN;
+    DOWN_PRESSED = key_state[D_DOWN] === KEY_WAS_DOWN;
+    LEFT_PRESSED = key_state[D_LEFT] === KEY_WAS_DOWN;
+    RIGHT_PRESSED = key_state[D_RIGHT] === KEY_WAS_DOWN;
+    A_PRESSED = key_state[A_BUTTON] === KEY_WAS_DOWN;
+    B_PRESSED = key_state[B_BUTTON] === KEY_WAS_DOWN;
+
 };
 
 let get_button_colour = (key: number): number => key_state[key] === KEY_IS_UP ? 0x993C3C3C : 0x99666666;
@@ -274,4 +289,10 @@ export let clear_input = (): void =>
         hardware_key_state[key] = KEY_IS_UP;
         key_state[key] = KEY_IS_UP;
     }
+    UP_PRESSED = false;
+    DOWN_PRESSED = false;
+    LEFT_PRESSED = false;
+    RIGHT_PRESSED = false;
+    A_PRESSED = false;
+    B_PRESSED = false;
 };

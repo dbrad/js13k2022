@@ -1,12 +1,13 @@
 import { assert } from "@debug/assert";
-import { effects } from "@gameplay/effects";
+import { card_list } from "@gameplay/cards";
+import { EffectFunction, effects } from "@gameplay/effects";
 import { get_next_enemy_intent } from "@gameplay/enemy-builder";
 import { BLACK, floor_palettes, wall_palettes, WHITE } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
 import { push_text } from "@graphics/text";
-import { key_state } from "@input/controls";
+import { A_PRESSED, B_PRESSED, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
 import { V2 } from "@math/vector";
-import { Card, Effect, Enemy, game_state, Level, Player } from "@root/game-state";
+import { Effect, Enemy, game_state, Level, Player } from "@root/game-state";
 import { get_modifiers, render_card } from "@root/nodes/card";
 import { render_panel } from "@root/nodes/panel";
 import { render_player_status } from "@root/nodes/player-status";
@@ -41,8 +42,8 @@ export namespace Combat
   let player: Player;
   let attackers: Minion[] = [];
   let defenders: Minion[] = [];
-  let deck: Card[] = [];
-  let discard: Card[] = [];
+  let deck: number[] = [];
+  let discard: number[] = [];
 
   let total_attack = 0;
   let total_defense = 0;
@@ -50,7 +51,7 @@ export namespace Combat
 
   let casting_spell = false;
 
-  let hand: Card[] = [];
+  let hand: number[] = [];
   let hand_size: number = 0;
   let discarding = [false, false, false, false, false];
 
@@ -88,19 +89,19 @@ export namespace Combat
     queue_index++;
   };
 
-  let player_position: V2 = [1.5 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 48];
-  let summon_positions: V2[] = [
-    [3.5 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 48],
-    [1.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 48],
-    [1.5 * 48 + SCREEN_CENTER_X - 264, 4 * 48 + 48],
-    [3 * 48 + SCREEN_CENTER_X - 264, 1.5 * 48 + 48],
-    [3 * 48 + SCREEN_CENTER_X - 264, 4.5 * 48 + 48],
+  let player_position: V2 = [1.5 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 32];
+  let attacker_positions: V2[] = [
+    [4 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 32],
+    [3.5 * 48 + SCREEN_CENTER_X - 264, 3.5 * 48 + 32],
+    [3.5 * 48 + SCREEN_CENTER_X - 264, 2.5 * 48 + 32],
+    [3 * 48 + SCREEN_CENTER_X - 264, 3.5 * 48 + 32],
+    [3 * 48 + SCREEN_CENTER_X - 264, 2.5 * 48 + 32],
   ];
   let enemy_starting_positions: V2[] = [
-    [8.5 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 48],
-    [7.5 * 48 + SCREEN_CENTER_X - 264, 1.5 * 48 + 48],
-    [7.5 * 48 + SCREEN_CENTER_X - 264, 4.5 * 48 + 48],
-    [6.5 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 48],
+    [8.5 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 32],
+    [7.5 * 48 + SCREEN_CENTER_X - 264, 1.5 * 48 + 32],
+    [7.5 * 48 + SCREEN_CENTER_X - 264, 4.5 * 48 + 32],
+    [6.5 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 32],
   ];
   let enemy_positions: V2[] = [];
 
@@ -166,17 +167,11 @@ export namespace Combat
     deck.length = 0;
     discard.length = 0;
 
-    deck = JSON.parse(JSON.stringify(game_state[GAMESTATE_DECK]));
+    deck = structuredClone(shuffle(game_state[GAMESTATE_DECK]));
   };
 
   let _update_fn = (now: number, delta: number) =>
   {
-    let UP_PRESSED = key_state[D_UP] === KEY_WAS_DOWN;
-    let DOWN_PRESSED = key_state[D_DOWN] === KEY_WAS_DOWN;
-    let LEFT_PRESSED = key_state[D_LEFT] === KEY_WAS_DOWN;
-    let RIGHT_PRESSED = key_state[D_RIGHT] === KEY_WAS_DOWN;
-    let A_PRESSED = key_state[A_BUTTON] === KEY_WAS_DOWN;
-    let B_PRESSED = key_state[B_BUTTON] === KEY_WAS_DOWN;
     hand_size = hand.length;
 
     if (selected_card_index >= hand_size)
@@ -191,19 +186,20 @@ export namespace Combat
         if (discarding[i])
           discard.push(hand.splice(i, 1)[0]);
         discarding[i] = false;
-      } for (let i = 0; i < 5; i++)
+      }
+      for (let i = 0; i < 5; i++)
       {
-        if (!hand[i])
+        if (hand[i] === undefined)
         {
-          let card = deck.pop();
-          if (!card)
+          let card_id = deck.pop();
+          if (card_id === undefined)
           {
-            deck = JSON.parse(JSON.stringify(shuffle(discard)));
+            deck = structuredClone(shuffle(discard));
             discard.length = 0;
-            card = deck.pop();
+            card_id = deck.pop();
           }
-          assert(card !== undefined, "card from deck undefined after shuffling in discard pile");
-          hand[i] = card;
+          assert(card_id !== undefined, "card from deck undefined after shuffling in discard pile");
+          hand[i] = card_id;
         }
       }
       hand_size = hand.length;
@@ -233,12 +229,12 @@ export namespace Combat
             card_use_menu = ["activate"];
             mode = COMBAT_MODE_ACTION_SELECT;
 
-            let card = hand[selected_card_index];
+            let card = card_list[hand[selected_card_index]];
             let card_type = card[CARD_TYPE];
             if (card_type === 3) // Buff Spell
             {
               for (let effect of card[CARD_EFFECTS])
-                effects[effect[EFFECT_APPLY_FUNCTION]](effect);
+                (effects[effect[EFFECT_APPLY_FUNCTION]] as EffectFunction)(effect);
 
               hand.splice(selected_card_index, 1);
               clear_particle_system();
@@ -281,7 +277,8 @@ export namespace Combat
         selected_action_index = safe_add(1, selected_action_index, 1);
       else if (A_PRESSED)
       {
-        let card = hand.splice(selected_card_index, 1)[0];
+        let card_id = hand.splice(selected_card_index, 1)[0];
+        let card = card_list[card_id];
         let card_type = card[CARD_TYPE];
 
         let [attack_modifier, defense_modifier] = get_modifiers(card_type);
@@ -292,7 +289,7 @@ export namespace Combat
         else
           attackers.push({ _type: card_type, _value: attack, _effects: card[CARD_EFFECTS] });
 
-        discard.push(card);
+        discard.push(card_id);
         clear_particle_system();
         mode = COMBAT_MODE_CARD_SELECT;
       }
@@ -309,14 +306,18 @@ export namespace Combat
       {
         if (casting_spell)
         {
-          let card = hand[selected_card_index];
-          for (let effect of card[CARD_EFFECTS])
-            effects[effect[EFFECT_APPLY_FUNCTION]](effect);
-
           let target_enemy = enemies[target_index_map[target_index]];
+
+          let card_id = hand[selected_card_index];
+          let card = card_list[card_id];
+          for (let effect of card[CARD_EFFECTS])
+            if (effect[EFFECT_APPLY_FUNCTION] >= 0)
+              effects[effect[EFFECT_APPLY_FUNCTION]](effect, target_enemy);
+
           target_enemy._hp = math.max(0, target_enemy._hp - card[CARD_ATTACK]);
 
           hand.splice(selected_card_index, 1);
+          discard.push(card_id);
           casting_spell = false;
           clear_particle_system();
           mode = COMBAT_MODE_CARD_SELECT;
@@ -327,8 +328,6 @@ export namespace Combat
     }
     else if (mode === COMBAT_MODE_ATTACK_ACTION)
     {
-      // ATTACK ACTION MINIGAME
-      // TODO: Minigame here
       if (A_PRESSED)
       {
         let target_enemy = enemies[target_index_map[target_index]];
@@ -343,8 +342,6 @@ export namespace Combat
     }
     else if (mode === COMBAT_MODE_DEFEND_ACTION)
     {
-      // DEFENSE ACTION MINIGAME
-      // TODO: Minigame here
       if (A_PRESSED)
       {
         total_defense = 0;
@@ -434,7 +431,7 @@ export namespace Combat
         let tile_y = player_room_y * 9 + y;
 
         let render_x = x * 48 + SCREEN_CENTER_X - 264;
-        let render_y = y * 48 + 48;
+        let render_y = y * 48 + 32;
 
         let tile_id = current_level._tile_map[tile_y * 110 + tile_x];
         if (tile_id > 4)
@@ -460,12 +457,6 @@ export namespace Combat
     push_quad(player_position[0] + 8 - 6, player_position[1] + 8 + 28, 30, 8, 0x99000000);
     push_textured_quad(TEXTURE_ROBED_MAN, player_position[0] + 8, player_position[1] + 8, { _scale: 2, _palette_offset: PALETTE_PLAYER, _animated: true });
 
-    // for (let s = 0; s < 5; s++)
-    // {
-    //   if (summons[s] && summons[s][SUMMON_ALIVE])
-    //     render_summon(summons[s], summon_positions[s][0] + 8, summon_positions[s][1] + 8);
-    // }
-
     for (let e = 0; e < 4; e++)
     {
       if (enemies[e] && enemies[e]._alive)
@@ -475,28 +466,46 @@ export namespace Combat
     if (mode === COMBAT_MODE_SELECT_TARGET)
     {
       let target_list_length = target_list.length;
-      render_panel(SCREEN_CENTER_X - 50, SCREEN_CENTER_Y - 5, 100, 14 * target_list_length + 3);
-      render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y], target_list, target_list.length, target_index, 1);
+      render_panel(SCREEN_CENTER_X - 50, SCREEN_CENTER_Y - 100, 100, 14 * target_list_length + 3);
+      render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y - 95], target_list, target_list.length, target_index, 1);
     }
 
     if (mode === COMBAT_MODE_CARD_SELECT || mode === COMBAT_MODE_DRAW || mode === COMBAT_MODE_ACTION_SELECT)
     {
       for (let hand_index = 0; hand_index < hand_size; hand_index++)
       {
-        let card = hand[hand_index];
+        let card = card_list[hand[hand_index]];
         if (card)
         {
           let selected = hand_index === selected_card_index && row;
           let highlight_colour = discarding[hand_index] ? 0xff0000ff : selected ? WHITE : undefined;
-          render_card(50 + 110 * hand_index, SCREEN_HEIGHT - 85 - (selected ? 10 : 0), card, highlight_colour);
+          render_card(50 + 110 * hand_index, SCREEN_HEIGHT - 85 - (selected ? 10 : 0), card, 1, highlight_colour);
         }
       }
     }
 
+    // for (let a = 0; a < attackers.length; a++)
+    // {
+    //   let unit_type = attackers[a]._type;
+    //   if (unit_type === 2)
+    //     render_spirit(attacker_positions[a][0] + 8 + 16, attacker_positions[a][1] + 8 + 16, 1);
+    //   else
+    //     push_textured_quad(unit_sprite[unit_type], attacker_positions[a][0] + 8, attacker_positions[a][1] + 8, { _animated: true, _palette_offset: unit_palette_map[unit_type], _scale: 2 });
+    // }
+
+    // for (let d = 0; d < defenders.length; d++)
+    // {
+    //   let unit_type = attackers[d]._type;
+    //   if (unit_type === 2)
+    //     render_spirit(attacker_positions[d][0] + 8 + 16, attacker_positions[d][1] + 8 + 16, 1);
+    //   else
+    //     push_textured_quad(unit_sprite[unit_type], attacker_positions[d][0] + 8, attacker_positions[d][1] + 8, { _animated: true, _palette_offset: unit_palette_map[unit_type], _scale: 2 });
+    // }
+
     if (mode === COMBAT_MODE_CARD_SELECT && !sub_mode)
     {
       push_text("discard and draw", SCREEN_CENTER_X, SCREEN_HEIGHT - 110, { _align: TEXT_ALIGN_CENTER });
-      render_panel(SCREEN_CENTER_X - 40, SCREEN_CENTER_Y - 10, 80, 28, !row ? WHITE : 0xff2d2d2d);
+      render_panel(SCREEN_CENTER_X - 40, SCREEN_CENTER_Y - 100, 80, 28, !row ? WHITE : 0xff2d2d2d);
       let text = "done";
       for (let d = 0; d < 5; d++)
       {
@@ -506,20 +515,20 @@ export namespace Combat
           break;
         }
       }
-      push_text(text, SCREEN_CENTER_X, SCREEN_CENTER_Y, { _align: TEXT_ALIGN_CENTER, _colour: (row ? 0xff444444 : WHITE) });
+      push_text(text, SCREEN_CENTER_X, SCREEN_CENTER_Y - 90, { _align: TEXT_ALIGN_CENTER, _colour: (row ? 0xff444444 : WHITE) });
     }
     else if (mode === COMBAT_MODE_CARD_SELECT)
     {
-      render_panel(SCREEN_CENTER_X - 40, SCREEN_CENTER_Y - 10, 80, 28, !row ? WHITE : 0xff2d2d2d);
-      push_text("end turn", SCREEN_CENTER_X, SCREEN_CENTER_Y, { _align: TEXT_ALIGN_CENTER, _colour: (row ? 0xff444444 : WHITE) });
+      render_panel(SCREEN_CENTER_X - 40, SCREEN_CENTER_Y - 100, 80, 28, !row ? WHITE : 0xff2d2d2d);
+      push_text("end turn", SCREEN_CENTER_X, SCREEN_CENTER_Y - 90, { _align: TEXT_ALIGN_CENTER, _colour: (row ? 0xff444444 : WHITE) });
     }
 
     render_player_status();
 
     if (mode === COMBAT_MODE_ACTION_SELECT)
     {
-      render_panel(SCREEN_CENTER_X - 55, SCREEN_CENTER_Y + 30 - 10, 110, 40);
-      render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y + 30], card_use_menu, card_use_menu.length, selected_action_index, 1);
+      render_panel(SCREEN_CENTER_X - 55, SCREEN_CENTER_Y - 100, 110, 40);
+      render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y - 90], card_use_menu, card_use_menu.length, selected_action_index, 1);
     }
   };
   export let _scene_id = get_next_scene_id();

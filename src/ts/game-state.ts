@@ -1,6 +1,5 @@
-import { buff, skeleton, spell, spirit, zombie } from "@gameplay/card-builders";
-import { build_attack_modifier, build_defense_modifier, build_heal } from "@gameplay/effects";
 import { V2 } from "@math/vector";
+import { number_sort } from "math";
 import { window_reference } from "./screen";
 import { set_zzfx_mute } from "./zzfx";
 
@@ -8,9 +7,10 @@ export type GameState = [
   number[], // GAMESTATE_EVENTS
   Level, // GAMESTATE_CURRENT_DUNGEON
   Player, // GAMESTATE_PLAYER
+  boolean[], // GAMESTATE_RESOURCES_GATHERED
   number[], // GAMESTATE_RESOURCES
-  Card[], // GAMESTATE_CARD_COLLECTION
-  Card[], // GAMESTATE_DECK
+  number[], // GAMESTATE_CARD_COLLECTION
+  number[], // GAMESTATE_DECK
   CombatData, // GAMESTATE_COMBAT
 ];
 
@@ -62,15 +62,10 @@ export type Enemy = {
   _max_hp: number,
   _hp: number,
   _attack: number,
-  _block_value: number,
-  _debuffs: boolean[],
-  _intent_pool: Enemy_Intent[],
-  _current_intent: Enemy_Intent,
-};
-
-export type Enemy_Intent = {
-  _type: number,
-  _value: number,
+  _attack_debuff_turns: number,
+  _attack_buff: number,
+  _intent_pool: number[],
+  _current_intent: number,
 };
 
 export type Room = {
@@ -78,7 +73,6 @@ export type Room = {
   _peeked: boolean,
   _exit: boolean,
   _enemies: Enemy[],
-  _loot: [];
   _events: [];
 };
 
@@ -104,22 +98,15 @@ export let setup_game_state = () =>
     events[i] = 0;
   }
 
-  let deck: Card[] = [];
-  for (let i = 0; i < 15; i += 3)
-  {
-    deck[i] = skeleton();
-    deck[i + 1] = zombie();
-    deck[i + 2] = spirit();
-  }
-  deck[15] = buff("necrotic\npower", [build_attack_modifier(1), build_defense_modifier(-1)]);
-  deck[16] = spell("minor death\ncoil", 1, build_heal(1));
+  let deck: number[] = "00000111112222266778".split("").map(n => +n).sort(number_sort);;
 
   game_state = [
     events,
     null_level,
     default_player,
-    [0, 0, 0, 0, 0],
-    [],
+    [false, false, false, false, false, false],
+    [0, 0, 0, 0, 0, 0],
+    [0, 1, 2],
     deck,
     [0, 0, [0, 0], [0, 0], [0, 0]]
   ];

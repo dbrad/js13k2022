@@ -11,7 +11,5 @@ declare const TEXTURE_ROBED_MAN: number;
 declare const TEXTURE_BANDIT: number;
 declare const TEXTURE_SKELETON: number;
 declare const TEXTURE_ZOMBIE: number;
-declare const TEXTURE_BAT: number;
-declare const TEXTURE_SNAKE: number;
 declare const TEXTURE_WALL: number;
 declare const TEXTURE_FLOOR: number;

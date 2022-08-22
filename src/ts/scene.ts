@@ -62,7 +62,6 @@ export let push_scene = (sceneId: number): void =>
     scene_stack.push(scene);
     current_scene = scene;
     current_scene._reset_fn();
-    save_game();
 };
 
 export let pop_scene = (): void =>
@@ -73,8 +72,6 @@ export let pop_scene = (): void =>
     scene_stack.pop();
     assert(old_scene !== undefined, `Unable to find scene #"${next_scene_id}"`);
     current_scene = scene_stack[scene_stack.length - 1];
-    current_scene._reset_fn();
-    save_game();
 };
 
 export let update_scene = (now: number, delta: number): void =>

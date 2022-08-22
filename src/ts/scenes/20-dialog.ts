@@ -1,9 +1,10 @@
 import { push_text } from "@graphics/text";
-import { key_state } from "@input/controls";
+import { A_PRESSED, B_PRESSED, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
 import { animation_frame } from "@root/animation";
 import { render_panel } from "@root/nodes/panel";
+import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, pop_scene, Scene } from "@root/scene";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
+import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
 import { zzfx } from "@root/zzfx";
 export namespace Dialog
 {
@@ -12,6 +13,9 @@ export namespace Dialog
   let currentDialogText: string = "";
   let currentDialogTextIndex: number = 0;
 
+  let choice_index = 0;
+  let choice_handler: (() => void) | null = null;
+
   let dialogTimer: number = 0;
   let letterRate = 32;
   let talkSoundPlay: number = 0;
@@ -19,6 +23,12 @@ export namespace Dialog
   export let _push_dialog_text = (text: string): void =>
   {
     dialogQueue.push(text);
+  };
+
+  export let _push_yes_no_dialog = (text: string, confirm_handler: () => void): void =>
+  {
+    dialogQueue.push(text);
+    choice_handler = confirm_handler;
   };
 
   let set_dialog_text = (text: string) =>
@@ -36,7 +46,12 @@ export namespace Dialog
     return false;
   };
 
-  let _reset_fn = () => { };
+  let _reset_fn = () =>
+  {
+    choice_index = 0;
+    if (targetDialogText.length === 0)
+      set_dialog_text(dialogQueue.shift() || "");
+  };
   let _update_fn = (now: number, delta: number) =>
   {
     if (targetDialogText.length === 0)
@@ -46,12 +61,24 @@ export namespace Dialog
     {
       if (currentDialogTextIndex >= targetDialogText.length)
       {
-        if (key_state[A_BUTTON] === KEY_WAS_DOWN)
+        if (UP_PRESSED) choice_index = 0;
+        else if (DOWN_PRESSED) choice_index = 1;
+        else if (A_PRESSED)
+        {
+          if (choice_handler)
+          {
+            if (!choice_index)
+              choice_handler();
+          }
+          choice_handler = null;
+          targetDialogText = "";
+        }
+        else if (B_PRESSED)
           targetDialogText = "";
       }
       else
       {
-        if (key_state[A_BUTTON] === KEY_WAS_DOWN)
+        if (A_PRESSED)
           letterRate = 16;
 
         dialogTimer += delta;
@@ -80,8 +107,16 @@ export namespace Dialog
     render_panel(0, box_y - box_h, box_w, box_h);
     push_text(currentDialogText, 5, box_y - (box_h - 5), { _width: box_w - 10, _scale: 2 });
 
-    if (currentDialogTextIndex >= targetDialogText.length && animation_frame)
-      push_text("continue", SCREEN_WIDTH - 5, box_y - 13, { _align: TEXT_ALIGN_RIGHT });
+    if (currentDialogTextIndex >= targetDialogText.length)
+    {
+      if (choice_handler)
+      {
+        render_panel(SCREEN_CENTER_X - 50, SCREEN_CENTER_Y, 100, 54);
+        render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y + 5], ["yes", "no"], 2, choice_index);
+      }
+      else if (animation_frame)
+        push_text("continue", SCREEN_WIDTH - 5, box_y - 13, { _align: TEXT_ALIGN_RIGHT });
+    }
   };
 
   export let _scene_id = get_next_scene_id();

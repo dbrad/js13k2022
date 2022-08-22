@@ -19,7 +19,6 @@ let zzfx_sample_rate: number = 44100;
 // zzfxX - the common audio context
 let zzfx_context: AudioContext;
 
-
 export let zzfx_init = (): void =>
 {
   if (!zzfx_context)

@@ -39,3 +39,5 @@ export let shuffle = <T>(array: T[]): T[] =>
 
 export let safe_subtract = (base: number, value: number): number => math.max(0, base - value);
 export let safe_add = (max: number, base: number, value: number): number => math.min(max, base + value);
+
+export let number_sort = (a: number, b: number) => a - b;

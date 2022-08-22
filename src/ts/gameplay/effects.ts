@@ -1,4 +1,4 @@
-import { Effect, game_state } from "@root/game-state";
+import { Effect, Enemy, game_state } from "@root/game-state";
 import { safe_add } from "math";
 
 
@@ -18,11 +18,18 @@ let heal = (effect: Effect) =>
   player[PLAYER_HP] = safe_add(player[PLAYER_MAX_HP], player[PLAYER_HP], effect[EFFECT_VALUE]);
 };
 
-type EffectFunction = (effect: Effect) => void;
-export let effects: EffectFunction[] = [
+let weaken = (effect: Effect, enemy: Enemy) =>
+{
+  enemy._attack_debuff_turns += effect[EFFECT_VALUE];
+};
+
+export type EffectFunction = (effect: Effect) => void;
+export type TargetedEffectFunction = (effect: Effect, enemy: Enemy) => void;
+export let effects: (EffectFunction | TargetedEffectFunction)[] = [
   attack_modifier,
   defense_modifier,
-  heal
+  heal,
+  weaken
 ];
 
 export let build_attack_modifier = (value: number): Effect =>
@@ -53,4 +60,11 @@ export let build_barbs = (value: number): Effect =>
     "barbs",
     value,
     -1
+  ];
+
+export let build_weaken = (value: number): Effect =>
+  [
+    "weaken",
+    value,
+    3
   ];
