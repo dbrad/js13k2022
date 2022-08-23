@@ -3,26 +3,27 @@ import { V2 } from "@math/vector";
 import { Enemy } from "@root/game-state";
 import { math, random_int } from "math";
 
-let enemy_data: V2[] = [
-  [0, 1], // ENEMY_TYPE_SKELETON
-  [1, 0], // ENEMY_TYPE_ZOMBIE
-  [0, 0], // ENEMY_TYPE_SPIRIT
-  [1, 1], // ENEMY_TYPE_CULTIST
-  [2, 1], // ENEMY_TYPE_LICH
+let enemy_attack_defense: V2[] = [
+  [1, 0], // ENEMY_TYPE_SKELETON
+  [0, 1], // ENEMY_TYPE_ZOMBIE
+  [2, 0], // ENEMY_TYPE_SPIRIT
+  [1, 2], // ENEMY_TYPE_CULTIST
+  [3, 1], // ENEMY_TYPE_LICH
 ];
-export let build_enemy = (_type: number, level: number): Enemy =>
+export let build_enemy = (_type: number, _level: number): Enemy =>
 {
-  let enemy_stats = enemy_data[_type];
+  let enemy_stats = enemy_attack_defense[_type];
 
-  let level_mod = math.floor(level / 10);
+  let level_mod = math.floor(_level / 15);
   let mod_plus_one = level_mod + 1;
 
   let _attack = random_int(mod_plus_one, mod_plus_one + (mod_plus_one * enemy_stats[0]));
   let _block_value = random_int(mod_plus_one + enemy_stats[1], level_mod + (mod_plus_one * enemy_stats[1]));
-  let _hp = (level - (_attack * 2) - (_block_value - 1)) * 3;
+  let _hp = (_level * 2 - (_attack) - (_block_value));
 
   return {
     _type,
+    _level,
     _alive: true,
     _max_hp: _hp,
     _hp,
@@ -42,7 +43,8 @@ export let get_enemy = (chapter: number, level: number) =>
 
 export let get_boss = (chapter: number, level: number) =>
 {
-  return build_enemy(4, level + 5);
+  let enemy_type = chapter === 4 ? 4 : 3;
+  return build_enemy(enemy_type, level + 5);
 };
 
 export let get_next_enemy_intent = (enemy: Enemy) =>

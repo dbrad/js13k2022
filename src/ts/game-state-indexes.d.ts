@@ -13,12 +13,8 @@ declare const SKELETON_MODIFIERS: 2;
 declare const ZOMBIE_MODIFIERS: 3;
 declare const SPIRIT_MODIFIERS: 4;
 
-declare const PLAYER_XP: 0;
-declare const PLAYER_LEVEL: 1;
-declare const PLAYER_LEVEL_PENDING: 2;
-declare const PLAYER_HP: 3;
-declare const PLAYER_MAX_HP: 4;
-declare const PLAYER_DEBUFFS: 5;
+declare const PLAYER_HP: 0;
+declare const PLAYER_MAX_HP: 1;
 
 declare const CARD_NAME: 0;
 declare const CARD_TYPE: 1;

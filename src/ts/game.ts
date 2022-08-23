@@ -1,7 +1,6 @@
 import { initialize_fps_meter, performance_mark, tick_fps_meter } from "@debug/fps-meter";
 import { BLACK, WHITE } from "@graphics/colour";
 import { push_text } from "@graphics/text";
-import { load_options } from "@root/game-state";
 import { initialize_input, is_touch_event, render_controls, update_hardware_input } from "@root/input/controls";
 import { initialze_interpolation_system, update_interpolation_system } from "@root/interpolate";
 import { initialize_particle_system } from "@root/particle-system";
@@ -16,8 +15,7 @@ import { LevelSelect } from "@scenes/02-level-select";
 import { Dungeon } from "@scenes/03-dungeon";
 import { Combat } from "@scenes/04-combat";
 import { Dialog } from "@scenes/20-dialog";
-import { Options } from "@scenes/21-options";
-import { gl_clear, gl_flush, gl_get_context, gl_init, gl_set_clear_colour } from "gl";
+import { gl_clear, gl_flush, gl_get_context, gl_init } from "gl";
 import { load_palette, load_textures } from "texture";
 import { animation_frame, update_animation_frame } from "./animation";
 
@@ -56,10 +54,8 @@ window_reference.addEventListener('load', async () =>
         register_scene(Combat._scene);
 
         register_scene(Dialog._scene);
-        register_scene(Options._scene);
 
         zzfx_init();
-        load_options();
       }
     }, 0);
   };
@@ -113,7 +109,6 @@ window_reference.addEventListener('load', async () =>
     requestAnimationFrame(loop);
   };
 
-  gl_set_clear_colour(0, 0, 0);
   then = performance.now();
   requestAnimationFrame(loop);
 });

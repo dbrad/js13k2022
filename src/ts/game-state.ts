@@ -1,7 +1,6 @@
 import { V2 } from "@math/vector";
 import { number_sort } from "math";
 import { window_reference } from "./screen";
-import { set_zzfx_mute } from "./zzfx";
 
 export type GameState = [
   number[], // GAMESTATE_EVENTS
@@ -15,22 +14,14 @@ export type GameState = [
 ];
 
 export type Player = [
-  number, // PLAYER_XP
-  number, // PLAYER_LEVEL
-  boolean, // PLAYER_LEVEL_PENDING
   number, // PLAYER_HP
   number, // PLAYER_MAX_HP
-  boolean[], // PLAYER_DEBUFFS
 ];
 
 let default_player: Player =
   [
-    0,
-    1,
-    false,
     10,
     10,
-    [false, false, false, false],
   ];
 
 export type CombatData = [
@@ -58,6 +49,7 @@ export type Effect = [
 
 export type Enemy = {
   _type: number,
+  _level: number,
   _alive: boolean,
   _max_hp: number,
   _hp: number,
@@ -98,7 +90,7 @@ export let setup_game_state = () =>
     events[i] = 0;
   }
 
-  let deck: number[] = "00000111112222266778".split("").map(n => +n).sort(number_sort);;
+  let starter_deck: number[] = "00000111112222266778".split("").map(n => +n).sort(number_sort);;
 
   game_state = [
     events,
@@ -107,7 +99,7 @@ export let setup_game_state = () =>
     [false, false, false, false, false, false],
     [0, 0, 0, 0, 0, 0],
     [0, 1, 2],
-    deck,
+    starter_deck,
     [0, 0, [0, 0], [0, 0], [0, 0]]
   ];
 };
@@ -141,44 +133,4 @@ export let load_game = (): void =>
 export let has_save_file = (): boolean =>
 {
   return storage.getItem(save_name) !== null;
-};
-
-// Save Options
-type GameOptions = {
-  mm: boolean, // Mute Music
-  ms: boolean, // Mute Sound
-  c: boolean, // Coil
-};
-
-export let options_state: GameOptions;
-let initialize_options = () =>
-{
-  options_state = {
-    mm: false,
-    ms: false,
-    c: false,
-  };
-};
-
-let options_save_name = save_name + "-o";
-
-export let save_options = (): void =>
-{
-  let json = JSON.stringify(options_state);
-  let b64 = btoa(json);
-  storage.setItem(options_save_name, b64);
-};
-
-export let load_options = (): void =>
-{
-  let b64 = storage.getItem(options_save_name);
-  if (!b64)
-  {
-    initialize_options();
-    save_options();
-    return;
-  }
-  options_state = JSON.parse(atob(b64)) as GameOptions;
-
-  set_zzfx_mute(options_state.ms);
 };

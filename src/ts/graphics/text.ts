@@ -26,8 +26,7 @@ let default_text_parameters = {
 
 let text_cache: Map<string, [string, number][]> = new Map();
 
-
-let parse_text = (text: string, width: number = SCREEN_WIDTH, font: number = FONT_NORMAL, scale: number = 1): number =>
+let parse_text_into_lines = (text: string, width: number = SCREEN_WIDTH, font: number = FONT_NORMAL, scale: number = 1): number =>
 {
   if (text_cache.has(`${text}_${font}_${scale}_${width}`)) return text_cache.get(`${text}_${font}_${scale}_${width}`)?.length || 0;
 
@@ -49,7 +48,7 @@ let parse_text = (text: string, width: number = SCREEN_WIDTH, font: number = FON
         let last_word = result_line.pop();
         assert(last_word !== undefined, "No last word to pop found.");
         let line = result_line.join(" ");
-        let line_length = line.replace(/[A-Z]/g, "").length;
+        let line_length = line.length;
         result_lines.push([line, line_length]);
         result_line = [last_word];
       }
@@ -89,7 +88,7 @@ export let push_text = (text: string, x: number, y: number, parameters: TextPara
   let lines = text_cache.get(`${text}_${font}_${scale}_${width}`);
   if (!lines)
   {
-    parse_text(text, width, font, scale);
+    parse_text_into_lines(text, width, font, scale);
     lines = text_cache.get(`${text}_${font}_${scale}_${width}`);
   }
   assert(lines !== undefined, "text lines not found");
@@ -102,23 +101,14 @@ export let push_text = (text: string, x: number, y: number, parameters: TextPara
     let line_length: number = (character_count * letter_size) + ((character_count - 1) * letter_gap);
 
     if (align === TEXT_ALIGN_CENTER)
-    {
       alignment_offset = math.floor(-line_length / 2);
-    }
     else if (align === TEXT_ALIGN_RIGHT)
-    {
       alignment_offset = math.floor(-(line_length));
-    }
 
     for (let word of words)
     {
       for (let letter of word.split(""))
       {
-        if (letter === "R")
-        {
-          colour = 0xFF0000FF;
-          continue;
-        }
         let character_index = character_code_map.get(letter);
         assert(character_index !== undefined, `Undefined character ${letter} used.`);
         let t = TEXTURES[font + character_index];
@@ -137,3 +127,6 @@ export let push_text = (text: string, x: number, y: number, parameters: TextPara
     x_offset = 0;
   }
 };
+
+export let CENTERED: TextParameters = { _align: TEXT_ALIGN_CENTER };
+export let SMALL_AND_CENTERED: TextParameters = { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL };

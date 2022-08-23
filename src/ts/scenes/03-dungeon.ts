@@ -9,18 +9,18 @@ import { add_interpolator, ease_out_quad, get_interpolation_data, linear } from 
 import { render_panel } from "@root/nodes/panel";
 import { render_player_status } from "@root/nodes/player-status";
 import { render_text_menu } from "@root/nodes/text-menu";
-import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
+import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
 import { math, safe_add, safe_subtract } from "math";
 import { Hub } from "./01-hub";
 import { Combat } from "./04-combat";
+import { Dialog } from "./20-dialog";
 export namespace Dungeon
 {
   let selected_option_index = 0;
-  let number_of_options = 3;
+  let number_of_options = 2;
   let menu_options = [
-    "map",
-    "status",
+    "full map",
     "retreat"
   ];
 
@@ -41,6 +41,7 @@ export namespace Dungeon
 
   let mode: number = 0;
   let current_level: Level;
+  let rooms: Room[];
   let player_position: V2;
 
   let render_minimap = (x: number, y: number, from_x: number, to_x: number, from_y: number, to_y: number) =>
@@ -59,7 +60,7 @@ export namespace Dungeon
       for (let x = from_x; x <= to_x; x++)
       {
         if (x < 1 || y < 0 || x > 9 || y > 7) continue;
-        const current_room = current_level._rooms[y * 10 + x];
+        const current_room = rooms[y * 10 + x];
 
         let colour: number = 0;
         let special_colour = 0;
@@ -98,6 +99,7 @@ export namespace Dungeon
     selected_option_index = 0;
 
     current_level = game_state[GAMESTATE_CURRENT_DUNGEON];
+    rooms = current_level._rooms;
     player_position = current_level._player_position;
 
     camera[0] = player_position[0];
@@ -114,14 +116,14 @@ export namespace Dungeon
     player_room_x = math.floor(player_tile_x / 11);
     player_room_y = math.floor(player_tile_y / 9);
     player_room_index = player_room_y * 10 + player_room_x;
-    player_room = current_level._rooms[player_room_index];
+    player_room = rooms[player_room_index];
     if (player_room)
       player_room._seen = true;
 
-    if (current_level._rooms[player_room_index + 10]) current_level._rooms[player_room_index + 10]._peeked = true;
-    if (current_level._rooms[player_room_index - 10]) current_level._rooms[player_room_index - 10]._peeked = true;
-    if (current_level._rooms[player_room_index + 1]) current_level._rooms[player_room_index + 1]._peeked = true;
-    if (current_level._rooms[player_room_index - 1]) current_level._rooms[player_room_index - 1]._peeked = true;
+    if (rooms[player_room_index + 10]) rooms[player_room_index + 10]._peeked = true;
+    if (rooms[player_room_index - 10]) rooms[player_room_index - 10]._peeked = true;
+    if (rooms[player_room_index + 1]) rooms[player_room_index + 1]._peeked = true;
+    if (rooms[player_room_index - 1]) rooms[player_room_index - 1]._peeked = true;
 
     let camera_lerp = get_interpolation_data(INTERP_CAMERA_MOVEMENT);
     if (camera_lerp)
@@ -149,20 +151,16 @@ export namespace Dungeon
           selected_option_index = safe_add(number_of_options - 1, selected_option_index, 1);
         else if (A_PRESSED)
         {
-          if (selected_option_index === 0)
+          if (!selected_option_index)
           {
             // FULL MAP
             mode = 2;
           }
-          else if (selected_option_index === 1)
-          {
-            // STATUS
-          }
-          else if (selected_option_index === 2)
+          else
           {
             // Retreat
-            // TODO: Confirmation window / post level wrap up
-            switch_to_scene(Hub._scene_id);
+            Dialog._push_yes_no_dialog("retreat to the entrance?\nyou will keep all reagents, but lose all progress on the level.", () => switch_to_scene(Hub._scene_id));
+            push_scene(Dialog._scene_id);
           }
         }
         else if (B_PRESSED)
@@ -195,7 +193,7 @@ export namespace Dungeon
         if (movement_target)
         {
           const targetRoom: V2 = [Math.floor(movement_target[0] / 16 / 11), Math.floor(movement_target[1] / 16 / 9)];
-          const room = current_level._rooms[targetRoom[1] * 10 + targetRoom[0]];
+          const room = rooms[targetRoom[1] * 10 + targetRoom[0]];
           if (room)
           {
             add_interpolator(INTERP_CAMERA_MOVEMENT, 500, camera, movement_target, null, ease_out_quad);
@@ -213,6 +211,7 @@ export namespace Dungeon
       else if (mode === 3)
       {
         // TRIGGER EVENTS / COMBAT
+        // TODO: TRIGGER EVENTS
         let enemies_alive = false;
         for (let enemy of player_room._enemies)
           enemies_alive = enemies_alive || enemy._alive;
@@ -276,7 +275,7 @@ export namespace Dungeon
 
     if (mode === 0)
     {
-      render_panel(SCREEN_WIDTH - 194, 40, 194, 100);
+      render_panel(SCREEN_WIDTH - 194, 40, 194, 70);
       render_text_menu([SCREEN_WIDTH - 97, 55], menu_options, number_of_options, selected_option_index);
     }
     else if (mode === 2)

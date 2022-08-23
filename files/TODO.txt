@@ -2,50 +2,54 @@ COMBAT
   Enemy AI
     Need the pool builder for each type
 
+  Apply debuffs
+  
   Better enemy indexes
-    Has positions change based on number of enemies?
+    Have positions change based on number of enemies?
 
-  Render Minions
   Render Attack and defense
-  End of Combat Loot Screen
 
   Combat Juice
-    Animate the hoard attack
     Animate enemy basic attack
     Animate enemy magic attack
-    Animate cards more
+    Animate cards more?
 
-  Fix Unit Positions
-    Some are behind UI at times
-
-  Enemies attacking after death bug
-
-  Enemies don't die to spells right away
+  Deck count
+  Discard count
 
   Player Death
 
+  Smooth Phase Changes
+
+LICH PALETTE
+CULTIST PALETTE
+
+Set control hints?
+
+Get loot
+
 LEVEL GEN
  EVENTS
-  Resource Trade?
-  Resource Get?
+  Resource Trade
+  Resource Get
   Heal Player
-  Get a Card?
-    Should there be a way to scrap cards?
   Chance events? 
     Chance to gain resources or lose hp?
   Hard optional fight for more resources or a special card
     Level of fight is current level + 10 or 20?
+
+AUDIO
+
+THIN STORY / INTRO
 
 COIL BONUS
   Add Detection
   1 level 1 card of each minion + 1 Minor Death Coil
 
 Nice to Haves
-  Options
   Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
 
 Optimizations
   Custom font range loader to reduce character set
   Remove Interpolation system with in-place lerps calls
   combine panel + text menu?
-  

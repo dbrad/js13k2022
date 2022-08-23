@@ -30,6 +30,7 @@ export let load_palette = (): Promise<void> =>
   });
 };
 
+let font_letters = `!"'()+,-./0123456789?abcdefghijklmnopqrstuvwxyz`;
 export let load_textures = (): Promise<void> =>
 {
   let texture_atlas: HTMLImageElement = new Image();
@@ -59,10 +60,11 @@ export let load_textures = (): Promise<void> =>
         }
         else if (texture_type === TEXTURE_TYPE_FONT)
         {
-          for (let i: number = 33; i <= 90; i++)
+          for (let letter_index: number = 0; letter_index < 47; letter_index++)
           {
-            character_code_map.set(String.fromCharCode(i).toLowerCase(), i);
-            let offset_x = x + (i - 33) * texture_width;
+            let i = font_letters.charCodeAt(letter_index);
+            character_code_map.set(String.fromCharCode(i), i);
+            let offset_x = x + (letter_index) * texture_width;
             TEXTURES[texture_id[0] + i] = {
               _w: texture_width,
               _h: texture_height,

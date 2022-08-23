@@ -103,49 +103,45 @@ export let gl_init = (context: WebGLRenderingContext): void =>
   let pallete_uniform_location = webgl_context.getUniformLocation(shader, "p");
   webgl_context.uniform1i(pallete_uniform_location, 1);
 
-  let vertex_attribute = webgl_context.getAttribLocation(shader, "v");
-  let texture_attribute = webgl_context.getAttribLocation(shader, "t");
-  let colour_attribute = webgl_context.getAttribLocation(shader, "c");
-  let pallete_offset_attribute = webgl_context.getAttribLocation(shader, "po");
+  let gl_getAttribLocation = webgl_context.getAttribLocation.bind(webgl_context);
 
-  webgl_context.enableVertexAttribArray(vertex_attribute);
-  webgl_context.vertexAttribPointer(vertex_attribute, 2, GL_FLOAT, false, VERTEX_SIZE, 0);
+  let vertex_attribute = gl_getAttribLocation(shader, "v");
+  let texture_attribute = gl_getAttribLocation(shader, "t");
+  let colour_attribute = gl_getAttribLocation(shader, "c");
+  let pallete_offset_attribute = gl_getAttribLocation(shader, "po");
 
-  webgl_context.enableVertexAttribArray(texture_attribute);
-  webgl_context.vertexAttribPointer(texture_attribute, 2, GL_FLOAT, false, VERTEX_SIZE, 8);
+  let gl_enableVertexAttribArray = webgl_context.enableVertexAttribArray.bind(webgl_context);;
+  let gl_vertexAttribPointer = webgl_context.vertexAttribPointer.bind(webgl_context);;
 
-  webgl_context.enableVertexAttribArray(colour_attribute);
-  webgl_context.vertexAttribPointer(colour_attribute, 4, GL_UNSIGNED_BYTE, true, VERTEX_SIZE, 16);
+  gl_enableVertexAttribArray(vertex_attribute);
+  gl_vertexAttribPointer(vertex_attribute, 2, GL_FLOAT, false, VERTEX_SIZE, 0);
 
-  webgl_context.enableVertexAttribArray(pallete_offset_attribute);
-  webgl_context.vertexAttribPointer(pallete_offset_attribute, 1, GL_FLOAT, false, VERTEX_SIZE, 20);
+  gl_enableVertexAttribArray(texture_attribute);
+  gl_vertexAttribPointer(texture_attribute, 2, GL_FLOAT, false, VERTEX_SIZE, 8);
+
+  gl_enableVertexAttribArray(colour_attribute);
+  gl_vertexAttribPointer(colour_attribute, 4, GL_UNSIGNED_BYTE, true, VERTEX_SIZE, 16);
+
+  gl_enableVertexAttribArray(pallete_offset_attribute);
+  gl_vertexAttribPointer(pallete_offset_attribute, 1, GL_FLOAT, false, VERTEX_SIZE, 20);
 
   webgl_context.uniformMatrix4fv(webgl_context.getUniformLocation(shader, "m"), false, new Float32Array([2 / width, 0, 0, 0, 0, -2 / height, 0, 0, 0, 0, 1, 1, -1, 1, 0, 0]));
+
+  webgl_context.clearColor(0, 0, 0, 1);
 };
 
 export let gl_upload_texture = (image: HTMLImageElement | HTMLCanvasElement, texture_slot: number): void =>
 {
+  let gl_texParameteri = webgl_context.texParameteri.bind(webgl_context);
   webgl_context.activeTexture(texture_slot);
   let texture = webgl_context.createTexture();
   assert(texture !== null, "Unable to create texture.");
   webgl_context.bindTexture(GL_TEXTURE2D, texture);
-  webgl_context.texParameteri(GL_TEXTURE2D, 10242, 33071);
-  webgl_context.texParameteri(GL_TEXTURE2D, 10243, 33071);
-  webgl_context.texParameteri(GL_TEXTURE2D, 10240, 9728);
-  webgl_context.texParameteri(GL_TEXTURE2D, 10241, 9728);
+  gl_texParameteri(GL_TEXTURE2D, 10242, 33071);
+  gl_texParameteri(GL_TEXTURE2D, 10243, 33071);
+  gl_texParameteri(GL_TEXTURE2D, 10240, 9728);
+  gl_texParameteri(GL_TEXTURE2D, 10241, 9728);
   webgl_context.texImage2D(GL_TEXTURE2D, 0, 6408, 6408, 5121, image);
-};
-
-let clear_colour: [number, number, number] = [0, 0, 0];
-export let gl_set_clear_colour = (r: number, g: number, b: number): void =>
-{
-  clear_colour = [r / 255, g / 255, b / 255];
-  webgl_context.clearColor(clear_colour[0], clear_colour[1], clear_colour[2], 1);
-};
-
-export let gl_get_clear_colour = (): [number, number, number] =>
-{
-  return [clear_colour[0] * 255, clear_colour[1] * 255, clear_colour[2] * 255];
 };
 
 export let gl_clear = (): void =>

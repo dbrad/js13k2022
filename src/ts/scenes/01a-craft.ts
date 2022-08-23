@@ -1,7 +1,7 @@
 import { card_list } from "@gameplay/cards";
 import { WHITE } from "@graphics/colour";
-import { push_text } from "@graphics/text";
-import { A_PRESSED, B_PRESSED, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
+import { CENTERED, push_text } from "@graphics/text";
+import { A_PRESSED, B_PRESSED, DOWN_PRESSED, set_key_pulse_time, UP_PRESSED } from "@input/controls";
 import { game_state } from "@root/game-state";
 import { render_card } from "@root/nodes/card";
 import { render_card_list } from "@root/nodes/card-list";
@@ -32,6 +32,7 @@ export namespace Craft
 
   let _reset_fn = () =>
   {
+    set_key_pulse_time([D_UP, D_DOWN], 150);
     selection_index = 0;
     player_resources = game_state[GAMESTATE_RESOURCES];
   };
@@ -69,18 +70,16 @@ export namespace Craft
       push_scene(Dialog._scene_id);
     }
     else if (B_PRESSED)
-    {
       switch_to_scene(Hub._scene_id);
-    }
   };
 
   let _render_fn = () =>
   {
     push_text("card crafting", SCREEN_WIDTH - 5, 5, { _scale: 3, _align: TEXT_ALIGN_RIGHT });
-    render_card_list(5, 4, card_index_list, number_of_cards, selection_index, 3);
-    render_card(SCREEN_CENTER_X - 100, 40, card_list[selection_index + 3], 2);
+    render_card_list(5, 50, card_index_list, number_of_cards, selection_index, 3);
+    render_card(SCREEN_CENTER_X - 100, 50, card_list[selection_index + 3], 2);
 
-    push_text("crafting cost", SCREEN_CENTER_X, SCREEN_CENTER_Y + 25, { _align: TEXT_ALIGN_CENTER });
+    push_text("crafting cost", SCREEN_CENTER_X, SCREEN_CENTER_Y + 35, CENTERED);
     let costs = card_costs[selection_index];
     let y_offset = 0;
     for (let [i, cost] of costs.entries())
@@ -88,7 +87,7 @@ export namespace Craft
       if (cost > 0)
       {
         let _colour = cost <= player_resources[i] ? WHITE : 0xff0000ff;
-        push_text(cost + " " + resource_names[i], SCREEN_CENTER_X, SCREEN_CENTER_Y + 50 + y_offset, { _align: TEXT_ALIGN_CENTER, _colour });
+        push_text(cost + " " + resource_names[i], SCREEN_CENTER_X, SCREEN_CENTER_Y + 60 + y_offset, { _align: TEXT_ALIGN_CENTER, _colour });
         y_offset += 15;
       }
     }

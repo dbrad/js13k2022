@@ -40,7 +40,7 @@ let key_map: Record<string, number> = {
 
 let gamepad: Gamepad | null = null;
 
-let is_touch: boolean = false;
+export let is_touch: boolean = false;
 let touches: V2[] = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
 
 export let is_touch_event = (e: Event | PointerEvent | TouchEvent): void =>
@@ -251,9 +251,9 @@ export let render_controls = (): void =>
         push_text("a", a_button_x + half_button_size, a_button_y + half_button_size - 7, button_text_options);
     }
     if (!gamepad && !is_touch)
-        help_text = "arrow keys / x: action / c: cancel";
+        help_text = "arrow keys / x. action / c. cancel";
     else
-        help_text = "dpad / a: action / b: cancel";
+        help_text = "dpad / a. action / b. cancel";
 
     push_text(help_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 8, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL, _colour: 0x66FFFFFF });
 

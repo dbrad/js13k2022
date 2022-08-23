@@ -7,7 +7,7 @@ import { render_card_list } from "@root/nodes/card-list";
 import { clear_particle_system } from "@root/particle-system";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
-import { safe_add, safe_subtract } from "math";
+import { number_sort, safe_add, safe_subtract } from "math";
 import { Hub } from "./01-hub";
 import { Dialog } from "./20-dialog";
 
@@ -67,19 +67,32 @@ export namespace ManageDeck
     {
       if (column)
       {
-        // pop from deck to collection and sort
+        let card_id = deck.splice(right_index, 1)[0];
+        if (card_id > 2)
+        {
+          collection.push(card_id);
+          collection.sort(number_sort);
+        }
       }
       else
       {
-        // pop from collection to deck and sort
+        let card_id = collection[left_index];
+        if (card_id > 2)
+        {
+          collection.splice(left_index, 1);
+        }
+        deck.push(card_id);
+        deck.sort(number_sort);
       }
+      collection_size = collection.length;
+      deck_size = deck.length;
       clear_particle_system();
     }
     else if (B_PRESSED)
     {
       if (deck_size < 20)
       {
-        Dialog._push_dialog_text("Deck must contain at least 20 cards.");
+        Dialog._push_dialog_text("deck must contain at least 20 cards.");
         push_scene(Dialog._scene_id);
       }
       else

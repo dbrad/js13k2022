@@ -13,7 +13,7 @@ export let canvas_reference: HTMLCanvasElement;
 
 export let initialize_page = (): HTMLCanvasElement =>
 {
-  document_reference.title = `js13k 2022 (${VERSION})`;
+  document_reference.title = `Forgotten Depths (${VERSION})`;
   let css = "margin:0;padding:0;background-color:#000;width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;";
   document_reference.documentElement.style.cssText = css;
   document_reference.body.style.cssText = css;

@@ -24,10 +24,3 @@ export let zzfx_init = (): void =>
   if (!zzfx_context)
     zzfx_context = new AudioContext();
 };
-
-export let set_zzfx_mute = (mute: boolean) =>
-{
-  if (mute) zzfx_volume = 0.0;
-  else zzfx_volume = 0.5;
-  zzfx_init();
-};
