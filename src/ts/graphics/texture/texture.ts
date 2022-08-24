@@ -44,21 +44,16 @@ export let load_textures = (): Promise<void> =>
       canvas.getContext("2d")?.drawImage(texture_atlas, 0, 0);
 
       gl_upload_texture(canvas, GL_TEXTURE0);
+
+      TEXTURES[TEXTURE_SINGLE_WHITE_PIXEL] = {
+        _w: 1, _h: 1,
+        _u0: 2 / width, _v0: 1 / height,
+        _u1: (2 + 1) / width, _v1: (1 + 1) / height
+      };
       for (let texture of texture_definitions)
       {
         let [texture_type, texture_id, x, y, texture_width, texture_height] = texture;
-        if (texture_type === TEXTURE_TYPE_SPRITE)
-        {
-          TEXTURES[texture_id[0]] = {
-            _w: texture_width,
-            _h: texture_height,
-            _u0: (x) / width,
-            _v0: (y) / height,
-            _u1: (x + texture_width) / width,
-            _v1: (y + texture_height) / height
-          };
-        }
-        else if (texture_type === TEXTURE_TYPE_FONT)
+        if (texture_type === TEXTURE_TYPE_FONT)
         {
           for (let letter_index: number = 0; letter_index < 47; letter_index++)
           {

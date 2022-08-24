@@ -5,7 +5,7 @@ import { A_PRESSED, B_PRESSED, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRE
 import { V2 } from "@math/vector";
 import { animation_frame } from "@root/animation";
 import { game_state, Level, Room } from "@root/game-state";
-import { add_interpolator, ease_out_quad, get_interpolation_data, linear } from "@root/interpolate";
+import { lerp } from "@root/interpolate";
 import { render_panel } from "@root/nodes/panel";
 import { render_player_status } from "@root/nodes/player-status";
 import { render_text_menu } from "@root/nodes/text-menu";
@@ -28,6 +28,11 @@ export namespace Dungeon
   let camera_pixel_size: V2 = [41 * 16, 25 * 16];
   let camera_half_width = math.floor(camera_pixel_size[0] / 2);
   let camera_half_height = math.floor(camera_pixel_size[1] / 2);
+
+  let player_origin: V2 = [0, 0];
+  let player_move_time_remaining = 0;
+  let player_moving = false;
+  let player_target: number[] = [];
 
   let camera_top_left: V2;
   let camera_bottom_right: V2;
@@ -125,20 +130,18 @@ export namespace Dungeon
     if (rooms[player_room_index + 1]) rooms[player_room_index + 1]._peeked = true;
     if (rooms[player_room_index - 1]) rooms[player_room_index - 1]._peeked = true;
 
-    let camera_lerp = get_interpolation_data(INTERP_CAMERA_MOVEMENT);
-    if (camera_lerp)
-    {
-      let values = camera_lerp._values;
-      camera[0] = math.floor(values[0]);
-      camera[1] = math.floor(values[1]);
-    }
+    camera[0] += math.ceil((player_position[0] - camera[0]) * 0.5 * (delta / 500));
+    camera[1] += math.ceil((player_position[1] - camera[1]) * 0.5 * (delta / 500));
 
-    let player_lerp = get_interpolation_data(INTERP_PLAYER_MOVEMENT);
-    if (player_lerp)
+    if (player_moving)
     {
-      let values = player_lerp._values;
-      player_position[0] = math.floor(values[0]);
-      player_position[1] = math.floor(values[1]);
+      player_move_time_remaining = safe_subtract(player_move_time_remaining, delta);
+      if (player_move_time_remaining <= 0)
+        player_moving = false;
+
+      let time_remaining = player_move_time_remaining / 750;
+      player_position[0] = math.floor(lerp(player_target[0], player_origin[0], time_remaining));
+      player_position[1] = math.floor(lerp(player_target[1], player_origin[1], time_remaining));
     }
     else
     {
@@ -196,8 +199,12 @@ export namespace Dungeon
           const room = rooms[targetRoom[1] * 10 + targetRoom[0]];
           if (room)
           {
-            add_interpolator(INTERP_CAMERA_MOVEMENT, 500, camera, movement_target, null, ease_out_quad);
-            add_interpolator(INTERP_PLAYER_MOVEMENT, 1000, player_position, movement_target, null, linear);
+            player_target[0] = movement_target[0];
+            player_target[1] = movement_target[1];
+            player_origin[0] = player_position[0];
+            player_origin[1] = player_position[1];
+            player_moving = true;
+            player_move_time_remaining = 750;
             mode = 3;
           }
         }

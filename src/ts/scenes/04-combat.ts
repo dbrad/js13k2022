@@ -7,13 +7,13 @@ import { push_quad, push_textured_quad } from "@graphics/quad";
 import { CENTERED, push_text, SMALL_AND_CENTERED } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
 import { V2 } from "@math/vector";
-import { Effect, Enemy, game_state, Level, Player } from "@root/game-state";
+import { Enemy, game_state, Level, Player } from "@root/game-state";
 import { get_modifiers, render_card } from "@root/nodes/card";
 import { render_panel } from "@root/nodes/panel";
 import { render_player_status } from "@root/nodes/player-status";
 import { resource_names } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
-import { render_enemy, unit_name_map } from "@root/nodes/unit";
+import { calculate_attack, render_enemy, unit_name_map } from "@root/nodes/unit";
 import { clear_particle_system } from "@root/particle-system";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
@@ -34,17 +34,9 @@ export namespace Combat
 
   let loot: [number, number, number, number, number] = [0, 0, 0, 0, 0];
 
-  type Minion = {
-    _type: number,
-    _value: number;
-    _effects: Effect[];
-  };
-
   let card_use_menu: string[] = [];
 
   let player: Player;
-  let attackers: Minion[] = [];
-  let defenders: Minion[] = [];
   let deck: number[] = [];
   let discard: number[] = [];
 
@@ -135,8 +127,6 @@ export namespace Combat
         loot[enemy._type] += math.ceil(enemy._level / 20);
       }
       enemies_alive = enemies_alive || enemy._alive;
-      if (enemy._alive)
-        get_next_enemy_intent(enemy);
     }
     return enemies_alive;
   };
@@ -163,9 +153,7 @@ export namespace Combat
       enemy_positions[i] = [x, y];
 
     game_state[GAMESTATE_COMBAT] = [0, 0, [0, 0], [0, 0], [0, 0]];
-    hand.length = 0;
-    deck.length = 0;
-    discard.length = 0;
+    hand.length = deck.length = discard.length = total_attack = total_defense = barbs_damage = 0;
 
     deck = structuredClone(shuffle(game_state[GAMESTATE_DECK]));
   };
@@ -285,9 +273,9 @@ export namespace Combat
         let attack = math.max(0, card[CARD_ATTACK] + attack_modifier);
         let defense = math.max(0, card[CARD_DEFENSE] + defense_modifier);
         if (selected_action_index)
-          defenders.push({ _type: card_type, _value: defense, _effects: card[CARD_EFFECTS] });
+          total_defense += defense;
         else
-          attackers.push({ _type: card_type, _value: attack, _effects: card[CARD_EFFECTS] });
+          total_attack += attack;
 
         discard.push(card_id);
         clear_particle_system();
@@ -338,36 +326,20 @@ export namespace Combat
     else if (mode === COMBAT_MODE_ATTACK_ACTION)
     {
       let target_enemy = enemies[target_index_map[target_index]];
-      total_attack = 0;
-      for (let attacker of attackers)
-        total_attack += attacker._value;
       target_enemy._hp = math.max(0, target_enemy._hp - total_attack);
       any_enemies_alive(enemies);
 
-      attackers.length = 0;
+      total_attack = 0;
       mode = COMBAT_MODE_DEFEND_ACTION;
     }
     else if (mode === COMBAT_MODE_DEFEND_ACTION)
     {
-      total_defense = 0;
-      barbs_damage = 0;
-      for (let defender of defenders)
-      {
-        total_defense += defender._value;
-        for (let effect of defender._effects)
-        {
-          if (effect[EFFECT_DESCRIPTION] === "barbs")
-            barbs_damage += effect[EFFECT_VALUE];
-        }
-      }
-
       for (let [index, enemy] of enemies.entries())
       {
         if (enemy._alive)
-          add_attack(index, enemy._attack, 100, () => { });
+          add_attack(index, calculate_attack(enemy), 500, () => { });
       }
 
-      defenders.length = 0;
       mode = COMBAT_MODE_ENEMY_ATTACKS;
     }
     else if (mode === COMBAT_MODE_ENEMY_ATTACKS)
@@ -399,6 +371,7 @@ export namespace Combat
       }
       if (attacks_done === 4)
       {
+        total_defense = 0;
         queue_index = 0;
         mode = COMBAT_MODE_POST_COMBAT;
       }
@@ -422,6 +395,14 @@ export namespace Combat
     {
       if (A_PRESSED || B_PRESSED)
       {
+        for (let l = 0; l < 5; l++)
+        {
+          if (loot[l] > 0)
+          {
+            game_state[GAMESTATE_RESOURCES_GATHERED][l] = true;
+            game_state[GAMESTATE_RESOURCES][l] = + loot[l];
+          }
+        }
         switch_to_scene(Dungeon._scene_id);
       }
     }
@@ -464,6 +445,15 @@ export namespace Combat
     // Render the entites
     push_quad(player_position[0] + 8 - 6, player_position[1] + 8 + 28, 30, 8, 0x99000000);
     push_textured_quad(TEXTURE_ROBED_MAN, player_position[0] + 8, player_position[1] + 8, { _scale: 2, _palette_offset: PALETTE_PLAYER, _animated: true });
+    if (total_attack > 0)
+    {
+      push_text("" + total_attack, player_position[0], player_position[1]);
+    }
+
+    if (total_defense > 0)
+    {
+      push_text("" + total_defense, player_position[0] + 48, player_position[1], { _align: TEXT_ALIGN_RIGHT });
+    }
 
     for (let e = 0; e < 4; e++)
     {

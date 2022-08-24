@@ -1,6 +1,5 @@
 const TEXTURE_TYPES = {
   TEXTURE_TYPE_FONT: 0,
-  TEXTURE_TYPE_SPRITE: 1,
   TEXTURE_TYPE_SPRITE_STRIP: 2,
 };
 
@@ -11,6 +10,8 @@ const TEXTURES = {
   TEXTURE_SWORD: texture_id++,
   TEXTURE_SHEILD: texture_id++,
   TEXTURE_STAIR: texture_id++,
+  TEXTURE_CROSS: texture_id++,
+  TEXTURE_ARROW: texture_id++,
 
   TEXTURE_WHITE_CIRCLE: texture_id++,
   TEXTURE_D_PAD: texture_id++,
@@ -30,13 +31,6 @@ const FONTS = {
 
   FONT_NORMAL: 200,
   FONT_SMALL: 400,
-};
-
-let interp_id = 0;
-const INTERPOLATION_IDS = {
-  INTERP_SCENE_TRANSITION: interp_id++,
-  INTERP_CAMERA_MOVEMENT: interp_id++,
-  INTERP_PLAYER_MOVEMENT: interp_id++,
 };
 
 const GL = {
@@ -96,7 +90,9 @@ const GAMESTATE = {
 
   ENEMY_INTENT_TYPE_NONE: 0,
   ENEMY_INTENT_TYPE_ATTACK: 1,
-  ENEMY_INTENT_TYPE_BLOCK: 2,
+  ENEMY_INTENT_TYPE_ATTACK_HEAL: 2,
+  ENEMY_INTENT_TYPE_HEAL: 3,
+  ENEMY_INTENT_TYPE_BUFF: 4,
 
   COMBAT_MODE_DRAW: combat_mode++,
   COMBAT_MODE_CARD_SELECT: combat_mode++,
@@ -125,4 +121,13 @@ const PALETTES = {
   PALETTE_ZOMBIE: 38,
   PALETTE_GHOUL: 40,
 };
-module.exports.DEFINITIONS = { ...TEXTURE_TYPES, ...TEXTURES, ...INTERPOLATION_IDS, ...FONTS, ...GL, ...CONTROLS, ...GAMESTATE, ...ENEMY_TYPES, ...PALETTES };
+
+let event_id = 0;
+const EVENTS = {
+  EVENT_NOT_DONE: 0,
+  EVENT_PENDING: 1,
+  EVENT_DONE: 2,
+
+  EVENT_COIL_FIRST_TIME: event_id++,
+};
+module.exports.DEFINITIONS = { ...TEXTURE_TYPES, ...TEXTURES, ...FONTS, ...GL, ...CONTROLS, ...GAMESTATE, ...ENEMY_TYPES, ...PALETTES, ...EVENTS };

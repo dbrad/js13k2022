@@ -1,14 +1,16 @@
 import { push_text } from "@graphics/text";
 import { A_PRESSED, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
+import { game_state } from "@root/game-state";
 import { render_resoures } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
-import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
+import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
-import { safe_add, safe_subtract } from "math";
+import { number_sort, safe_add, safe_subtract } from "math";
 import { MainMenu } from "./00-main-menu";
 import { Craft } from "./01a-craft";
 import { ManageDeck } from "./01b-manaage-deck";
 import { LevelSelect } from "./02-level-select";
+import { Dialog } from "./20-dialog";
 export namespace Hub
 {
   let selected_option_index = 0;
@@ -25,6 +27,30 @@ export namespace Hub
   };
   let _update_fn = (now: number, delta: number) =>
   {
+    if (document.monetization && document.monetization.state === "pending")
+    {
+    }
+    else if (document.monetization && document.monetization.state === "started")
+    {
+      if (game_state[GAMESTATE_EVENTS][EVENT_COIL_FIRST_TIME] === EVENT_NOT_DONE)
+      {
+        Dialog._push_dialog_text("thank you for supporting this game through web monetization!");
+        Dialog._push_dialog_text("as a bonus for supporting this game a few extra cards have been added to you collection!");
+        Dialog._push_dialog_text("death coil added to collection!\nlevel 1 skeleton, zombie, and spirit added to collection!");
+        game_state[GAMESTATE_CARD_COLLECTION].push(12);
+        game_state[GAMESTATE_CARD_COLLECTION].push(3);
+        game_state[GAMESTATE_CARD_COLLECTION].push(4);
+        game_state[GAMESTATE_CARD_COLLECTION].push(5);
+        game_state[GAMESTATE_CARD_COLLECTION].sort(number_sort);
+        push_scene(Dialog._scene_id);
+        game_state[GAMESTATE_EVENTS][EVENT_COIL_FIRST_TIME] = EVENT_DONE;
+        return;
+      }
+    }
+    else
+    {
+    }
+
     if (UP_PRESSED)
       selected_option_index = safe_subtract(selected_option_index, 1);
     else if (DOWN_PRESSED)

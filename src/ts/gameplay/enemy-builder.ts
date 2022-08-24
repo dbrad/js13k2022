@@ -10,6 +10,15 @@ let enemy_attack_defense: V2[] = [
   [1, 2], // ENEMY_TYPE_CULTIST
   [3, 1], // ENEMY_TYPE_LICH
 ];
+
+let enemy_intents: number[][] = [
+  [ENEMY_INTENT_TYPE_ATTACK],
+  [ENEMY_INTENT_TYPE_ATTACK, ENEMY_INTENT_TYPE_ATTACK_HEAL, ENEMY_INTENT_TYPE_ATTACK],
+  [ENEMY_INTENT_TYPE_HEAL, ENEMY_INTENT_TYPE_ATTACK, ENEMY_INTENT_TYPE_ATTACK],
+  [ENEMY_INTENT_TYPE_HEAL, ENEMY_INTENT_TYPE_ATTACK, ENEMY_INTENT_TYPE_BUFF, ENEMY_INTENT_TYPE_ATTACK],
+  [ENEMY_INTENT_TYPE_ATTACK_HEAL, ENEMY_INTENT_TYPE_ATTACK, ENEMY_INTENT_TYPE_BUFF, ENEMY_INTENT_TYPE_ATTACK],
+];
+
 export let build_enemy = (_type: number, _level: number): Enemy =>
 {
   let enemy_stats = enemy_attack_defense[_type];
@@ -49,10 +58,9 @@ export let get_boss = (chapter: number, level: number) =>
 
 export let get_next_enemy_intent = (enemy: Enemy) =>
 {
+  if (enemy._intent_pool.length === 0)
+    enemy._intent_pool = structuredClone(enemy_intents[enemy._type]);
   let intent = enemy._intent_pool.pop();
-  if (!intent)
-    enemy._intent_pool = [ENEMY_INTENT_TYPE_ATTACK]; // TODO: generate new intent pool based on unit
-  intent = enemy._intent_pool.pop();
   assert(intent !== undefined, "No intent found after when trying to get intent");
   enemy._current_intent = intent;
 };

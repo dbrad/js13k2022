@@ -21,7 +21,7 @@ release:
 	mkdir build/release
 	cp src/html/index.html build/release/index.html
 	node scripts/release-build.js | node_modules/.bin/terser --config-file scripts/terser.config.json -o build/release/game.js
-	yarn --silent roadroller build/release/game.js -O2 -Zab9 -Zlr1100 -Zmc4 -Zmd21 -S0,1,2,3,7,13,21,26,42,97,309,330 -o build/release/game.js
+	yarn --silent roadroller build/release/game.js -O2 -Zab10 -Zlr1100 -Zmc4 -Zmd19 -S0,1,2,3,7,13,21,26,42,97,341,396 -o build/release/game.js
 	rm -rf dist
 	mkdir -p dist/src
 	yarn html-inline -i ./build/release/index.html -o ./dist/src/index.html

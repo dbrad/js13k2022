@@ -1,0 +1,47 @@
+USED: 92.14 % | 12266 BYTES
+LEFT:  7.86 % |  1046 BYTES
+
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+TypeScript                      55            505             40           3492
+-------------------------------------------------------------------------------
+SUM:                            55            505             40           3492
+-------------------------------------------------------------------------------
+
+What do I need for more intents?
+  Attack
+    Done
+
+  Buff (+1 attack rest of combat)  
+    Cultist and Lich only
+    increases attack buff stat by 1
+    Need an Up Arrow Sprite?
+    red particles
+
+  Heal
+    Spirits and liches
+    Need sprite
+    Green Particles
+
+  Attack and Heal 
+    Zombie only
+    Attack then green particles
+
+  Need a type on the action queue again
+
+  Skeleton
+    Attack only
+
+  Zombie
+    Attack + Attack and Heal for 50% of attack (ceil)
+
+  Spirits
+    Attack + Heal
+
+  Cultist 
+    Attack + Heal + Buff
+    
+  Lich
+    All
+  

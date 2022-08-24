@@ -1,32 +1,20 @@
 COMBAT
-  Enemy AI
-    Need the pool builder for each type
-
-  Apply debuffs
-  
   Better enemy indexes
     Have positions change based on number of enemies?
-
-  Render Attack and defense
 
   Combat Juice
     Animate enemy basic attack
     Animate enemy magic attack
-    Animate cards more?
-
-  Deck count
-  Discard count
 
   Player Death
-
+    Lose all reagents from this level?
+    Need to track regants for a given level and payout after boss is beat
   Smooth Phase Changes
 
 LICH PALETTE
 CULTIST PALETTE
 
 Set control hints?
-
-Get loot
 
 LEVEL GEN
  EVENTS
@@ -39,17 +27,17 @@ LEVEL GEN
     Level of fight is current level + 10 or 20?
 
 AUDIO
+  Button Press
+  Hit Sound
+  Heal Sound
+  Buff Sound
+  Bass Sound?
 
 THIN STORY / INTRO
-
-COIL BONUS
-  Add Detection
-  1 level 1 card of each minion + 1 Minor Death Coil
+Tutorials
 
 Nice to Haves
   Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
 
 Optimizations
-  Custom font range loader to reduce character set
-  Remove Interpolation system with in-place lerps calls
   combine panel + text menu?

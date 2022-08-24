@@ -3,6 +3,8 @@ declare const TEXTURE_SINGLE_WHITE_PIXEL: number;
 declare const TEXTURE_SWORD: number;
 declare const TEXTURE_SHEILD: number;
 declare const TEXTURE_STAIR: number;
+declare const TEXTURE_CROSS: number;
+declare const TEXTURE_ARROW: number;
 
 declare const TEXTURE_WHITE_CIRCLE: number;
 declare const TEXTURE_D_PAD: number;

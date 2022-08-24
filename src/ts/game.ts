@@ -2,7 +2,6 @@ import { initialize_fps_meter, performance_mark, tick_fps_meter } from "@debug/f
 import { BLACK, WHITE } from "@graphics/colour";
 import { push_text } from "@graphics/text";
 import { initialize_input, is_touch_event, render_controls, update_hardware_input } from "@root/input/controls";
-import { initialze_interpolation_system, update_interpolation_system } from "@root/interpolate";
 import { initialize_particle_system } from "@root/particle-system";
 import { register_scene, render_scene, update_scene } from "@root/scene";
 import { canvas_reference, initialize_page, SCREEN_CENTER_X, SCREEN_CENTER_Y, window_reference } from "@root/screen";
@@ -33,31 +32,26 @@ window_reference.addEventListener('load', async () =>
   let playing = false;
   let initialize_game = (e: PointerEvent | TouchEvent) =>
   {
-    setTimeout(() =>
+    if (!playing)
     {
-      if (!playing)
-      {
-        is_touch_event(e);
-        canvas_reference.removeEventListener("pointerdown", initialize_game);
-        canvas_reference.removeEventListener("touchstart", initialize_game);
-        playing = true;
-        initialize_input();
-        initialze_interpolation_system();
-        initialize_particle_system(10000);
+      is_touch_event(e);
+      canvas_reference.removeEventListener("touchstart", initialize_game);
+      canvas_reference.removeEventListener("pointerdown", initialize_game);
+      playing = true;
 
-        register_scene(MainMenu._scene);
-        register_scene(Hub._scene);
-        register_scene(Craft._scene);
-        register_scene(ManageDeck._scene);
-        register_scene(LevelSelect._scene);
-        register_scene(Dungeon._scene);
-        register_scene(Combat._scene);
+      initialize_input();
+      initialize_particle_system(10000);
+      zzfx_init();
 
-        register_scene(Dialog._scene);
-
-        zzfx_init();
-      }
-    }, 0);
+      register_scene(MainMenu._scene);
+      register_scene(Hub._scene);
+      register_scene(Craft._scene);
+      register_scene(ManageDeck._scene);
+      register_scene(LevelSelect._scene);
+      register_scene(Dungeon._scene);
+      register_scene(Combat._scene);
+      register_scene(Dialog._scene);
+    }
   };
 
   canvas_reference.addEventListener("touchstart", initialize_game);
@@ -78,7 +72,6 @@ window_reference.addEventListener('load', async () =>
     elasped_time += delta;
     then = now;
 
-
     if (playing)
     {
       performance_mark("update_start");
@@ -86,7 +79,6 @@ window_reference.addEventListener('load', async () =>
       while (elasped_time >= time_step)
       {
         update_animation_frame(time_step);
-        update_interpolation_system(now, time_step);
         update_scene(now, time_step);
         elasped_time -= time_step;
       }
@@ -103,7 +95,7 @@ window_reference.addEventListener('load', async () =>
     else
     {
       update_animation_frame(delta);
-      push_text("touch to play", SCREEN_CENTER_X, SCREEN_CENTER_Y, { _align: TEXT_ALIGN_CENTER, _colour: animation_frame ? WHITE : BLACK });
+      push_text("touch to play", SCREEN_CENTER_X, SCREEN_CENTER_Y, { _align: TEXT_ALIGN_CENTER, _colour: animation_frame ? WHITE : BLACK, _scale: 2 });
       gl_flush();
     }
     requestAnimationFrame(loop);
