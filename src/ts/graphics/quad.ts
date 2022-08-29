@@ -20,15 +20,8 @@ export type TextureQuadParameters = {
   _colour?: number;
   _animated?: boolean;
 };
-let default_texture_quad_parameters = {
-  _palette_offset: 0,
-  _horizontal_flip: false,
-  _vertical_flip: false,
-  _scale: 1,
-  _colour: WHITE,
-  _animated: false,
-};
-export let push_textured_quad = (texture_id: number, x: number, y: number, parameters: TextureQuadParameters = default_texture_quad_parameters): void =>
+
+export let push_textured_quad = (texture_id: number, x: number, y: number, parameters: TextureQuadParameters = {}): void =>
 {
   let pallete_offset = parameters._palette_offset || 0;
   let horizontal_flip = parameters._horizontal_flip || false;

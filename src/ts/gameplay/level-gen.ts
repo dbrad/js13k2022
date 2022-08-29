@@ -35,7 +35,7 @@ let get_next_floor_id = (): number =>
 
 export let generate_level = (chapter: number = 1, floor: number = 0): void =>
 {
-  let enemy_level = (chapter * 5) + (floor * 2);
+  let enemy_level = (chapter * 10) + (floor * 2);
 
   // Generate Room Layout
   let number_of_rooms = math.floor(random_int(0, 2) + 5 + chapter * 2.6);
@@ -55,7 +55,7 @@ export let generate_level = (chapter: number = 1, floor: number = 0): void =>
       if (room_layout[neighbours_neighbour] && room_layout[neighbours_neighbour] > 0)
       {
         number_of_neighbours++;
-        if (number_of_neighbours > 1) return false;;
+        if (number_of_neighbours > 1) return false;
       }
     }
     return true;
@@ -193,6 +193,7 @@ export let generate_level = (chapter: number = 1, floor: number = 0): void =>
     _player_position: [60 * 16, 31 * 16],
     _tile_map: tile_map,
     _rooms: rooms,
+    _level_resources: [0, 0, 0, 0, 0]
   };
 };
 
@@ -261,7 +262,7 @@ let create_event_room = (): Room =>
 let create_combat_room = (chapter: number, enemy_level: number, is_boss: boolean = false): Room =>
 {
   let number_of_enemies = random_int(1, math.ceil(enemy_level / 10) + 1) - (is_boss ? 1 : 0);
-  let level = number_of_enemies === 1 ? enemy_level + 1 : enemy_level;
+  let level = number_of_enemies >= 3 ? math.ceil(enemy_level / 3) : number_of_enemies === 2 ? enemy_level / 2 : enemy_level;
 
   let enemies: Enemy[] = [];
   if (is_boss)

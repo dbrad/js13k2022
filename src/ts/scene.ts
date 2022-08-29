@@ -23,7 +23,7 @@ let scene_transitioning = false;
 
 let target_scene = 0;
 
-let scenes: Map<number, Scene> = new Map();
+let scenes: Scene[] = [];
 let scene_stack: Scene[] = [];
 let current_scene: Scene;
 
@@ -32,7 +32,7 @@ export let get_next_scene_id = (): number => next_scene_id++;
 
 export let register_scene = (scene: Scene): void =>
 {
-    scenes.set(scene._scene_id, scene);
+    scenes[scene._scene_id] = scene;
 
     if (!current_scene)
     {
@@ -56,7 +56,7 @@ export let push_scene = (sceneId: number): void =>
 {
     clear_input();
 
-    let scene = scenes.get(sceneId);
+    let scene = scenes[sceneId];
     assert(scene !== undefined, `Unable to find scene #"${sceneId}"`);
     scene_stack.push(scene);
     current_scene = scene;
@@ -88,7 +88,7 @@ export let update_scene = (now: number, delta: number): void =>
             target_alpha = 0;
             transition_time_remaining = transition_time;
 
-            let scene = scenes.get(target_scene);
+            let scene = scenes[target_scene];
             assert(scene !== undefined, `Unable to find scene #"${target_scene}"`);
             current_scene = scene;
             scene_stack = [scene];

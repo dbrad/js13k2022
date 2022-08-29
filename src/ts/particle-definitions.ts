@@ -23,3 +23,15 @@ export let spirit_particle: ParticleParameters = {
   _colour_end: [200, 200, 200, 0.25],
   _lifetime: 1500
 };
+
+export let buff_particle: ParticleParameters = {
+  _position: [0, 0],
+  _velocity: [0, -40],
+  _velocity_variation: [30, 20],
+  _size_begin: 0.75,
+  _size_end: 0,
+  _size_variation: 0.5,
+  _colour_begin: [255, 255, 255, 1],
+  _colour_end: [200, 200, 200, 0.25],
+  _lifetime: 800
+};

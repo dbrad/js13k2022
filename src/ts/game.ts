@@ -40,7 +40,7 @@ window_reference.addEventListener('load', async () =>
       playing = true;
 
       initialize_input();
-      initialize_particle_system(10000);
+      initialize_particle_system();
       zzfx_init();
 
       register_scene(MainMenu._scene);

@@ -1,4 +1,4 @@
-import { BLACK, floor_palettes, wall_palettes } from "@graphics/colour";
+import { BLACK } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
 import { push_text } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
@@ -8,6 +8,7 @@ import { game_state, Level, Room } from "@root/game-state";
 import { lerp } from "@root/interpolate";
 import { render_panel } from "@root/nodes/panel";
 import { render_player_status } from "@root/nodes/player-status";
+import { render_resources } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
@@ -162,7 +163,7 @@ export namespace Dungeon
           else
           {
             // Retreat
-            Dialog._push_yes_no_dialog("retreat to the entrance?\nyou will keep all reagents, but lose all progress on the level.", () => switch_to_scene(Hub._scene_id));
+            Dialog._push_yes_no_dialog("retreat to the entrance?\nyou will lose all progress and reagents gathered in this level.", () => switch_to_scene(Hub._scene_id));
             push_scene(Dialog._scene_id);
           }
         }
@@ -255,9 +256,9 @@ export namespace Dungeon
             push_quad(render_x, render_y, 16, 16, BLACK);
 
           if (tile_id > 5)
-            push_textured_quad(TEXTURE_FLOOR, render_x, render_y, { _palette_offset: floor_palettes[tile_id - 6] });
+            push_textured_quad(TEXTURE_FLOOR, render_x, render_y, { _palette_offset: 12 + (tile_id - 6) * 3 });
           else if (tile_id > 1 && tile_id < 5)
-            push_textured_quad(TEXTURE_WALL, render_x, render_y, { _palette_offset: wall_palettes[tile_id - 2] });
+            push_textured_quad(TEXTURE_WALL, render_x, render_y, { _palette_offset: 3 * (tile_id - 1) });
 
           // Lighting
           let distance = math.sqrt((player_tile_x - tile_x) ** 2 + (player_tile_y - tile_y) ** 2);
@@ -283,7 +284,7 @@ export namespace Dungeon
     if (mode === 0)
     {
       render_panel(SCREEN_WIDTH - 194, 40, 194, 70);
-      render_text_menu([SCREEN_WIDTH - 97, 55], menu_options, number_of_options, selected_option_index);
+      render_text_menu(SCREEN_WIDTH - 97, 55, menu_options, number_of_options, selected_option_index);
     }
     else if (mode === 2)
     {
@@ -292,6 +293,7 @@ export namespace Dungeon
     }
     else
     {
+      render_resources(game_state[GAMESTATE_CURRENT_DUNGEON]._level_resources);
       render_minimap(50, SCREEN_HEIGHT - 50, player_room_x - 1, player_room_x + 1, player_room_y - 1, player_room_y + 1);
     }
     render_player_status();

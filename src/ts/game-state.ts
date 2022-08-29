@@ -18,12 +18,6 @@ export type Player = [
   number, // PLAYER_MAX_HP
 ];
 
-let default_player: Player =
-  [
-    10,
-    10,
-  ];
-
 export type CombatData = [
   number, // ATTACK_MODIFIER
   number, // DEFENSE_MODIFIER
@@ -72,12 +66,14 @@ export type Level = {
   _tile_map: Int8Array,
   _player_position: V2,
   _rooms: Room[],
+  _level_resources: number[];
 };
 
 const null_level: Level = {
   _tile_map: new Int8Array(),
   _player_position: [0, 0],
   _rooms: [],
+  _level_resources: []
 };
 
 // Gamestate Object
@@ -90,12 +86,12 @@ export let setup_game_state = () =>
     events[i] = 0;
   }
 
-  let starter_deck: number[] = "00000111112222266778".split("").map(n => +n).sort(number_sort);;
+  let starter_deck: number[] = "00000111112222266778".split("").map(n => +n).sort(number_sort);
 
   game_state = [
     events,
     null_level,
-    default_player,
+    [10, 10],
     [false, false, false, false, false, false],
     [0, 0, 0, 0, 0, 0],
     [0, 1, 2],

@@ -8,15 +8,20 @@ import { Dungeon } from "./03-dungeon";
 export namespace LevelSelect
 {
   let selected_option_index = 0;
-  let number_of_options = 1;
+  let number_of_options = 5;
   let menu_options = [
-    "continue",
+    "the catacombs",
+    "the bone zone",
+    "the flesh mound",
+    "the forgotten haunt",
+    "the throne of the first lich",
   ];
 
   let _reset_fn = () =>
   {
     // TODO: update menu options based on game progress
   };
+
   let _update_fn = (now: number, delta: number) =>
   {
     if (UP_PRESSED)
@@ -25,16 +30,13 @@ export namespace LevelSelect
       selected_option_index = safe_add(number_of_options - 1, selected_option_index, 1);
     else if (A_PRESSED)
     {
-      if (selected_option_index === 0)
-      {
-        generate_level(1, 0);
-        switch_to_scene(Dungeon._scene_id);
-      }
+      generate_level(selected_option_index + 1, 0);
+      switch_to_scene(Dungeon._scene_id);
     }
   };
   let _render_fn = () =>
   {
-    render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y], menu_options, number_of_options, selected_option_index);
+    render_text_menu(SCREEN_CENTER_X, SCREEN_CENTER_Y - 100, menu_options, number_of_options, selected_option_index);
   };
   export let _scene_id = get_next_scene_id();
   export let _scene: Scene = { _scene_id, _reset_fn, _update_fn, _render_fn };

@@ -1,0 +1,17 @@
+2022-08-25
+
+USED: 93.49 % | 12446 BYTES
+LEFT:  6.51 % |   866 BYTES
+
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+TypeScript                      55            508             41           3546
+-------------------------------------------------------------------------------
+SUM:                            55            508             41           3546
+-------------------------------------------------------------------------------
+
+How should i ping-pong lerp?
+I need to go from point A to B and back to A again quickly, with little code
+point B is just point A to the left a bit
+so i want to go from origin, to origin - 10, back to origin

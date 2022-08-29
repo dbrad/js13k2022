@@ -2,7 +2,7 @@ import { assert } from "@debug/assert";
 import { card_list } from "@gameplay/cards";
 import { EffectFunction, effects } from "@gameplay/effects";
 import { get_next_enemy_intent } from "@gameplay/enemy-builder";
-import { BLACK, floor_palettes, wall_palettes, WHITE } from "@graphics/colour";
+import { BLACK, WHITE } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
 import { CENTERED, push_text, SMALL_AND_CENTERED } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
@@ -14,7 +14,8 @@ import { render_player_status } from "@root/nodes/player-status";
 import { resource_names } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { calculate_attack, render_enemy, unit_name_map } from "@root/nodes/unit";
-import { clear_particle_system } from "@root/particle-system";
+import { buff_particle } from "@root/particle-definitions";
+import { clear_particle_system, emit_particles } from "@root/particle-system";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
 import { math, safe_add, safe_subtract, shuffle } from "math";
@@ -52,45 +53,47 @@ export namespace Combat
 
   type AttackAnimation = {
     _source_index: number,
-    _attack_value: number,
+    _action_type: number,
+    _action_value: number,
     _done: boolean,
     _playing: boolean,
     _lifetime_remaining: number,
-    _animation_fn: () => void;
   };
 
-  let attack_queue: AttackAnimation[] = [];
+  let enemy_action_queue: AttackAnimation[] = [];
   let queue_index = 0;
   for (let i = 0; i < 4; i++)
   {
-    attack_queue[i] = {
+    enemy_action_queue[i] = {
       _source_index: 0,
-      _attack_value: 0,
+      _action_type: 0,
+      _action_value: 0,
       _done: true,
       _playing: false,
       _lifetime_remaining: 0,
-      _animation_fn: () => { }
     };
   }
 
-  let add_attack = (source_index: number, attack_value: number, lifetime: number, animation_fn: () => void) =>
+  let add_attack = (source_index: number, attack_value: number, action_type: number, lifetime: number) =>
   {
-    attack_queue[queue_index]._source_index = source_index;
-    attack_queue[queue_index]._attack_value = attack_value;
-    attack_queue[queue_index]._done = false;
-    attack_queue[queue_index]._playing = false;
-    attack_queue[queue_index]._lifetime_remaining = lifetime;
-    attack_queue[queue_index]._animation_fn = animation_fn;
+    enemy_action_queue[queue_index]._source_index = source_index;
+    enemy_action_queue[queue_index]._action_type = action_type;
+    enemy_action_queue[queue_index]._action_value = attack_value;
+    enemy_action_queue[queue_index]._done = false;
+    enemy_action_queue[queue_index]._playing = false;
+    enemy_action_queue[queue_index]._lifetime_remaining = lifetime;
     queue_index++;
   };
 
-  let player_position: V2 = [1.5 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 32];
+  let player_position: V2 = [1.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32];
+  let enemy_position_index = [0, 0, 0, 0];
   let enemy_starting_positions: V2[] = [
-    [8.5 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 32],
-    [7.5 * 48 + SCREEN_CENTER_X - 264, 1.5 * 48 + 32],
-    [7.5 * 48 + SCREEN_CENTER_X - 264, 4.5 * 48 + 32],
-    [6.5 * 48 + SCREEN_CENTER_X - 264, 3 * 48 + 32],
+    [8.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32],
+    [7.5 * 48 + SCREEN_CENTER_X - 264, 0.5 * 48 + 32],
+    [7.5 * 48 + SCREEN_CENTER_X - 264, 3.5 * 48 + 32],
+    [6.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32],
   ];
+  let enemy_offsets: number[] = [0, 0, 0, 0];
   let enemy_positions: V2[] = [];
 
   let target_index: number = 0;
@@ -325,6 +328,7 @@ export namespace Combat
     }
     else if (mode === COMBAT_MODE_ATTACK_ACTION)
     {
+      // TODO: Player attack animation
       let target_enemy = enemies[target_index_map[target_index]];
       target_enemy._hp = math.max(0, target_enemy._hp - total_attack);
       any_enemies_alive(enemies);
@@ -337,7 +341,7 @@ export namespace Combat
       for (let [index, enemy] of enemies.entries())
       {
         if (enemy._alive)
-          add_attack(index, calculate_attack(enemy), 500, () => { });
+          add_attack(index, calculate_attack(enemy), enemy._current_intent, 800);
       }
 
       mode = COMBAT_MODE_ENEMY_ATTACKS;
@@ -345,27 +349,55 @@ export namespace Combat
     else if (mode === COMBAT_MODE_ENEMY_ATTACKS)
     {
       let attacks_done = 0;
-      for (let attack of attack_queue)
+      for (let action of enemy_action_queue)
       {
-        if (attack._done)
+        let index = action._source_index;
+        let enemy = enemies[index];
+        if (action._done)
         {
           attacks_done++;
           continue;
         }
-        if (attack._lifetime_remaining <= 0)
+        let intent = action._action_type;
+
+        if (action._lifetime_remaining <= 0)
         {
-          attack._done = true;
-          player[PLAYER_HP] = safe_subtract(player[PLAYER_HP], safe_subtract(attack._attack_value, total_defense));
-          total_defense = safe_subtract(total_defense, attack._attack_value);
-          enemies[attack._source_index]._hp = safe_subtract(enemies[attack._source_index]._hp, barbs_damage);
-          // player death?
+          action._done = true;
+          if (intent === ENEMY_INTENT_TYPE_ATTACK || intent === ENEMY_INTENT_TYPE_ATTACK_HEAL)
+          {
+            player[PLAYER_HP] = safe_subtract(player[PLAYER_HP], safe_subtract(action._action_value, total_defense));
+            total_defense = safe_subtract(total_defense, action._action_value);
+            enemy._hp = safe_subtract(enemy._hp, barbs_damage);
+          }
+          else if (intent === ENEMY_INTENT_TYPE_HEAL || intent === ENEMY_INTENT_TYPE_ATTACK_HEAL)
+            enemy._hp = safe_add(enemy._max_hp, enemy._hp, action._action_value);
+          else if (intent === ENEMY_INTENT_TYPE_BUFF)
+            enemy._attack_buff++;
         }
 
-        attack._lifetime_remaining -= delta;
-        if (!attack._playing)
+        action._lifetime_remaining -= delta;
+        if (intent === ENEMY_INTENT_TYPE_ATTACK || intent === ENEMY_INTENT_TYPE_ATTACK_HEAL)
+          enemy_offsets[index] = math.max(0, math.floor((1 - math.abs((action._lifetime_remaining - 600) / 100 - 1)) * 10) / 10);
+
+        if (!action._playing)
         {
-          attack._animation_fn();
-          attack._playing = true;
+          buff_particle._position[0] = enemy_positions[index][0] + 24;
+          buff_particle._position[1] = enemy_positions[index][1] + 40;
+          if (intent === ENEMY_INTENT_TYPE_HEAL || intent === ENEMY_INTENT_TYPE_ATTACK_HEAL)
+          {
+            buff_particle._colour_begin = [0, 255, 0, 1];
+            buff_particle._colour_begin = [0, 255, 0, 0.25];
+            emit_particles(buff_particle, 50);
+            // TODO: Heal Sound
+          }
+          else if (intent === ENEMY_INTENT_TYPE_BUFF)
+          {
+            buff_particle._colour_begin = [255, 0, 0, 1];
+            buff_particle._colour_begin = [255, 0, 0, 0.25];
+            emit_particles(buff_particle, 50);
+            // TODO: Buff Sound
+          }
+          action._playing = true;
         }
         break;
       }
@@ -384,7 +416,10 @@ export namespace Combat
         for (let enemy of enemies)
         {
           if (enemy._alive)
+          {
             get_next_enemy_intent(enemy);
+            enemy._attack_debuff_turns = safe_subtract(enemy._attack_debuff_turns, 1);
+          }
         }
         mode = COMBAT_MODE_DRAW;
       }
@@ -400,7 +435,7 @@ export namespace Combat
           if (loot[l] > 0)
           {
             game_state[GAMESTATE_RESOURCES_GATHERED][l] = true;
-            game_state[GAMESTATE_RESOURCES][l] = + loot[l];
+            game_state[GAMESTATE_CURRENT_DUNGEON]._level_resources[l] += loot[l];
           }
         }
         switch_to_scene(Dungeon._scene_id);
@@ -428,9 +463,9 @@ export namespace Combat
           push_quad(render_x, render_y, 48, 48, BLACK);
 
         if (tile_id > 5)
-          push_textured_quad(TEXTURE_FLOOR, render_x, render_y, { _scale: 3, _palette_offset: floor_palettes[tile_id - 6] });
+          push_textured_quad(TEXTURE_FLOOR, render_x, render_y, { _scale: 3, _palette_offset: 12 + (tile_id - 6) * 3 });
         else if (tile_id > 1 && tile_id < 5)
-          push_textured_quad(TEXTURE_WALL, render_x, render_y, { _scale: 3, _palette_offset: wall_palettes[tile_id - 2] });
+          push_textured_quad(TEXTURE_WALL, render_x, render_y, { _scale: 3, _palette_offset: 3 * (tile_id - 1) });
 
         let distance = math.sqrt((player_room_x * 11 + 2 - tile_x) ** 2 + (player_room_y * 9 + 3 - tile_y) ** 2);
         if (distance >= 7)
@@ -458,7 +493,7 @@ export namespace Combat
     for (let e = 0; e < 4; e++)
     {
       if (enemies[e] && enemies[e]._alive)
-        render_enemy(enemies[e], enemy_positions[e][0] + 8, enemy_positions[e][1] + 8);
+        render_enemy(enemies[e], enemy_positions[e][0] + 8 - (enemy_offsets[e] * 20), enemy_positions[e][1] + 8);
     }
 
     // Mode specific rendering logic
@@ -503,14 +538,14 @@ export namespace Combat
     {
       render_mode_text("select whether to use the minion's attack or defense");
       render_panel(SCREEN_CENTER_X - 55, SCREEN_CENTER_Y, 110, 40);
-      render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y + 10], card_use_menu, card_use_menu.length, selected_action_index, 1);
+      render_text_menu(SCREEN_CENTER_X, SCREEN_CENTER_Y + 10, card_use_menu, card_use_menu.length, selected_action_index, 1);
     }
     else if (mode === COMBAT_MODE_SELECT_TARGET)
     {
       render_mode_text("select target");
       let target_list_length = target_list.length;
       render_panel(SCREEN_CENTER_X - 50, SCREEN_CENTER_Y, 100, 14 * target_list_length + 3);
-      render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y + 5], target_list, target_list.length, target_index, 1);
+      render_text_menu(SCREEN_CENTER_X, SCREEN_CENTER_Y + 5, target_list, target_list.length, target_index, 1);
     }
     else if (mode === COMBAT_MODE_LOOT_AND_LEAVE)
     {
@@ -532,7 +567,7 @@ export namespace Combat
 
     render_player_status();
   };
-  let render_mode_text = (text: string) => push_text(text, SCREEN_CENTER_X, SCREEN_HEIGHT - 110, CENTERED);
+  let render_mode_text = (text: string) => push_text(text, SCREEN_CENTER_X, SCREEN_HEIGHT - 106, CENTERED);
 
   export let _scene_id = get_next_scene_id();
   export let _scene: Scene = { _scene_id, _reset_fn, _update_fn, _render_fn };

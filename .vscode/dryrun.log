@@ -1,0 +1,8 @@
+make.exe --dry-run --always-make --keep-going --print-directory
+make: Entering directory 'c:/Users/d_bra/code/js13k-2022-boilerplate'
+./tools/7z/7za x tools.7z -otools -y
+mkdir build
+mkdir dist
+yarn install
+make: Leaving directory 'c:/Users/d_bra/code/js13k-2022-boilerplate'
+ 

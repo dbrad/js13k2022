@@ -110,8 +110,8 @@ export let gl_init = (context: WebGLRenderingContext): void =>
   let colour_attribute = gl_getAttribLocation(shader, "c");
   let pallete_offset_attribute = gl_getAttribLocation(shader, "po");
 
-  let gl_enableVertexAttribArray = webgl_context.enableVertexAttribArray.bind(webgl_context);;
-  let gl_vertexAttribPointer = webgl_context.vertexAttribPointer.bind(webgl_context);;
+  let gl_enableVertexAttribArray = webgl_context.enableVertexAttribArray.bind(webgl_context);
+  let gl_vertexAttribPointer = webgl_context.vertexAttribPointer.bind(webgl_context);
 
   gl_enableVertexAttribArray(vertex_attribute);
   gl_vertexAttribPointer(vertex_attribute, 2, GL_FLOAT, false, VERTEX_SIZE, 0);

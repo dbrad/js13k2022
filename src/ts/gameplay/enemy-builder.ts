@@ -8,7 +8,7 @@ let enemy_attack_defense: V2[] = [
   [0, 1], // ENEMY_TYPE_ZOMBIE
   [2, 0], // ENEMY_TYPE_SPIRIT
   [1, 2], // ENEMY_TYPE_CULTIST
-  [3, 1], // ENEMY_TYPE_LICH
+  [1, 3], // ENEMY_TYPE_LICH
 ];
 
 let enemy_intents: number[][] = [
@@ -23,12 +23,11 @@ export let build_enemy = (_type: number, _level: number): Enemy =>
 {
   let enemy_stats = enemy_attack_defense[_type];
 
-  let level_mod = math.floor(_level / 15);
+  let level_mod = math.floor(_level / 10);
   let mod_plus_one = level_mod + 1;
 
   let _attack = random_int(mod_plus_one, mod_plus_one + (mod_plus_one * enemy_stats[0]));
-  let _block_value = random_int(mod_plus_one + enemy_stats[1], level_mod + (mod_plus_one * enemy_stats[1]));
-  let _hp = (_level * 2 - (_attack) - (_block_value));
+  let _hp = ((_level * 2 - _attack) + (level_mod * enemy_stats[1]));
 
   return {
     _type,
@@ -46,6 +45,7 @@ export let build_enemy = (_type: number, _level: number): Enemy =>
 
 export let get_enemy = (chapter: number, level: number) =>
 {
+  // TODO: Change enemy skew based on chapter
   let enemy_type = chapter === 1 ? random_int(0, 2) : random_int(0, 3);
   return build_enemy(enemy_type, level);
 };

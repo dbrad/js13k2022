@@ -5,8 +5,6 @@ import { math } from "math";
 import { TEXTURES } from "texture";
 import { WHITE } from "./colour";
 
-const font_sizes: Map<number, number> = new Map([[FONT_NORMAL, 8], [FONT_SMALL, 5]]);
-
 export type TextParameters =
   {
     _colour?: number,
@@ -16,22 +14,14 @@ export type TextParameters =
     _font?: number,
   };
 
-let default_text_parameters = {
-  _colour: WHITE,
-  _align: TEXT_ALIGN_LEFT,
-  _scale: 1,
-  _width: SCREEN_WIDTH,
-  _font: FONT_NORMAL
-};
+export const character_code_map: { [key: string]: number; } = {};
+const font_sizes: { [key: number]: number; } = { [FONT_NORMAL]: 8, [FONT_SMALL]: 5 };
+const text_cache: { [key: string]: [string, number][]; } = {};
 
-let text_cache: Map<string, [string, number][]> = new Map();
-
-let parse_text_into_lines = (text: string, width: number = SCREEN_WIDTH, font: number = FONT_NORMAL, scale: number = 1): number =>
+let parse_text_into_lines = (text: string, width: number = SCREEN_WIDTH, font: number = FONT_NORMAL, scale: number = 1): [string, number][] =>
 {
-  if (text_cache.has(`${text}_${font}_${scale}_${width}`)) return text_cache.get(`${text}_${font}_${scale}_${width}`)?.length || 0;
-
   let letter_gap = font === FONT_SMALL ? 1 : 0;
-  let font_size = font_sizes.get(font) || 8;
+  let font_size = font_sizes[font] || 8;
   let letter_size: number = (font_size + letter_gap) * scale;
   let result_lines: [string, number][] = [];
   let result_line: string[] = [];
@@ -62,36 +52,28 @@ let parse_text_into_lines = (text: string, width: number = SCREEN_WIDTH, font: n
     result_line.length = 0;
   }
 
-  text_cache.set(`${text}_${font}_${scale}_${width}`, result_lines);
+  text_cache[`${text}_${font}_${scale}_${width}`] = result_lines;
 
-  return result_lines.length;
+  return result_lines;
 };
 
-export let character_code_map: Map<string, number> = new Map();
-
-export let push_text = (text: string, x: number, y: number, parameters: TextParameters = default_text_parameters): void =>
+export let push_text = (text: string, x: number, y: number, parameters: TextParameters = {}): void =>
 {
   let colour = parameters._colour || WHITE;
-  let original_colour = colour;
   let align = parameters._align || TEXT_ALIGN_LEFT;
   let scale = parameters._scale || 1;
   let width = parameters._width || SCREEN_WIDTH;
   let font: number = parameters._font || FONT_NORMAL;
 
-  let letter_gap = font === FONT_SMALL ? 1 : 0;
-  let font_size = font_sizes.get(font) || 8;
-  let letter_size: number = (font_size) * scale;
+  let letter_gap = font === FONT_SMALL ? scale : 0;
+  let letter_size: number = (font_sizes[font] || 8) * scale;
 
   let original_x = x;
   let x_offset: number = 0;
 
-  let lines = text_cache.get(`${text}_${font}_${scale}_${width}`);
+  let lines = text_cache[`${text}_${font}_${scale}_${width}`];
   if (!lines)
-  {
-    parse_text_into_lines(text, width, font, scale);
-    lines = text_cache.get(`${text}_${font}_${scale}_${width}`);
-  }
-  assert(lines !== undefined, "text lines not found");
+    lines = parse_text_into_lines(text, width, font, scale);
 
   let alignment_offset: number = 0;
 
@@ -109,7 +91,7 @@ export let push_text = (text: string, x: number, y: number, parameters: TextPara
     {
       for (let letter of word.split(""))
       {
-        let character_index = character_code_map.get(letter);
+        let character_index = character_code_map[letter];
         assert(character_index !== undefined, `Undefined character ${letter} used.`);
         let t = TEXTURES[font + character_index];
         x = original_x + x_offset + alignment_offset;
@@ -120,7 +102,6 @@ export let push_text = (text: string, x: number, y: number, parameters: TextPara
         gl_restore();
         x_offset += letter_size + letter_gap;
       }
-      colour = original_colour;
       x_offset += letter_size + letter_gap;
     }
     y += letter_size + (scale * 2);

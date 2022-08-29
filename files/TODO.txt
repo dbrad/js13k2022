@@ -1,20 +1,26 @@
 COMBAT
   Better enemy indexes
     Have positions change based on number of enemies?
-
-  Combat Juice
-    Animate enemy basic attack
-    Animate enemy magic attack
-
+    1 enemy = 0
+    2 enemy = 1,0
+    3 enemy = 1,0,2
+    4 enemy = 1,3,0,2
+  
+  Render Buff and Debuff on enemy
+  
   Player Death
     Lose all reagents from this level?
     Need to track regants for a given level and payout after boss is beat
+
   Smooth Phase Changes
+
+Exit Dungeon after boss
+  Collect loot to gamestate
+
+Track Game progress
 
 LICH PALETTE
 CULTIST PALETTE
-
-Set control hints?
 
 LEVEL GEN
  EVENTS
@@ -38,6 +44,7 @@ Tutorials
 
 Nice to Haves
   Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
+  Set control hints?
 
 Optimizations
   combine panel + text menu?

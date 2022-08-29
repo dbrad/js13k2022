@@ -9,6 +9,7 @@ export let SCREEN_CENTER_Y = SCREEN_HEIGHT / 2;
 
 export let window_reference: Window = window;
 export let document_reference: Document = document;
+export let monetization_reference: Monetization = document.monetization;
 export let canvas_reference: HTMLCanvasElement;
 
 export let initialize_page = (): HTMLCanvasElement =>

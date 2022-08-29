@@ -5,6 +5,7 @@ import { set_V2, set_V4, V4 } from "@math/vector";
 import { Enemy } from "@root/game-state";
 import { spirit_particle } from "@root/particle-definitions";
 import { emit_particle } from "@root/particle-system";
+import { math } from "math";
 import { render_percentage_bar } from "./percent-bar";
 
 export let unit_sprite = [
@@ -57,15 +58,20 @@ export let render_enemy = (enemy: Enemy, x: number, y: number) =>
   if (intent_type !== ENEMY_INTENT_TYPE_NONE)
   {
     push_textured_quad(intent_type_sprite[intent_type], x + 16, y - 10, { _palette_offset: intent_palette[intent_type] });
+
     if (intent_type === ENEMY_INTENT_TYPE_ATTACK_HEAL)
       push_textured_quad(TEXTURE_CROSS, x + 24, y - 10, { _palette_offset: PALETTE_PLAYER - 1 });
 
-    let _colour = attack > enemy._attack ? 0xff00ff00 : attack < enemy._attack ? 0xff0000ff : WHITE;
-    push_text(attack + "", x + 8, y - 10, { _colour });
+    if (intent_type === ENEMY_INTENT_TYPE_ATTACK || intent_type === ENEMY_INTENT_TYPE_ATTACK_HEAL)
+      push_text(attack + "", x + 8, y - 10, { _colour: attack > enemy._attack ? 0xff00ff00 : attack < enemy._attack ? 0xff0000ff : WHITE });
+    else if (intent_type === ENEMY_INTENT_TYPE_HEAL)
+      push_text(math.ceil(enemy._attack / 2) + "", x + 8, y - 10);
+    else if (intent_type === ENEMY_INTENT_TYPE_BUFF)
+      push_textured_quad(TEXTURE_SWORD, x + 8, y - 10);
   }
 };
 
-let spirit_colours: [V4, V4] = [abgr_number_to_rgba_v4(0xFFFFFFFF), abgr_number_to_rgba_v4(0x40FFCCCC)];
+let spirit_colours: [V4, V4] = [abgr_number_to_rgba_v4(0x22FFFFFF), abgr_number_to_rgba_v4(0x11FFCCCC)];
 export let render_spirit = (x: number, y: number, scale: number = 1) =>
 {
   let [begin, end] = spirit_colours;

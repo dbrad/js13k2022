@@ -1,21 +1,15 @@
-2022-08-15
+2022-08-24
 
-USED: 73.01 % |  9719 BYTES
-LEFT: 26.99 % |  3593 BYTES
+USED: 92.68 % | 12337 BYTES
+LEFT:  7.32 % |   975 BYTES
 
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-TypeScript                      49            420             51           2882
+TypeScript                      55            506             40           3502
 -------------------------------------------------------------------------------
-SUM:                            49            420             51           2882
+SUM:                            55            506             40           3502
 -------------------------------------------------------------------------------
 
-
-Enemy stats
-  Attack Modifier
-  Defense Modifier
-
-  Max atk and def for a given level?
-  level / 10 + 1?
-  roll from level based to + modifier for type?
+A deck must have at least 20 cards
+every 2 extra cards gives the player 1 more hp during the run

@@ -16,7 +16,7 @@ export type Texture = {
 
 export let TEXTURES: Texture[] = [];
 
-export let load_palette = (): Promise<void> =>
+export let load_palette = async (): Promise<void> =>
 {
   let palette: HTMLImageElement = new Image();
   return new Promise((resolve) =>
@@ -30,8 +30,10 @@ export let load_palette = (): Promise<void> =>
   });
 };
 
+let make_texture = (_w: number, _h: number, _u0: number, _v0: number, _u1: number, _v1: number): Texture => { return { _w, _h, _u0, _v0, _u1, _v1 }; };
+
 let font_letters = `!"'()+,-./0123456789?abcdefghijklmnopqrstuvwxyz`;
-export let load_textures = (): Promise<void> =>
+export let load_textures = async (): Promise<void> =>
 {
   let texture_atlas: HTMLImageElement = new Image();
   return new Promise((resolve) =>
@@ -45,44 +47,25 @@ export let load_textures = (): Promise<void> =>
 
       gl_upload_texture(canvas, GL_TEXTURE0);
 
-      TEXTURES[TEXTURE_SINGLE_WHITE_PIXEL] = {
-        _w: 1, _h: 1,
-        _u0: 2 / width, _v0: 1 / height,
-        _u1: (2 + 1) / width, _v1: (1 + 1) / height
-      };
+      TEXTURES[TEXTURE_SINGLE_WHITE_PIXEL] = make_texture(1, 1, 2 / width, 1 / height, 3 / width, 2 / height);
+
       for (let texture of texture_definitions)
       {
-        let [texture_type, texture_id, x, y, texture_width, texture_height] = texture;
-        if (texture_type === TEXTURE_TYPE_FONT)
+        let [def_type, id, x, y, w, h] = texture;
+        if (def_type === TEXTURE_TYPE_FONT)
         {
           for (let letter_index: number = 0; letter_index < 47; letter_index++)
           {
             let i = font_letters.charCodeAt(letter_index);
-            character_code_map.set(String.fromCharCode(i), i);
-            let offset_x = x + (letter_index) * texture_width;
-            TEXTURES[texture_id[0] + i] = {
-              _w: texture_width,
-              _h: texture_height,
-              _u0: (offset_x) / width,
-              _v0: (y) / height,
-              _u1: (offset_x + texture_width) / width,
-              _v1: (y + texture_height) / height
-            };
+            character_code_map[String.fromCharCode(i)] = i;
+            let offset_x = x + (letter_index) * w;
+            TEXTURES[id[0] + i] = make_texture(w, h, offset_x / width, y / height, (offset_x + w) / width, (y + h) / height);
           }
         }
         else
         {
-          for (let offset_x: number = x, i: number = 0; offset_x < width; offset_x += texture_width)
-          {
-            TEXTURES[texture_id[i++]] = {
-              _w: texture_width,
-              _h: texture_height,
-              _u0: (offset_x) / width,
-              _v0: (y) / height,
-              _u1: (offset_x + texture_width) / width,
-              _v1: (y + texture_height) / height
-            };
-          }
+          for (let offset_x: number = x, i: number = 0; offset_x < width; offset_x += w)
+            TEXTURES[id[i++]] = make_texture(w, h, offset_x / width, y / height, (offset_x + w) / width, (y + h) / height);
         }
       }
       resolve();

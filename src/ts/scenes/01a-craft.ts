@@ -5,7 +5,7 @@ import { A_PRESSED, B_PRESSED, DOWN_PRESSED, set_key_pulse_time, UP_PRESSED } fr
 import { game_state } from "@root/game-state";
 import { render_card } from "@root/nodes/card";
 import { render_card_list } from "@root/nodes/card-list";
-import { render_resoures, resource_names } from "@root/nodes/resources";
+import { render_resources, resource_names } from "@root/nodes/resources";
 import { clear_particle_system } from "@root/particle-system";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
@@ -91,7 +91,7 @@ export namespace Craft
         y_offset += 15;
       }
     }
-    render_resoures();
+    render_resources(game_state[GAMESTATE_RESOURCES]);
   };
 
   export let _scene_id = get_next_scene_id();

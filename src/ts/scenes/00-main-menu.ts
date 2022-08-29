@@ -62,7 +62,7 @@ export namespace MainMenu
 
     push_text("forgotten depths", SCREEN_CENTER_X, SCREEN_CENTER_Y - 110, { _align: TEXT_ALIGN_CENTER, _scale: 3 });
     push_text("path of the necromancer", SCREEN_CENTER_X, SCREEN_CENTER_Y - 70, SMALL_AND_CENTERED);
-    render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y - 20], menu_options, number_of_options, selected_option_index);
+    render_text_menu(SCREEN_CENTER_X, SCREEN_CENTER_Y - 20, menu_options, number_of_options, selected_option_index);
     push_text(`js13k 2022 entry by david brad`, SCREEN_CENTER_X, SCREEN_HEIGHT - 30, CENTERED);
   };
 

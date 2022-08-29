@@ -38,13 +38,11 @@ export type ParticleParameters = {
 };
 
 let particle_pool: Particle[] = [];
-let particle_pool_size: number = 10000;
-let particle_pool_index = 9999;
+let particle_pool_size: number = 5000;
+let particle_pool_index = 4999;
 
-export let initialize_particle_system = (pool_size: number): void =>
+export let initialize_particle_system = (): void =>
 {
-  particle_pool_index = pool_size - 1;
-  particle_pool_size = pool_size;
   for (let i = particle_pool_size - 1; i >= 0; --i)
   {
     particle_pool[i] = {

@@ -52,6 +52,7 @@ export namespace Dialog
     if (targetDialogText.length === 0)
       set_dialog_text(dialogQueue.shift() || "");
   };
+
   let _update_fn = (now: number, delta: number) =>
   {
     if (targetDialogText.length === 0)
@@ -112,7 +113,7 @@ export namespace Dialog
       if (choice_handler)
       {
         render_panel(SCREEN_CENTER_X - 50, SCREEN_CENTER_Y, 100, 54);
-        render_text_menu([SCREEN_CENTER_X, SCREEN_CENTER_Y + 5], ["yes", "no"], 2, choice_index);
+        render_text_menu(SCREEN_CENTER_X, SCREEN_CENTER_Y + 5, ["yes", "no"], 2, choice_index);
       }
       else if (animation_frame)
         push_text("continue", SCREEN_WIDTH - 5, box_y - 13, { _align: TEXT_ALIGN_RIGHT });
