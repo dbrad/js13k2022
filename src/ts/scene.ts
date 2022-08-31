@@ -11,7 +11,7 @@ import { clear_particle_system, render_particle_system, update_particle_system }
 export type Scene = {
     _scene_id: number;
     _reset_fn: () => void;
-    _update_fn: (now: number, delta: number) => void;
+    _update_fn: (delta: number) => void;
     _render_fn: () => void;
 };
 
@@ -73,10 +73,10 @@ export let pop_scene = (): void =>
     current_scene = scene_stack[scene_stack.length - 1];
 };
 
-export let update_scene = (now: number, delta: number): void =>
+export let update_scene = (delta: number): void =>
 {
     if (!scene_transitioning)
-        update_input_system(now, delta);
+        update_input_system(delta);
     else
         transition_time_remaining -= delta;
 
@@ -104,8 +104,8 @@ export let update_scene = (now: number, delta: number): void =>
             scene_transitioning = false;
     }
 
-    current_scene._update_fn(now, delta);
-    update_particle_system(now, delta);
+    current_scene._update_fn(delta);
+    update_particle_system(delta);
 };
 
 export let render_scene = (): void =>

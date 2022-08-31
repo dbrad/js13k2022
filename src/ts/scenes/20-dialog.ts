@@ -1,5 +1,5 @@
 import { push_text } from "@graphics/text";
-import { A_PRESSED, B_PRESSED, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
+import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
 import { animation_frame } from "@root/animation";
 import { render_panel } from "@root/nodes/panel";
 import { render_text_menu } from "@root/nodes/text-menu";
@@ -53,8 +53,9 @@ export namespace Dialog
       set_dialog_text(dialogQueue.shift() || "");
   };
 
-  let _update_fn = (now: number, delta: number) =>
+  let _update_fn = (delta: number) =>
   {
+    controls_used(A_BUTTON, B_BUTTON);
     if (targetDialogText.length === 0)
       set_dialog_text(dialogQueue.shift() || "");
 
@@ -62,6 +63,9 @@ export namespace Dialog
     {
       if (currentDialogTextIndex >= targetDialogText.length)
       {
+        if (choice_handler)
+          controls_used(D_UP, D_DOWN, A_BUTTON, B_BUTTON);
+
         if (UP_PRESSED) choice_index = 0;
         else if (DOWN_PRESSED) choice_index = 1;
         else if (A_PRESSED)
@@ -106,7 +110,7 @@ export namespace Dialog
     let box_y = SCREEN_HEIGHT - 10;
     let box_h = 100;
     render_panel(0, box_y - box_h, box_w, box_h);
-    push_text(currentDialogText, 5, box_y - (box_h - 5), { _width: box_w - 10, _scale: 2 });
+    push_text(currentDialogText, 5, box_y - (box_h - 5), { _scale: 2 });
 
     if (currentDialogTextIndex >= targetDialogText.length)
     {

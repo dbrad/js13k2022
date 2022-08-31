@@ -59,7 +59,7 @@ export namespace TileMap
 
   let active_lights: [V2, number][] = [];
 
-  let _update_fn = (now: number, delta: number) =>
+  let _update_fn = (delta: number) =>
   {
     let camera_movement = get_interpolation_data(INTERP_CAMERA_MOVEMENT);
     if (camera_movement)

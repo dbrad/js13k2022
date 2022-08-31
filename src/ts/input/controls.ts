@@ -2,6 +2,7 @@ import { push_quad, push_textured_quad, TextureQuadParameters } from "@graphics/
 import { push_text, TextParameters } from "@graphics/text";
 import { V2 } from "@math/vector";
 import { canvas_reference, document_reference, request_fullscreen, SCREEN_HEIGHT, SCREEN_WIDTH, window_reference } from "@root/screen";
+import { boop, boop_bad, boop_good, zzfx_play } from "@root/zzfx";
 import { is_point_in_circle, is_point_in_rect, math } from "math";
 
 let hardware_key_state: number[] = [
@@ -21,6 +22,16 @@ let key_state: number[] = [
     KEY_IS_UP, // A_BUTTON
     KEY_IS_UP, // B_BUTTON
 ];
+
+let controls_enabled = [false, false, false, false, false, false];
+export let controls_used = (...keys: number[]) =>
+{
+    for (let key = 0; key < 6; key++)
+        controls_enabled[key] = false;
+
+    for (let key of keys)
+        controls_enabled[key] = true;
+};
 
 export let UP_PRESSED: boolean = false;
 export let DOWN_PRESSED: boolean = false;
@@ -186,7 +197,7 @@ export let update_hardware_input = (): void =>
     }
 };
 
-export let update_input_system = (now: number, delta: number): void =>
+export let update_input_system = (delta: number): void =>
 {
     for (let key = 0; key <= 5; key++) 
     {
@@ -213,7 +224,6 @@ export let update_input_system = (now: number, delta: number): void =>
             else if (key_state[key] === KEY_WAS_DOWN)
                 key_state[key] = KEY_IS_UP;
         }
-
     }
     UP_PRESSED = key_state[D_UP] === KEY_WAS_DOWN;
     DOWN_PRESSED = key_state[D_DOWN] === KEY_WAS_DOWN;
@@ -222,6 +232,18 @@ export let update_input_system = (now: number, delta: number): void =>
     A_PRESSED = key_state[A_BUTTON] === KEY_WAS_DOWN;
     B_PRESSED = key_state[B_BUTTON] === KEY_WAS_DOWN;
 
+    if (UP_PRESSED && controls_enabled[D_UP])
+        zzfx_play(boop);
+    if (DOWN_PRESSED && controls_enabled[D_DOWN])
+        zzfx_play(boop);
+    if (LEFT_PRESSED && controls_enabled[D_LEFT])
+        zzfx_play(boop);
+    if (RIGHT_PRESSED && controls_enabled[D_RIGHT])
+        zzfx_play(boop);
+    if (A_PRESSED && controls_enabled[A_BUTTON])
+        zzfx_play(boop_good);
+    if (B_PRESSED && controls_enabled[B_BUTTON])
+        zzfx_play(boop_bad);
 };
 
 let get_button_colour = (key: number): number => key_state[key] === KEY_IS_UP ? 0x993C3C3C : 0x99666666;

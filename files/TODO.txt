@@ -1,12 +1,7 @@
 COMBAT
-  Better enemy indexes
-    Have positions change based on number of enemies?
-    1 enemy = 0
-    2 enemy = 1,0
-    3 enemy = 1,0,2
-    4 enemy = 1,3,0,2
-  
   Render Buff and Debuff on enemy
+
+  Show barbs counter somewhere
   
   Player Death
     Lose all reagents from this level?
@@ -14,37 +9,33 @@ COMBAT
 
   Smooth Phase Changes
 
+  Player Animations / Effects
+
 Exit Dungeon after boss
   Collect loot to gamestate
 
 Track Game progress
+  Lock higher stages until progress is right
+
+Hide cards that you haven't collected reagents for yet
 
 LICH PALETTE
 CULTIST PALETTE
 
 LEVEL GEN
  EVENTS
-  Resource Trade
   Resource Get
   Heal Player
-  Chance events? 
-    Chance to gain resources or lose hp?
-  Hard optional fight for more resources or a special card
-    Level of fight is current level + 10 or 20?
+  Hard optional fight for more resources or a whole card
+    Level of fight is current level + 10?
+  Exit
 
 AUDIO
-  Button Press
-  Hit Sound
-  Heal Sound
-  Buff Sound
-  Bass Sound?
-
-THIN STORY / INTRO
-Tutorials
+  FAKE MUSIC BASS LINE THINGY
+  Player action sounds
 
 Nice to Haves
   Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
   Set control hints?
 
 Optimizations
-  combine panel + text menu?

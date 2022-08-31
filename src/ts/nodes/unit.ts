@@ -63,9 +63,9 @@ export let render_enemy = (enemy: Enemy, x: number, y: number) =>
       push_textured_quad(TEXTURE_CROSS, x + 24, y - 10, { _palette_offset: PALETTE_PLAYER - 1 });
 
     if (intent_type === ENEMY_INTENT_TYPE_ATTACK || intent_type === ENEMY_INTENT_TYPE_ATTACK_HEAL)
-      push_text(attack + "", x + 8, y - 10, { _colour: attack > enemy._attack ? 0xff00ff00 : attack < enemy._attack ? 0xff0000ff : WHITE });
+      push_text(attack, x + 8, y - 10, { _colour: attack > enemy._attack ? 0xff00ff00 : attack < enemy._attack ? 0xff0000ff : WHITE });
     else if (intent_type === ENEMY_INTENT_TYPE_HEAL)
-      push_text(math.ceil(enemy._attack / 2) + "", x + 8, y - 10);
+      push_text(math.ceil(enemy._attack / 2), x + 8, y - 10);
     else if (intent_type === ENEMY_INTENT_TYPE_BUFF)
       push_textured_quad(TEXTURE_SWORD, x + 8, y - 10);
   }

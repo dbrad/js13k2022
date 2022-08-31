@@ -1,9 +1,10 @@
 import { generate_level } from "@gameplay/level-gen";
-import { A_PRESSED, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
+import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y } from "@root/screen";
 import { safe_add, safe_subtract } from "math";
+import { Hub } from "./01-hub";
 import { Dungeon } from "./03-dungeon";
 export namespace LevelSelect
 {
@@ -19,10 +20,11 @@ export namespace LevelSelect
 
   let _reset_fn = () =>
   {
+    controls_used(D_UP, D_DOWN, A_BUTTON, B_BUTTON);
     // TODO: update menu options based on game progress
   };
 
-  let _update_fn = (now: number, delta: number) =>
+  let _update_fn = (delta: number) =>
   {
     if (UP_PRESSED)
       selected_option_index = safe_subtract(selected_option_index, 1);
@@ -33,6 +35,8 @@ export namespace LevelSelect
       generate_level(selected_option_index + 1, 0);
       switch_to_scene(Dungeon._scene_id);
     }
+    else if (B_PRESSED)
+      switch_to_scene(Hub._scene_id);
   };
   let _render_fn = () =>
   {

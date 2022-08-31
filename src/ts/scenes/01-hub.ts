@@ -1,5 +1,5 @@
 import { push_text } from "@graphics/text";
-import { A_PRESSED, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
+import { A_PRESSED, controls_used, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
 import { game_state } from "@root/game-state";
 import { render_resources } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
@@ -23,9 +23,10 @@ export namespace Hub
   ];
   let _reset_fn = () =>
   {
+    controls_used(D_UP, D_DOWN, A_BUTTON);
     selected_option_index = 0;
   };
-  let _update_fn = (now: number, delta: number) =>
+  let _update_fn = (delta: number) =>
   {
     if (monetization_reference && monetization_reference.state === "pending")
     {
@@ -34,9 +35,9 @@ export namespace Hub
     {
       if (game_state[GAMESTATE_EVENTS][EVENT_COIL_FIRST_TIME] === EVENT_NOT_DONE)
       {
-        Dialog._push_dialog_text("thank you for supporting this game through web monetization!");
-        Dialog._push_dialog_text("as a bonus a few extra cards have been added to you collection!");
-        Dialog._push_dialog_text("death coil added!\nlevel 1 skeleton, zombie, and spirit added!");
+        Dialog._push_dialog_text("thank you for supporting this game|through web monetization!");
+        Dialog._push_dialog_text("as a bonus a few extra cards have been|added to you collection!");
+        Dialog._push_dialog_text("death coil added!|level 1 skeleton, zombie,|and spirit added!");
         game_state[GAMESTATE_CARD_COLLECTION].push(3, 4, 5, 12);
         game_state[GAMESTATE_CARD_COLLECTION].sort(number_sort);
         push_scene(Dialog._scene_id);

@@ -59,7 +59,7 @@ export let initialize_particle_system = (): void =>
   }
 };
 
-export let update_particle_system = (now: number, delta: number): void =>
+export let update_particle_system = (delta: number): void =>
 {
   let delta_in_seconds = (delta / 1000);
   for (let i = 0; i < particle_pool_size; i++)

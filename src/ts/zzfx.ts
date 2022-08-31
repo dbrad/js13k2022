@@ -21,8 +21,24 @@ let zzfx_sample_rate: number = 44100;
 // zzfxX - the common audio context
 let zzfx_context: AudioContext;
 
+export let buff_sound: number[];
+export let heal_sound: number[];
+export let boop_good: number[];
+export let boop: number[];
+export let boop_bad: number[];
+export let hit: number[];
+export let music: number[];
+
 export let zzfx_init = (): void =>
 {
   if (!zzfx_context)
     zzfx_context = new AudioContext();
+
+  buff_sound = zzfx_generate(...[, , 162, .06, .17, .4, , , -6.5, , -60, .03, .01, , , .1, .2, .59, .29]);
+  heal_sound = zzfx_generate(...[, , 640, .08, .13, .42, 2, 1.08, -3.4, , 36, .03, .09, , , , , .59, .22, .44]);
+  boop_good = zzfx_generate(...[, .1, 440, .05, .05, , , , , , 200, .06, , , , , , .5, .05, 1]);
+  boop = zzfx_generate(...[, .1, , .05, .05, , , , , , 200, .06, , , , , , .5, .05]);
+  boop_bad = zzfx_generate(...[, 0, , .05, .05, , , , , , -50, .06, , , , 1.5, , .5, .05, 1]);
+  hit = zzfx_generate(...[2, , 197, .01, .05, .08, 3, 2.75, .4, , , , , 2, -8.6, .4, .08, .87, .01]);
+  music = zzfx_generate(...[, 0, 65, , .08, .17, , .45, , , , , , .2, , .1, , .26, .15]);
 };

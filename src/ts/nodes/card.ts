@@ -45,7 +45,7 @@ export let render_card = (x: number, y: number, card: Card, scale: number = 1, h
     {
       let attack_colour = attack_modifier > 0 ? 0xff00ff00 : attack_modifier < 0 ? 0xff0000ff : 0xffffffff;
       push_textured_quad(TEXTURE_SWORD, x + 4, y + card_height - 4 - 8 * scale, { _scale: scale });
-      push_text("" + attack, x + 6 + 8 * scale, y + card_height - 4 - 8 * scale, { _colour: attack_colour, _scale: scale });
+      push_text(attack, x + 6 + 8 * scale, y + card_height - 4 - 8 * scale, { _colour: attack_colour, _scale: scale });
     }
 
     let defense = math.max(0, card[CARD_DEFENSE] + defense_modifier);
@@ -53,7 +53,7 @@ export let render_card = (x: number, y: number, card: Card, scale: number = 1, h
     {
       let defense_colour = defense_modifier > 0 ? 0xff00ff00 : defense_modifier < 0 ? 0xff0000ff : 0xffffffff;
       push_textured_quad(TEXTURE_SHEILD, x + card_width - 5 - 16 * scale, y + card_height - 4 - 8 * scale, { _scale: scale });
-      push_text("" + defense, x + card_width - 3 - 8 * scale, y + card_height - 4 - 8 * scale, { _colour: defense_colour, _scale: scale });
+      push_text(defense, x + card_width - 3 - 8 * scale, y + card_height - 4 - 8 * scale, { _colour: defense_colour, _scale: scale });
     }
   }
 };

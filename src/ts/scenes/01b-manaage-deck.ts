@@ -1,6 +1,6 @@
 import { card_list } from "@gameplay/cards";
-import { push_text } from "@graphics/text";
-import { A_PRESSED, B_PRESSED, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, set_key_pulse_time, UP_PRESSED } from "@input/controls";
+import { CENTERED_TEXT, push_text } from "@graphics/text";
+import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, set_key_pulse_time, UP_PRESSED } from "@input/controls";
 import { game_state } from "@root/game-state";
 import { render_card } from "@root/nodes/card";
 import { render_card_list } from "@root/nodes/card-list";
@@ -25,12 +25,13 @@ export namespace ManageDeck
 
   let _reset_fn = () =>
   {
+    controls_used(D_UP, D_DOWN, D_LEFT, D_RIGHT, A_BUTTON, B_BUTTON);
     set_key_pulse_time([D_UP, D_DOWN], 150);
     column = 0;
     left_index = 0;
     right_index = 0;
   };
-  let _update_fn = (now: number, delta: number) =>
+  let _update_fn = (delta: number) =>
   {
     collection = game_state[GAMESTATE_CARD_COLLECTION];
     collection_size = collection.length;
@@ -99,11 +100,12 @@ export namespace ManageDeck
         switch_to_scene(Hub._scene_id);
     }
   };
+
   let _render_fn = () =>
   {
     push_text("deck management", SCREEN_WIDTH - 5, 5, { _scale: 3, _align: TEXT_ALIGN_RIGHT });
-    push_text("collection (" + collection_size + ")", 75, 40, { _scale: 1, _align: TEXT_ALIGN_CENTER });
-    push_text("deck (" + deck_size + ")", SCREEN_WIDTH - 75, 40, { _scale: 1, _align: TEXT_ALIGN_CENTER });
+    push_text("collection (" + collection_size + ")", 75, 40, CENTERED_TEXT);
+    push_text("deck (" + deck_size + ")", SCREEN_WIDTH - 75, 40, CENTERED_TEXT);
 
     render_card_list(5, 50, collection, collection_size, column ? -1 : left_index);
     render_card_list(SCREEN_WIDTH - 140, 50, deck, deck_size, column ? right_index : -1);

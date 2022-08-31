@@ -79,7 +79,7 @@ window_reference.addEventListener('load', async () =>
       while (elasped_time >= time_step)
       {
         update_animation_frame(time_step);
-        update_scene(now, time_step);
+        update_scene(time_step);
         elasped_time -= time_step;
       }
       performance_mark("update_end");

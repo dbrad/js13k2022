@@ -207,7 +207,7 @@ export namespace Combat_OldTurnBased
     summons = player[PLAYER_ACTIVE_SUMMONS];
   };
 
-  let _update_fn = (now: number, delta: number) =>
+  let _update_fn = (delta: number) =>
   {
     let UP_PRESSED = key_state[D_UP] === KEY_WAS_DOWN;
     let DOWN_PRESSED = key_state[D_DOWN] === KEY_WAS_DOWN;

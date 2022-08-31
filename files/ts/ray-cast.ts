@@ -1,7 +1,7 @@
 import { push_quad } from "../draw-quad";
 import { Font_Small, push_text } from "../draw-text";
 import { gl_push_textured_quad } from "../gl";
-import { key_state, D_LEFT, D_RIGHT, D_UP, D_DOWN, KEY_WAS_DOWN } from "../input";
+import { D_DOWN, D_LEFT, D_RIGHT, D_UP, key_state, KEY_WAS_DOWN } from "../input";
 import { add_interpolator, get_interpolation_data, has_interpolation_data } from "../interpolate";
 import { INTERP_CAMERA_MOVEMENT, INTERP_PLAYER_MOVEMENT } from "../interpolation_ids";
 import { math } from "../math";
@@ -67,7 +67,7 @@ export namespace RayCast
     u_step = (wall_texture._u1 - wall_texture._u0) / 16;
   };
   let _reset_fn = () => { };
-  let _update_fn = (now: number, delta: number) =>
+  let _update_fn = (delta: number) =>
   {
     for (let x = 0; x < resolution; x++)
     {

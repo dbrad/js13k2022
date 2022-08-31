@@ -1,7 +1,7 @@
 import { card_list } from "@gameplay/cards";
 import { WHITE } from "@graphics/colour";
-import { CENTERED, push_text } from "@graphics/text";
-import { A_PRESSED, B_PRESSED, DOWN_PRESSED, set_key_pulse_time, UP_PRESSED } from "@input/controls";
+import { CENTERED_TEXT, push_text } from "@graphics/text";
+import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, set_key_pulse_time, UP_PRESSED } from "@input/controls";
 import { game_state } from "@root/game-state";
 import { render_card } from "@root/nodes/card";
 import { render_card_list } from "@root/nodes/card-list";
@@ -32,12 +32,13 @@ export namespace Craft
 
   let _reset_fn = () =>
   {
+    controls_used(D_UP, D_DOWN, A_BUTTON, B_BUTTON);
     set_key_pulse_time([D_UP, D_DOWN], 150);
     selection_index = 0;
     player_resources = game_state[GAMESTATE_RESOURCES];
   };
 
-  let _update_fn = (now: number, delta: number) =>
+  let _update_fn = (delta: number) =>
   {
     let collection = game_state[GAMESTATE_CARD_COLLECTION];
     if (UP_PRESSED)
@@ -56,7 +57,7 @@ export namespace Craft
       if (can_afford(costs))
       {
         let card = card_list[selection_index + 3];
-        Dialog._push_yes_no_dialog(`are you sure you want to craft\n"${card[CARD_NAME].replace("\n", " ")}"`,
+        Dialog._push_yes_no_dialog(`are you sure you want to craft|"${card[CARD_NAME].replace("|", " ")}"`,
           () =>
           {
             for (let [i, cost] of costs.entries())
@@ -79,7 +80,7 @@ export namespace Craft
     render_card_list(5, 50, card_index_list, number_of_cards, selection_index, 3);
     render_card(SCREEN_CENTER_X - 100, 50, card_list[selection_index + 3], 2);
 
-    push_text("crafting cost", SCREEN_CENTER_X, SCREEN_CENTER_Y + 35, CENTERED);
+    push_text("crafting cost", SCREEN_CENTER_X, SCREEN_CENTER_Y + 35, CENTERED_TEXT);
     let costs = card_costs[selection_index];
     let y_offset = 0;
     for (let [i, cost] of costs.entries())

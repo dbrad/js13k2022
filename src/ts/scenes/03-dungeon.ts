@@ -1,7 +1,7 @@
 import { BLACK } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
 import { push_text } from "@graphics/text";
-import { A_PRESSED, B_PRESSED, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
+import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
 import { V2 } from "@math/vector";
 import { animation_frame } from "@root/animation";
 import { game_state, Level, Room } from "@root/game-state";
@@ -91,7 +91,7 @@ export namespace Dungeon
           push_quad(render_x, render_y, 16, 16, colour);
 
         if (special_colour)
-          push_text("!", render_x + 4, render_y + 4, { _colour: special_colour, _scale: 1 });
+          push_text("!", render_x + 4, render_y + 4, { _colour: special_colour });
 
         if ((current_room?._seen || current_room?._peeked) && current_room?._exit)
           push_textured_quad(TEXTURE_STAIR, render_x + 4, render_y + 4);
@@ -112,8 +112,10 @@ export namespace Dungeon
     camera[1] = player_position[1];
   };
 
-  let _update_fn = (now: number, delta: number) =>
+  let _update_fn = (delta: number) =>
   {
+    controls_used();
+
     camera_top_left = [camera[0] - camera_half_width, camera[1] - camera_half_height];
     camera_bottom_right = [camera[0] + camera_half_width, camera[1] + camera_half_height];
 
@@ -148,6 +150,8 @@ export namespace Dungeon
     {
       if (mode === 0)
       {
+        controls_used(D_UP, D_DOWN, A_BUTTON, B_BUTTON);
+
         // MENU MODE
         if (UP_PRESSED)
           selected_option_index = safe_subtract(selected_option_index, 1);
@@ -163,7 +167,7 @@ export namespace Dungeon
           else
           {
             // Retreat
-            Dialog._push_yes_no_dialog("retreat to the entrance?\nyou will lose all progress and reagents gathered in this level.", () => switch_to_scene(Hub._scene_id));
+            Dialog._push_yes_no_dialog("retreat to the entrance?|you will lose all progress and reagents from in this level.", () => switch_to_scene(Hub._scene_id));
             push_scene(Dialog._scene_id);
           }
         }
@@ -175,6 +179,8 @@ export namespace Dungeon
       }
       else if (mode === 1)
       {
+        controls_used(D_UP, D_DOWN, D_LEFT, D_RIGHT, A_BUTTON, B_BUTTON);
+
         // MOVE MODE
         if (A_PRESSED || B_PRESSED)
           mode = 0;
@@ -212,6 +218,7 @@ export namespace Dungeon
       }
       else if (mode === 2)
       {
+        controls_used(A_BUTTON, B_BUTTON);
         // MAP MODE
         if (A_PRESSED || B_PRESSED)
           mode = 0;
@@ -288,11 +295,12 @@ export namespace Dungeon
     }
     else if (mode === 2)
     {
-      // Map Render
+      // Full Map Render
       render_minimap(SCREEN_CENTER_X, SCREEN_CENTER_Y, 1, 9, 0, 7);
     }
     else
     {
+      // Show Resources and Mini-Map on Screen
       render_resources(game_state[GAMESTATE_CURRENT_DUNGEON]._level_resources);
       render_minimap(50, SCREEN_HEIGHT - 50, player_room_x - 1, player_room_x + 1, player_room_y - 1, player_room_y + 1);
     }

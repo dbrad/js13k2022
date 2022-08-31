@@ -1,5 +1,5 @@
-import { CENTERED, push_text, SMALL_AND_CENTERED } from "@graphics/text";
-import { A_PRESSED, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
+import { CENTERED_TEXT, push_text, SMALL_FONT_AND_CENTERED_TEXT } from "@graphics/text";
+import { A_PRESSED, controls_used, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
 import { has_save_file, load_game, setup_game_state } from "@root/game-state";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
@@ -17,6 +17,7 @@ export namespace MainMenu
 
   let _reset_fn = () =>
   {
+    controls_used(D_UP, D_DOWN, A_BUTTON);
     if (has_save_file())
     {
       number_of_options = 2;
@@ -29,7 +30,7 @@ export namespace MainMenu
 
   let timer_end = Date.parse('13 Sep 2022 07:00:00 EST') / 1000;
   let remaining_seconds: number;
-  let _update_fn = (now: number, delta: number) =>
+  let _update_fn = (delta: number) =>
   {
     if (DEBUG)
       remaining_seconds = timer_end - Date.now() / 1000;
@@ -57,13 +58,13 @@ export namespace MainMenu
       let minutes = (Math.floor((remaining_seconds % 86400) % 3600 / 60) + "").padStart(2, "0");
       let seconds = (Math.floor(remaining_seconds % 60) + "").padStart(2, "0");
 
-      push_text(`submission deadline ${days}.${hours}.${minutes}.${seconds}`, SCREEN_CENTER_X, SCREEN_HEIGHT - 40, SMALL_AND_CENTERED);
+      push_text(`submission deadline ${days}.${hours}.${minutes}.${seconds}`, SCREEN_CENTER_X, SCREEN_HEIGHT - 40, SMALL_FONT_AND_CENTERED_TEXT);
     }
 
     push_text("forgotten depths", SCREEN_CENTER_X, SCREEN_CENTER_Y - 110, { _align: TEXT_ALIGN_CENTER, _scale: 3 });
-    push_text("path of the necromancer", SCREEN_CENTER_X, SCREEN_CENTER_Y - 70, SMALL_AND_CENTERED);
+    push_text("path of the necromancer", SCREEN_CENTER_X, SCREEN_CENTER_Y - 70, SMALL_FONT_AND_CENTERED_TEXT);
     render_text_menu(SCREEN_CENTER_X, SCREEN_CENTER_Y - 20, menu_options, number_of_options, selected_option_index);
-    push_text(`js13k 2022 entry by david brad`, SCREEN_CENTER_X, SCREEN_HEIGHT - 30, CENTERED);
+    push_text(`js13k 2022 entry by david brad`, SCREEN_CENTER_X, SCREEN_HEIGHT - 30, CENTERED_TEXT);
   };
 
   export let _scene_id = get_next_scene_id();
