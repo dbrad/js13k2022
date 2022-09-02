@@ -15,6 +15,7 @@ declare const SPIRIT_MODIFIERS: 4;
 
 declare const PLAYER_HP: 0;
 declare const PLAYER_MAX_HP: 1;
+declare const PLAYER_GAME_PROGRESS: 2;
 
 declare const CARD_NAME: 0;
 declare const CARD_TYPE: 1;

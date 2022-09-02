@@ -2,7 +2,7 @@ import { push_quad, push_textured_quad, TextureQuadParameters } from "@graphics/
 import { push_text, TextParameters } from "@graphics/text";
 import { V2 } from "@math/vector";
 import { canvas_reference, document_reference, request_fullscreen, SCREEN_HEIGHT, SCREEN_WIDTH, window_reference } from "@root/screen";
-import { boop, boop_bad, boop_good, zzfx_play } from "@root/zzfx";
+import { boop, boop_good, zzfx_play } from "@root/zzfx";
 import { is_point_in_circle, is_point_in_rect, math } from "math";
 
 let hardware_key_state: number[] = [
@@ -128,8 +128,8 @@ let [dpad_x, dpad_y] = [20, SCREEN_HEIGHT - dpad_size - 100];
 let button_scale = 3;
 let button_size = 16 * button_scale;
 let half_button_size = button_size / 2;
-let button_options: TextureQuadParameters = { _scale: button_scale, _colour: 0x993C3C3C };
-let button_text_options: TextParameters = { _scale: 3, _colour: 0X99A0A0A0, _font: FONT_SMALL, _align: TEXT_ALIGN_CENTER };
+let button_options: TextureQuadParameters = { _scale: button_scale, _colour: 0x993c3c3c };
+let button_text_options: TextParameters = { _scale: 3, _colour: 0x99a0a0a0, _font: FONT_SMALL, _align: TEXT_ALIGN_CENTER };
 
 let [a_button_x, a_button_y] = [SCREEN_WIDTH - button_size - 80, SCREEN_HEIGHT - button_size - 120];
 let [b_button_x, b_button_y] = [SCREEN_WIDTH - button_size - 20, SCREEN_HEIGHT - button_size - 140];
@@ -152,23 +152,23 @@ export let update_hardware_input = (): void =>
             let [x, y] = touches[i];
 
             // D-pad Checks
-            if (is_point_in_rect([x, y], [dpad_x, dpad_y, dpad_size, dpad_touch_center]))
+            if (is_point_in_rect(x, y, dpad_x, dpad_y, dpad_size, dpad_touch_center))
                 hardware_key_state[D_UP] = KEY_IS_DOWN;
 
-            if (is_point_in_rect([x, y], [dpad_x, dpad_y + dpad_touch_center * 2, dpad_size, dpad_touch_center]))
+            if (is_point_in_rect(x, y, dpad_x, dpad_y + dpad_touch_center * 2, dpad_size, dpad_touch_center))
                 hardware_key_state[D_DOWN] = KEY_IS_DOWN;
 
-            if (is_point_in_rect([x, y], [dpad_x, dpad_y, dpad_touch_center, dpad_size]))
+            if (is_point_in_rect(x, y, dpad_x, dpad_y, dpad_touch_center, dpad_size))
                 hardware_key_state[D_LEFT] = KEY_IS_DOWN;
 
-            if (is_point_in_rect([x, y], [dpad_x + dpad_touch_center * 2, dpad_y, dpad_touch_center, dpad_size]))
+            if (is_point_in_rect(x, y, dpad_x + dpad_touch_center * 2, dpad_y, dpad_touch_center, dpad_size))
                 hardware_key_state[D_RIGHT] = KEY_IS_DOWN;
 
             // Button Checks
-            if (is_point_in_circle([x, y], [a_button_x + half_button_size, a_button_y + half_button_size], half_button_size))
+            if (is_point_in_circle(x, y, a_button_x + half_button_size, a_button_y + half_button_size, half_button_size))
                 hardware_key_state[A_BUTTON] = KEY_IS_DOWN;
 
-            if (is_point_in_circle([x, y], [b_button_x + half_button_size, b_button_y + half_button_size], half_button_size))
+            if (is_point_in_circle(x, y, b_button_x + half_button_size, b_button_y + half_button_size, half_button_size))
                 hardware_key_state[B_BUTTON] = KEY_IS_DOWN;
         }
     }
@@ -243,28 +243,29 @@ export let update_input_system = (delta: number): void =>
     if (A_PRESSED && controls_enabled[A_BUTTON])
         zzfx_play(boop_good);
     if (B_PRESSED && controls_enabled[B_BUTTON])
-        zzfx_play(boop_bad);
+        zzfx_play(boop_good);
 };
 
-let get_button_colour = (key: number): number => key_state[key] === KEY_IS_UP ? 0x993C3C3C : 0x99666666;
+let TRANSPARENT_WHITE = 0x55ffffff;
+let get_button_colour = (key: number): number => key_state[key] === KEY_IS_UP ? 0x993c3c3c : 0x99666666;
 export let render_controls = (): void =>
 {
     let help_text = "";
     if (is_touch)
     {
-        push_textured_quad(TEXTURE_D_PAD, dpad_x, dpad_y, { _scale: dpad_scale, _colour: 0x99FFFFFF });
+        push_textured_quad(TEXTURE_D_PAD, dpad_x, dpad_y, { _scale: dpad_scale, _colour: TRANSPARENT_WHITE });
 
         if (key_state[D_UP] !== KEY_IS_UP)
-            push_quad(dpad_x, dpad_y, dpad_size, dpad_touch_center, 0x55FFFFFF);
+            push_quad(dpad_x, dpad_y, dpad_size, dpad_touch_center, TRANSPARENT_WHITE);
 
         if (key_state[D_DOWN] !== KEY_IS_UP)
-            push_quad(dpad_x, dpad_y + dpad_touch_center * 2, dpad_size, dpad_touch_center, 0x55FFFFFF);
+            push_quad(dpad_x, dpad_y + dpad_touch_center * 2, dpad_size, dpad_touch_center, TRANSPARENT_WHITE);
 
         if (key_state[D_LEFT] !== KEY_IS_UP)
-            push_quad(dpad_x, dpad_y, dpad_touch_center, dpad_size, 0x55FFFFFF);
+            push_quad(dpad_x, dpad_y, dpad_touch_center, dpad_size, TRANSPARENT_WHITE);
 
         if (key_state[D_RIGHT] !== KEY_IS_UP)
-            push_quad(dpad_x + dpad_touch_center * 2, dpad_y, dpad_touch_center, dpad_size, 0x55FFFFFF);
+            push_quad(dpad_x + dpad_touch_center * 2, dpad_y, dpad_touch_center, dpad_size, TRANSPARENT_WHITE);
 
         push_textured_quad(TEXTURE_WHITE_CIRCLE, b_button_x, b_button_y, { ...button_options, _colour: get_button_colour(B_BUTTON) });
         push_text("b", b_button_x + half_button_size, b_button_y + half_button_size - 7, button_text_options);
@@ -277,7 +278,7 @@ export let render_controls = (): void =>
     else
         help_text = "dpad / a. action / b. cancel";
 
-    push_text(help_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 8, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL, _colour: 0x66FFFFFF });
+    push_text(help_text, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 8, { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL, _colour: 0x66ffffff });
 
     if (false)
     {

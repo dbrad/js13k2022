@@ -23,13 +23,19 @@ let weaken = (effect: Effect, enemy: Enemy) =>
   enemy._attack_debuff_turns += effect[EFFECT_VALUE];
 };
 
+let barbs = (effect: Effect) =>
+{
+  game_state[GAMESTATE_COMBAT][2] += effect[EFFECT_VALUE];
+};
+
 export type EffectFunction = (effect: Effect) => void;
 export type TargetedEffectFunction = (effect: Effect, enemy: Enemy) => void;
 export let effects: (EffectFunction | TargetedEffectFunction)[] = [
   attack_modifier,
   defense_modifier,
   heal,
-  weaken
+  weaken,
+  barbs
 ];
 
 export let build_attack_modifier = (value: number): Effect =>
@@ -59,7 +65,7 @@ export let build_barbs = (value: number): Effect =>
   [
     "barbs",
     value,
-    -1
+    4
   ];
 
 export let build_weaken = (value: number): Effect =>

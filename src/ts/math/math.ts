@@ -1,14 +1,12 @@
-import { V2, V4 } from "./vector";
 
-export let is_point_in_rect = (point: V2, rect: V4): boolean =>
+export let is_point_in_rect = (x0: number, y0: number, x1: number, y1: number, w: number, h: number): boolean =>
 {
-  return point[0] >= rect[0] && point[0] < rect[0] + rect[2] && point[1] >= rect[1] && point[1] < rect[1] + rect[3]
-    ;
+  return x0 >= x1 && x0 < x1 + w && y0 >= y1 && y0 < y1 + h;
 };
 
-export let is_point_in_circle = (point: V2, center: V2, radius: number): boolean =>
+export let is_point_in_circle = (x0: number, y0: number, x1: number, y1: number, radius: number): boolean =>
 {
-  return (((point[0] - center[0]) * (point[0] - center[0]) + (point[1] - center[1]) * (point[1] - center[1])) < radius * radius);
+  return (((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1)) < radius * radius);
 };
 
 export let math = Math;

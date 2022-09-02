@@ -1,11 +1,11 @@
 import { card_list } from "@gameplay/cards";
-import { WHITE } from "@graphics/colour";
+import { RED, WHITE } from "@graphics/colour";
 import { CENTERED_TEXT, push_text } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, set_key_pulse_time, UP_PRESSED } from "@input/controls";
 import { game_state } from "@root/game-state";
 import { render_card } from "@root/nodes/card";
 import { render_card_list } from "@root/nodes/card-list";
-import { render_resources, resource_names } from "@root/nodes/resources";
+import { get_resource_name, render_resources } from "@root/nodes/resources";
 import { clear_particle_system } from "@root/particle-system";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
@@ -87,8 +87,8 @@ export namespace Craft
     {
       if (cost > 0)
       {
-        let _colour = cost <= player_resources[i] ? WHITE : 0xff0000ff;
-        push_text(cost + " " + resource_names[i], SCREEN_CENTER_X, SCREEN_CENTER_Y + 60 + y_offset, { _align: TEXT_ALIGN_CENTER, _colour });
+        let _colour = cost <= player_resources[i] ? WHITE : RED;
+        push_text(cost + " " + get_resource_name(i), SCREEN_CENTER_X, SCREEN_CENTER_Y + 60 + y_offset, { _align: TEXT_ALIGN_CENTER, _colour });
         y_offset += 15;
       }
     }

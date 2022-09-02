@@ -1,5 +1,5 @@
 import { card_list } from "@gameplay/cards";
-import { WHITE } from "@graphics/colour";
+import { DARK_GREY, WHITE } from "@graphics/colour";
 import { push_text } from "@graphics/text";
 import { is_touch } from "@input/controls";
 import { render_panel } from "./panel";
@@ -16,7 +16,7 @@ export let render_card_list = (x: number, y: number, card_id_list: number[], lis
     let touch_offset = render_index >= 6 && is_touch ? 116 : 0;
     let y_offset = (render_index) * 16 + touch_offset;
 
-    let _colour = (card_index - skip) === selected_index ? WHITE : 0xff2d2d2d;
+    let _colour = (card_index - skip) === selected_index ? WHITE : DARK_GREY;
 
     render_panel(x, y + y_offset, 140, 16, _colour);
     push_text(card[CARD_NAME].replace("|", " "), x + 5, y + 4 + y_offset, { _colour });

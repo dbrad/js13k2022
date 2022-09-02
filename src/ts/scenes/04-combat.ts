@@ -2,7 +2,7 @@ import { assert } from "@debug/assert";
 import { card_list } from "@gameplay/cards";
 import { EffectFunction, effects } from "@gameplay/effects";
 import { get_next_enemy_intent } from "@gameplay/enemy-builder";
-import { BLACK, WHITE } from "@graphics/colour";
+import { BLACK, BLACK_T25, BLACK_T50, BLACK_T75, DARK_GREY, FLOOR_COLOUR, LIGHT_GREY, RED, WHITE } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
 import { CENTERED_TEXT, push_text, SMALL_FONT_AND_CENTERED_TEXT } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
@@ -20,6 +20,7 @@ import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
 import { buff_sound, heal_sound, hit, zzfx_play } from "@root/zzfx";
 import { math, safe_add, safe_subtract, shuffle } from "math";
+import { Hub } from "./01-hub";
 import { Dungeon } from "./03-dungeon";
 export namespace Combat
 {
@@ -36,21 +37,31 @@ export namespace Combat
 
   let loot: [number, number, number, number, number] = [0, 0, 0, 0, 0];
 
+  let wait_timer = 0;
+  let next_mode = COMBAT_MODE_WAIT;
+
   let card_use_menu: string[] = [];
 
   let player: Player;
   let deck: number[] = [];
-  let discard: number[] = [];
+  let discard_pile: number[] = [];
 
   let total_attack = 0;
   let total_defense = 0;
-  let barbs_damage = 0;
-
   let casting_spell = false;
 
   let hand: number[] = [];
   let hand_size: number = 0;
   let discarding = [false, false, false, false, false];
+
+  let player_position: V2 = [1.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32];
+  let enemy_position_index = [0, 0, 0, 0];
+  let enemy_positions: V2[] = [[8.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32], [7.5 * 48 + SCREEN_CENTER_X - 264, 0.5 * 48 + 32], [7.5 * 48 + SCREEN_CENTER_X - 264, 3.5 * 48 + 32], [6.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32]];
+  let enemy_offsets: number[] = [0, 0, 0, 0];
+
+  let target_index: number = 0;
+  let target_list: string[] = [];
+  let target_index_map: number[] = [];
 
   type AttackAnimation = {
     _source_index: number,
@@ -86,14 +97,12 @@ export namespace Combat
     queue_index++;
   };
 
-  let player_position: V2 = [1.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32];
-  let enemy_position_index = [0, 0, 0, 0];
-  let enemy_positions: V2[] = [[8.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32], [7.5 * 48 + SCREEN_CENTER_X - 264, 0.5 * 48 + 32], [7.5 * 48 + SCREEN_CENTER_X - 264, 3.5 * 48 + 32], [6.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32]];
-  let enemy_offsets: number[] = [0, 0, 0, 0];
-
-  let target_index: number = 0;
-  let target_list: string[] = [];
-  let target_index_map: number[] = [];
+  let switch_mode_with_delay = (target_mode: number) =>
+  {
+    next_mode = target_mode;
+    wait_timer = 250;
+    mode = COMBAT_MODE_WAIT;
+  };
 
   let go_to_target_mode = () =>
   {
@@ -159,8 +168,8 @@ export namespace Combat
     else
       enemy_position_index = [0];
 
-    game_state[GAMESTATE_COMBAT] = [0, 0, [0, 0], [0, 0], [0, 0]];
-    hand.length = deck.length = discard.length = total_attack = total_defense = barbs_damage = 0;
+    game_state[GAMESTATE_COMBAT] = [0, 0, 0];
+    hand.length = deck.length = discard_pile.length = total_attack = total_defense = 0;
 
     deck = structuredClone(shuffle(game_state[GAMESTATE_DECK]));
   };
@@ -176,12 +185,20 @@ export namespace Combat
     if (selected_card_index < 0)
       selected_card_index = 0;
 
-    if (mode === COMBAT_MODE_DRAW)
+    if (mode === COMBAT_MODE_WAIT)
+    {
+      wait_timer -= delta;
+      if (wait_timer <= 0)
+      {
+        mode = next_mode;
+      }
+    }
+    else if (mode === COMBAT_MODE_DRAW)
     {
       for (let i = 4; i >= 0; i--)
       {
         if (discarding[i])
-          discard.push(hand.splice(i, 1)[0]);
+          discard_pile.push(hand.splice(i, 1)[0]);
         discarding[i] = false;
       }
       for (let i = 0; i < 5; i++)
@@ -191,8 +208,8 @@ export namespace Combat
           let card_id = deck.pop();
           if (card_id === undefined)
           {
-            deck = structuredClone(shuffle(discard));
-            discard.length = 0;
+            deck = structuredClone(shuffle(discard_pile));
+            discard_pile.length = 0;
             card_id = deck.pop();
           }
           assert(card_id !== undefined, "card from deck undefined after shuffling in discard pile");
@@ -200,14 +217,16 @@ export namespace Combat
         }
       }
       hand_size = hand.length;
-      mode = COMBAT_MODE_CARD_SELECT;
+      switch_mode_with_delay(COMBAT_MODE_CARD_SELECT);
     }
     else if (mode === COMBAT_MODE_CARD_SELECT)
     {
       controls_used(D_UP, D_DOWN, D_LEFT, D_RIGHT, A_BUTTON);
 
-      if (hand_size === 0)
+      if (hand_size === 0 && total_attack > 0)
         go_to_target_mode();
+      else if (hand_size === 0)
+        switch_mode_with_delay(COMBAT_MODE_DEFEND_ACTION);
 
       if (UP_PRESSED)
         row = 0;
@@ -253,7 +272,7 @@ export namespace Combat
             if (total_attack > 0)
               go_to_target_mode();
             else
-              mode = COMBAT_MODE_DEFEND_ACTION;
+              switch_mode_with_delay(COMBAT_MODE_DEFEND_ACTION);
           }
         }
         else // 0 = Discard Mode
@@ -265,7 +284,7 @@ export namespace Combat
             row = 1;
             play_card_mode = 1; // SWITCH TO PLAY MODE
             clear_particle_system();
-            mode = COMBAT_MODE_DRAW;
+            switch_mode_with_delay(COMBAT_MODE_DRAW);
           }
         }
       }
@@ -293,12 +312,12 @@ export namespace Combat
         else
           total_attack += attack;
 
-        discard.push(card_id);
+        discard_pile.push(card_id);
         clear_particle_system();
-        mode = COMBAT_MODE_CARD_SELECT;
+        switch_mode_with_delay(COMBAT_MODE_CARD_SELECT);
       }
       else if (B_PRESSED)
-        mode = COMBAT_MODE_CARD_SELECT;
+        switch_mode_with_delay(COMBAT_MODE_CARD_SELECT);
     }
     else if (mode === COMBAT_MODE_SELECT_TARGET)
     {
@@ -339,21 +358,21 @@ export namespace Combat
           target_enemy._hp = math.max(0, target_enemy._hp - card[CARD_ATTACK]);
 
           hand.splice(selected_card_index, 1);
-          discard.push(card_id);
+          discard_pile.push(card_id);
           casting_spell = false;
 
           if (any_enemies_alive(enemies))
-            mode = COMBAT_MODE_CARD_SELECT;
+            switch_mode_with_delay(COMBAT_MODE_CARD_SELECT);
           else
-            mode = COMBAT_MODE_POST_COMBAT;
+            switch_mode_with_delay(COMBAT_MODE_POST_COMBAT);
         }
         else
-          mode = COMBAT_MODE_ATTACK_ACTION;
+          switch_mode_with_delay(COMBAT_MODE_ATTACK_ACTION);
       }
       else if (B_PRESSED && casting_spell)
       {
         casting_spell = false;
-        mode = COMBAT_MODE_CARD_SELECT;
+        switch_mode_with_delay(COMBAT_MODE_CARD_SELECT);
       }
     }
     else if (mode === COMBAT_MODE_ATTACK_ACTION)
@@ -364,10 +383,12 @@ export namespace Combat
       any_enemies_alive(enemies);
 
       total_attack = 0;
-      mode = COMBAT_MODE_DEFEND_ACTION;
+      switch_mode_with_delay(COMBAT_MODE_DEFEND_ACTION);
     }
     else if (mode === COMBAT_MODE_DEFEND_ACTION)
     {
+      queue_index = 0;
+
       for (let index of enemy_position_index)
       {
         let enemy = enemies[index];
@@ -375,7 +396,7 @@ export namespace Combat
           add_attack(index, enemy._current_intent !== ENEMY_INTENT_TYPE_HEAL ? calculate_attack(enemy) : math.ceil(enemy._attack / 2), enemy._current_intent, 500);
       }
 
-      mode = COMBAT_MODE_ENEMY_ATTACKS;
+      switch_mode_with_delay(COMBAT_MODE_ENEMY_ATTACKS);
     }
     else if (mode === COMBAT_MODE_ENEMY_ATTACKS)
     {
@@ -389,9 +410,10 @@ export namespace Combat
           attacks_done++;
           continue;
         }
-        let intent = action._action_type;
 
+        let intent = action._action_type;
         let is_attack = intent === ENEMY_INTENT_TYPE_ATTACK || intent === ENEMY_INTENT_TYPE_ATTACK_HEAL;
+
         if (action._lifetime_remaining <= 0)
         {
           action._done = true;
@@ -399,12 +421,21 @@ export namespace Combat
           {
             player[PLAYER_HP] = safe_subtract(player[PLAYER_HP], safe_subtract(action._action_value, total_defense));
             total_defense = safe_subtract(total_defense, action._action_value);
-            enemy._hp = safe_subtract(enemy._hp, barbs_damage);
+            enemy._hp = safe_subtract(enemy._hp, game_state[GAMESTATE_COMBAT][2]);
           }
+
           if (intent === ENEMY_INTENT_TYPE_HEAL || intent === ENEMY_INTENT_TYPE_ATTACK_HEAL)
             enemy._hp = safe_add(enemy._max_hp, enemy._hp, action._action_value);
           else if (intent === ENEMY_INTENT_TYPE_BUFF)
             enemy._attack_buff++;
+
+          if (player[PLAYER_HP] <= 0)
+          {
+            // set death event
+            switch_to_scene(Hub._scene_id);
+            mode = -1;
+            return;
+          }
         }
 
         action._lifetime_remaining -= delta;
@@ -439,8 +470,7 @@ export namespace Combat
       if (attacks_done === 4)
       {
         total_defense = 0;
-        queue_index = 0;
-        mode = COMBAT_MODE_POST_COMBAT;
+        switch_mode_with_delay(COMBAT_MODE_POST_COMBAT);
       }
     }
     else if (mode === COMBAT_MODE_POST_COMBAT)
@@ -456,10 +486,10 @@ export namespace Combat
             enemy._attack_debuff_turns = safe_subtract(enemy._attack_debuff_turns, 1);
           }
         }
-        mode = COMBAT_MODE_DRAW;
+        switch_mode_with_delay(COMBAT_MODE_DRAW);
       }
       else
-        mode = COMBAT_MODE_LOOT_AND_LEAVE;
+        switch_mode_with_delay(COMBAT_MODE_LOOT_AND_LEAVE);
     }
     else if (mode === COMBAT_MODE_LOOT_AND_LEAVE)
     {
@@ -494,7 +524,7 @@ export namespace Combat
 
         let tile_id = current_level._tile_map[tile_y * 110 + tile_x];
         if (tile_id > 4)
-          push_quad(render_x, render_y, 48, 48, 0xff2a1f1c);
+          push_quad(render_x, render_y, 48, 48, FLOOR_COLOUR);
         else
           push_quad(render_x, render_y, 48, 48, BLACK);
 
@@ -505,17 +535,21 @@ export namespace Combat
 
         let distance = math.sqrt((player_room_x * 11 + 2 - tile_x) ** 2 + (player_room_y * 9 + 3 - tile_y) ** 2);
         if (distance >= 7)
-          push_quad(render_x, render_y, 48, 48, 0xBD000000);
+          push_quad(render_x, render_y, 48, 48, BLACK_T75);
         else if (distance >= 5)
-          push_quad(render_x, render_y, 48, 48, 0x7F000000);
+          push_quad(render_x, render_y, 48, 48, BLACK_T50);
         else if (distance >= 3)
-          push_quad(render_x, render_y, 48, 48, 0x40000000);
+          push_quad(render_x, render_y, 48, 48, BLACK_T25);
       }
     }
 
+    let barbs = game_state[GAMESTATE_COMBAT][2];
     // Render the entites
     push_quad(player_position[0] + 8 - 6, player_position[1] + 8 + 28, 30, 8, 0x99000000);
     push_textured_quad(TEXTURE_ROBED_MAN, player_position[0] + 8, player_position[1] + 8, { _scale: 2, _palette_offset: PALETTE_PLAYER, _animated: true });
+    if (barbs > 0)
+      push_text("barbs x " + barbs, player_position[0] + 24, player_position[1] + 44, SMALL_FONT_AND_CENTERED_TEXT);
+
     if (total_attack > 0)
     {
       push_text(total_attack, player_position[0] + 8, player_position[1], { _align: TEXT_ALIGN_RIGHT });
@@ -535,22 +569,18 @@ export namespace Combat
         render_enemy(enemy, enemy_positions[enemy_position_index[e]][0] + 8 - (enemy_offsets[enemy_position_index[e]] * 20), enemy_positions[enemy_position_index[e]][1] + 8);
     }
 
-    // Mode specific rendering logic
-    if (mode === COMBAT_MODE_CARD_SELECT || mode === COMBAT_MODE_DRAW || mode === COMBAT_MODE_ACTION_SELECT)
+    for (let hand_index = 0; hand_index < hand_size; hand_index++)
     {
-      for (let hand_index = 0; hand_index < hand_size; hand_index++)
+      let card = card_list[hand[hand_index]];
+      if (card)
       {
-        let card = card_list[hand[hand_index]];
-        if (card)
-        {
-          let selected = hand_index === selected_card_index && row;
-          let highlight_colour = discarding[hand_index] ? 0xff0000ff : selected ? WHITE : undefined;
-          render_card(50 + 110 * hand_index, SCREEN_HEIGHT - 85 - (selected ? 10 : 0), card, 1, highlight_colour);
-        }
+        let selected = hand_index === selected_card_index && row;
+        let highlight_colour = discarding[hand_index] ? RED : selected ? WHITE : undefined;
+        render_card(50 + 110 * hand_index, SCREEN_HEIGHT - 85 - (selected ? 10 : 0), card, 1, highlight_colour);
       }
-      push_text(`${deck.length}|deck`, 25, SCREEN_HEIGHT - 30, SMALL_FONT_AND_CENTERED_TEXT);
-      push_text(`${discard.length}|discard`, SCREEN_WIDTH - 25, SCREEN_HEIGHT - 30, SMALL_FONT_AND_CENTERED_TEXT);
     }
+    push_text(`${deck.length}|deck`, 25, SCREEN_HEIGHT - 30, SMALL_FONT_AND_CENTERED_TEXT);
+    push_text(`${discard_pile.length}|discard`, SCREEN_WIDTH - 25, SCREEN_HEIGHT - 30, SMALL_FONT_AND_CENTERED_TEXT);
 
     if (mode === COMBAT_MODE_CARD_SELECT && !play_card_mode)
     {
@@ -564,14 +594,14 @@ export namespace Combat
           break;
         }
       }
-      render_panel(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y, 120, 28, !row ? WHITE : 0xff2d2d2d);
-      push_text(text, SCREEN_CENTER_X, SCREEN_CENTER_Y + 10, { _align: TEXT_ALIGN_CENTER, _colour: (row ? 0xff444444 : WHITE) });
+      render_panel(SCREEN_CENTER_X - 60, SCREEN_CENTER_Y, 120, 28, !row ? WHITE : DARK_GREY);
+      push_text(text, SCREEN_CENTER_X, SCREEN_CENTER_Y + 10, { _align: TEXT_ALIGN_CENTER, _colour: (row ? LIGHT_GREY : WHITE) });
     }
     else if (mode === COMBAT_MODE_CARD_SELECT)
     {
       render_mode_text("play minions and spells from your hard");
-      render_panel(SCREEN_CENTER_X - 40, SCREEN_CENTER_Y, 80, 28, !row ? WHITE : 0xff2d2d2d);
-      push_text("end turn", SCREEN_CENTER_X, SCREEN_CENTER_Y + 10, { _align: TEXT_ALIGN_CENTER, _colour: (row ? 0xff444444 : WHITE) });
+      render_panel(SCREEN_CENTER_X - 40, SCREEN_CENTER_Y, 80, 28, !row ? WHITE : DARK_GREY);
+      push_text("end turn", SCREEN_CENTER_X, SCREEN_CENTER_Y + 10, { _align: TEXT_ALIGN_CENTER, _colour: (row ? LIGHT_GREY : WHITE) });
     }
     else if (mode === COMBAT_MODE_ACTION_SELECT)
     {
@@ -588,7 +618,7 @@ export namespace Combat
     }
     else if (mode === COMBAT_MODE_LOOT_AND_LEAVE)
     {
-      render_panel(SCREEN_CENTER_X - 200, 30, 400, 300);
+      render_panel(SCREEN_CENTER_X - 175, 30, 350, 300);
       push_text("victory!", SCREEN_CENTER_X, 50, { _scale: 3, _align: TEXT_ALIGN_CENTER });
       push_text("reagents found", SCREEN_CENTER_X, 110, { _align: TEXT_ALIGN_CENTER, _scale: 2 });
       let y = 0;

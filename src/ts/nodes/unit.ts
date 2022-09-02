@@ -1,6 +1,6 @@
-import { abgr_number_to_rgba_v4, WHITE } from "@graphics/colour";
+import { abgr_number_to_rgba_v4, GREEN, RED, WHITE } from "@graphics/colour";
 import { push_textured_quad } from "@graphics/quad";
-import { push_text } from "@graphics/text";
+import { push_text, SMALL_FONT_AND_CENTERED_TEXT } from "@graphics/text";
 import { set_V2, set_V4, V4 } from "@math/vector";
 import { Enemy } from "@root/game-state";
 import { spirit_particle } from "@root/particle-definitions";
@@ -50,8 +50,11 @@ export let render_enemy = (enemy: Enemy, x: number, y: number) =>
   else
     push_textured_quad(unit_sprite[enemy_type], x, y, { _scale: 2, _horizontal_flip: true, _palette_offset: unit_palette_map[enemy_type], _animated: true });
 
-  render_percentage_bar(x - 8, y + 32, 48, 5, enemy._hp, enemy._max_hp, 0xFF0000FF);
+  render_percentage_bar(x - 8, y + 32, 48, 5, enemy._hp, enemy._max_hp, RED);
   push_text(unit_name_map[enemy_type], x + 16, y + 38, { _font: FONT_SMALL, _align: TEXT_ALIGN_CENTER });
+
+  if (enemy._attack_debuff_turns > 0)
+    push_text("weaken (" + enemy._attack_debuff_turns + " turns)", x + 24, y - 18, SMALL_FONT_AND_CENTERED_TEXT);
 
   let intent = enemy._current_intent;
   let intent_type = intent;
@@ -63,7 +66,7 @@ export let render_enemy = (enemy: Enemy, x: number, y: number) =>
       push_textured_quad(TEXTURE_CROSS, x + 24, y - 10, { _palette_offset: PALETTE_PLAYER - 1 });
 
     if (intent_type === ENEMY_INTENT_TYPE_ATTACK || intent_type === ENEMY_INTENT_TYPE_ATTACK_HEAL)
-      push_text(attack, x + 8, y - 10, { _colour: attack > enemy._attack ? 0xff00ff00 : attack < enemy._attack ? 0xff0000ff : WHITE });
+      push_text(attack, x + 8, y - 10, { _colour: attack > enemy._attack ? GREEN : attack < enemy._attack ? RED : WHITE });
     else if (intent_type === ENEMY_INTENT_TYPE_HEAL)
       push_text(math.ceil(enemy._attack / 2), x + 8, y - 10);
     else if (intent_type === ENEMY_INTENT_TYPE_BUFF)
@@ -71,7 +74,7 @@ export let render_enemy = (enemy: Enemy, x: number, y: number) =>
   }
 };
 
-let spirit_colours: [V4, V4] = [abgr_number_to_rgba_v4(0x22FFFFFF), abgr_number_to_rgba_v4(0x11FFCCCC)];
+let spirit_colours: [V4, V4] = [abgr_number_to_rgba_v4(0x22ffffff), abgr_number_to_rgba_v4(0x11ffcccc)];
 export let render_spirit = (x: number, y: number, scale: number = 1) =>
 {
   let [begin, end] = spirit_colours;

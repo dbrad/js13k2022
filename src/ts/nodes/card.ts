@@ -1,13 +1,13 @@
-import { BLACK } from "@graphics/colour";
+import { BLACK, DARK_GREY, GREEN, RED, WHITE } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
-import { push_text } from "@graphics/text";
+import { push_text, SMALL_FONT_AND_CENTERED_TEXT } from "@graphics/text";
 import { V2 } from "@math/vector";
 import { Card, game_state } from "@root/game-state";
 import { math } from "math";
 import { render_spirit, unit_palette_map, unit_sprite } from "./unit";
 
-
-export let render_card = (x: number, y: number, card: Card, scale: number = 1, highlight_colour: number = 0xff2d2d2d) =>
+let card_type_text = ['minion', 'minion', 'minion', 'buff', 'spell'];
+export let render_card = (x: number, y: number, card: Card, scale: number = 1, highlight_colour: number = DARK_GREY) =>
 {
   let card_width = 100 * scale;
   let card_width_half = card_width / 2;
@@ -38,30 +38,31 @@ export let render_card = (x: number, y: number, card: Card, scale: number = 1, h
   if (card_type <= 2)
     [attack_modifier, defense_modifier] = get_modifiers(card_type);
 
+  push_text(card_type_text[card_type], x + card_width_half, y + card_height - 4 - 5 * scale, { ...SMALL_FONT_AND_CENTERED_TEXT, _scale: scale });
+
   if (card_type !== 3)
   {
     let attack = math.max(0, card[CARD_ATTACK] + attack_modifier);
     if (attack > 0)
     {
-      let attack_colour = attack_modifier > 0 ? 0xff00ff00 : attack_modifier < 0 ? 0xff0000ff : 0xffffffff;
+      let attack_colour = attack_modifier > 0 ? GREEN : attack_modifier < 0 ? RED : WHITE;
       push_textured_quad(TEXTURE_SWORD, x + 4, y + card_height - 4 - 8 * scale, { _scale: scale });
-      push_text(attack, x + 6 + 8 * scale, y + card_height - 4 - 8 * scale, { _colour: attack_colour, _scale: scale });
+      push_text(attack, x + 6 + 8 * scale, y + card_height - 3 - 8 * scale, { _colour: attack_colour, _scale: scale });
     }
 
     let defense = math.max(0, card[CARD_DEFENSE] + defense_modifier);
     if (defense > 0)
     {
-      let defense_colour = defense_modifier > 0 ? 0xff00ff00 : defense_modifier < 0 ? 0xff0000ff : 0xffffffff;
-      push_textured_quad(TEXTURE_SHEILD, x + card_width - 5 - 16 * scale, y + card_height - 4 - 8 * scale, { _scale: scale });
-      push_text(defense, x + card_width - 3 - 8 * scale, y + card_height - 4 - 8 * scale, { _colour: defense_colour, _scale: scale });
+      let defense_colour = defense_modifier > 0 ? GREEN : defense_modifier < 0 ? RED : WHITE;
+      push_textured_quad(TEXTURE_SHEILD, x + card_width - 3 - 8 * scale, y + card_height - 4 - 8 * scale, { _scale: scale });
+      push_text(defense, x + card_width - 4 - 8 * scale, y + card_height - 3 - 8 * scale, { _align: TEXT_ALIGN_RIGHT, _colour: defense_colour, _scale: scale });
     }
   }
 };
 
 export let get_modifiers = (card_type: number): V2 =>
 {
-  let unit_specific_modifiers = game_state[GAMESTATE_COMBAT][card_type + 2] as V2;
-  let attack_modifier = game_state[GAMESTATE_COMBAT][ATTACK_MODIFIER] + unit_specific_modifiers[0];
-  let defense_modifier = game_state[GAMESTATE_COMBAT][DEFENSE_MODIFIER] + unit_specific_modifiers[1];
+  let attack_modifier = game_state[GAMESTATE_COMBAT][ATTACK_MODIFIER];
+  let defense_modifier = game_state[GAMESTATE_COMBAT][DEFENSE_MODIFIER];
   return [attack_modifier, defense_modifier];
 };

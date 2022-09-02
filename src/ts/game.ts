@@ -5,7 +5,7 @@ import { initialize_input, is_touch_event, render_controls, update_hardware_inpu
 import { initialize_particle_system } from "@root/particle-system";
 import { register_scene, render_scene, update_scene } from "@root/scene";
 import { canvas_reference, initialize_page, SCREEN_CENTER_X, SCREEN_CENTER_Y, window_reference } from "@root/screen";
-import { zzfx_init } from "@root/zzfx";
+import { play_music, zzfx_init } from "@root/zzfx";
 import { MainMenu } from "@scenes/00-main-menu";
 import { Hub } from "@scenes/01-hub";
 import { Craft } from "@scenes/01a-craft";
@@ -76,6 +76,7 @@ window_reference.addEventListener('load', async () =>
     {
       performance_mark("update_start");
       update_hardware_input();
+      play_music(delta);
       while (elasped_time >= time_step)
       {
         update_animation_frame(time_step);

@@ -1,41 +1,25 @@
 COMBAT
-  Render Buff and Debuff on enemy
-
-  Show barbs counter somewhere
-  
-  Player Death
-    Lose all reagents from this level?
-    Need to track regants for a given level and payout after boss is beat
-
-  Smooth Phase Changes
-
   Player Animations / Effects
-
-Exit Dungeon after boss
-  Collect loot to gamestate
-
-Track Game progress
-  Lock higher stages until progress is right
-
-Hide cards that you haven't collected reagents for yet
 
 LICH PALETTE
 CULTIST PALETTE
 
-LEVEL GEN
- EVENTS
+EVENTS
   Resource Get
   Heal Player
   Hard optional fight for more resources or a whole card
     Level of fight is current level + 10?
-  Exit
 
 AUDIO
-  FAKE MUSIC BASS LINE THINGY
   Player action sounds
+
+POST DEATH EVENT / MESSAGE
+
+BUGS
+  Card list index is going beyond list length when moving cards from collection to deck
+  Make sure player doesn't draw forever if they have less than 5 cards total
 
 Nice to Haves
   Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
-  Set control hints?
-
-Optimizations
+  Set control hints
+  More Palette swaps for level tiles

@@ -76,6 +76,7 @@ const GAMESTATE = {
 
   PLAYER_HP: 0,
   PLAYER_MAX_HP: 1,
+  PLAYER_GAME_PROGRESS: 2,
 
   CARD_NAME: 0,
   CARD_TYPE: 1,
@@ -103,6 +104,7 @@ const GAMESTATE = {
   COMBAT_MODE_ENEMY_ATTACKS: combat_mode++,
   COMBAT_MODE_POST_COMBAT: combat_mode++,
   COMBAT_MODE_LOOT_AND_LEAVE: combat_mode++,
+  COMBAT_MODE_WAIT: combat_mode++,
 };
 
 let enemy_type = 0;

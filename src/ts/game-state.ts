@@ -16,14 +16,13 @@ export type GameState = [
 export type Player = [
   number, // PLAYER_HP
   number, // PLAYER_MAX_HP
+  number, // PLAYER_GAME_PROGRESS
 ];
 
 export type CombatData = [
   number, // ATTACK_MODIFIER
   number, // DEFENSE_MODIFIER
-  V2, // SKELETON_MODIFIERS
-  V2, // ZOMBIE_MODIFIERS
-  V2, // SPIRIT_MODIFIERS
+  number, // BARBS
 ];
 
 export type Card = [
@@ -59,10 +58,11 @@ export type Room = {
   _peeked: boolean,
   _exit: boolean,
   _enemies: Enemy[],
-  _events: [];
+  _event: number;
 };
 
 export type Level = {
+  _chapter: number,
   _tile_map: Int8Array,
   _player_position: V2,
   _rooms: Room[],
@@ -70,6 +70,7 @@ export type Level = {
 };
 
 const null_level: Level = {
+  _chapter: 0,
   _tile_map: new Int8Array(),
   _player_position: [0, 0],
   _rooms: [],
@@ -91,12 +92,12 @@ export let setup_game_state = () =>
   game_state = [
     events,
     null_level,
-    [10, 10],
+    [10, 10, 0],
     [false, false, false, false, false, false],
     [0, 0, 0, 0, 0, 0],
     [0, 1, 2],
     starter_deck,
-    [0, 0, [0, 0], [0, 0], [0, 0]]
+    [0, 0, 0]
   ];
 };
 

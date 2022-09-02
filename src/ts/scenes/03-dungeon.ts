@@ -1,4 +1,4 @@
-import { BLACK } from "@graphics/colour";
+import { BLACK, BLACK_T25, BLACK_T50, BLACK_T75, DARK_GREY, FLOOR_COLOUR, LIGHT_GREY, RED, YELLOW } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
 import { push_text } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
@@ -24,6 +24,7 @@ export namespace Dungeon
     "full map",
     "retreat"
   ];
+  let boss_defeated = false;
 
   let camera: V2 = [60 * 16, 31 * 16];
   let camera_pixel_size: V2 = [41 * 16, 25 * 16];
@@ -72,16 +73,16 @@ export namespace Dungeon
         let special_colour = 0;
 
         if (player_room_x === x && player_room_y === y)
-          colour = animation_frame ? 0xFFEEEEEE : 0xFF666666;
+          colour = animation_frame ? 0xffeeeeee : LIGHT_GREY;
         else if (current_room?._seen)
-          colour = 0xFF666666;
+          colour = LIGHT_GREY;
         else if (current_room?._peeked)
         {
-          colour = 0xFF333333;
-          if (current_room?._events.length > 0)
-            special_colour = 0xFF00FFFF;
+          colour = DARK_GREY;
+          if (current_room?._event > 0)
+            special_colour = YELLOW;
           else if (current_room?._enemies.length > 0)
-            special_colour = 0xFF0000FF;
+            special_colour = RED;
         }
 
         let render_x = (x - from_x) * 18 + x_offset;
@@ -99,10 +100,18 @@ export namespace Dungeon
     }
   };
 
+  let post_area_wrap_up = () =>
+  {
+    game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS] = math.max(game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS], current_level._chapter);
+    for (let r = 0; r < 5; r++)
+      game_state[GAMESTATE_RESOURCES][r] += current_level._level_resources[r];
+  };
+
   let _reset_fn = () =>
   {
-    mode = 1;
+    mode = 3;
     selected_option_index = 0;
+    boss_defeated = false;
 
     current_level = game_state[GAMESTATE_CURRENT_DUNGEON];
     rooms = current_level._rooms;
@@ -167,7 +176,8 @@ export namespace Dungeon
           else
           {
             // Retreat
-            Dialog._push_yes_no_dialog("retreat to the entrance?|you will lose all progress and reagents from in this level.", () => switch_to_scene(Hub._scene_id));
+            let text = boss_defeated ? "exit this area and take all reagents with you?" : "retreat to the entrance?|you will lose all progress and reagents|from in this area.";
+            Dialog._push_yes_no_dialog(text, () => mode = 4);
             push_scene(Dialog._scene_id);
           }
         }
@@ -226,17 +236,46 @@ export namespace Dungeon
       else if (mode === 3)
       {
         // TRIGGER EVENTS / COMBAT
-        // TODO: TRIGGER EVENTS
-        let enemies_alive = false;
+        let any_enemies_alive = false;
         for (let enemy of player_room._enemies)
-          enemies_alive = enemies_alive || enemy._alive;
-        if (enemies_alive)
+          any_enemies_alive = any_enemies_alive || enemy._alive;
+        if (any_enemies_alive)
         {
           switch_to_scene(Combat._scene_id);
-          mode = 9;
         }
         else
-          mode = 1;
+        {
+          // Events / Exit
+          if (player_room._exit)
+          {
+            boss_defeated = true;
+            menu_options[1] = "leave area";
+            // Offer player exit
+            Dialog._push_yes_no_dialog("boss of the area defeated.|leave this area and return to the entrance?", () => mode = 4);
+            push_scene(Dialog._scene_id);
+          }
+          else if (player_room._event > 0)
+          {
+            switch (player_room._event)
+            {
+              case 1: // Random Resource Gain
+                break;
+              case 2: // Heal Player
+                break;
+              case 3: // Optional Hard Fight
+                break;
+            }
+            player_room._event = 0;
+          }
+        }
+        mode = 1;
+      }
+      else if (mode === 4)
+      {
+        if (boss_defeated)
+          post_area_wrap_up();
+        switch_to_scene(Hub._scene_id);
+        mode = 9;
       }
     }
   };
@@ -258,7 +297,7 @@ export namespace Dungeon
           let tile_id = current_level._tile_map[tile_y * 110 + tile_x];
 
           if (tile_id > 4)
-            push_quad(render_x, render_y, 16, 16, 0xff2a1f1c); // 1c1f2a
+            push_quad(render_x, render_y, 16, 16, FLOOR_COLOUR);
           else
             push_quad(render_x, render_y, 16, 16, BLACK);
 
@@ -272,11 +311,11 @@ export namespace Dungeon
           if (distance >= 8)
             push_quad(render_x, render_y, 16, 16, BLACK);
           else if (distance >= 6)
-            push_quad(render_x, render_y, 16, 16, 0xBD000000);
+            push_quad(render_x, render_y, 16, 16, BLACK_T75);
           else if (distance >= 4)
-            push_quad(render_x, render_y, 16, 16, 0x7F000000);
+            push_quad(render_x, render_y, 16, 16, BLACK_T50);
           else if (distance >= 2)
-            push_quad(render_x, render_y, 16, 16, 0x40000000);
+            push_quad(render_x, render_y, 16, 16, BLACK_T25);
         }
       }
     }

@@ -1,3 +1,5 @@
+import { BLACK_T75 } from "@graphics/colour";
+import { push_quad } from "@graphics/quad";
 import { push_text } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
 import { animation_frame } from "@root/animation";
@@ -106,9 +108,10 @@ export namespace Dialog
 
   let _render_fn = () =>
   {
+    push_quad(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK_T75);
     let box_w = SCREEN_WIDTH;
     let box_y = SCREEN_HEIGHT - 10;
-    let box_h = 100;
+    let box_h = 80;
     render_panel(0, box_y - box_h, box_w, box_h);
     push_text(currentDialogText, 5, box_y - (box_h - 5), { _scale: 2 });
 

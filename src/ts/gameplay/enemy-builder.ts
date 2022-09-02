@@ -27,7 +27,7 @@ export let build_enemy = (_type: number, _level: number): Enemy =>
   let mod_plus_one = level_mod + 1;
 
   let _attack = random_int(mod_plus_one, mod_plus_one + (mod_plus_one * enemy_stats[0]));
-  let _hp = ((_level * 2 - _attack) + (level_mod * enemy_stats[1]));
+  let _hp = ((_level * 2 - (_attack * 2)) + (level_mod * enemy_stats[1]));
 
   return {
     _type,

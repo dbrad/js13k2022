@@ -1,5 +1,5 @@
 import { card_list } from "@gameplay/cards";
-import { CENTERED_TEXT, push_text } from "@graphics/text";
+import { CENTERED_TEXT, push_text, SMALL_FONT_AND_CENTERED_TEXT } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, set_key_pulse_time, UP_PRESSED } from "@input/controls";
 import { game_state } from "@root/game-state";
 import { render_card } from "@root/nodes/card";
@@ -7,7 +7,7 @@ import { render_card_list } from "@root/nodes/card-list";
 import { clear_particle_system } from "@root/particle-system";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
-import { number_sort, safe_add, safe_subtract } from "math";
+import { math, number_sort, safe_add, safe_subtract } from "math";
 import { Hub } from "./01-hub";
 import { Dialog } from "./20-dialog";
 
@@ -91,9 +91,9 @@ export namespace ManageDeck
     }
     else if (B_PRESSED)
     {
-      if (deck_size < 20)
+      if (deck_size < 10 || deck_size > 40)
       {
-        Dialog._push_dialog_text("deck must contain at least 20 cards.");
+        Dialog._push_dialog_text("deck must contain at least 10 card|and no more than 40 cards.");
         push_scene(Dialog._scene_id);
       }
       else
@@ -104,8 +104,9 @@ export namespace ManageDeck
   let _render_fn = () =>
   {
     push_text("deck management", SCREEN_WIDTH - 5, 5, { _scale: 3, _align: TEXT_ALIGN_RIGHT });
-    push_text("collection (" + collection_size + ")", 75, 40, CENTERED_TEXT);
-    push_text("deck (" + deck_size + ")", SCREEN_WIDTH - 75, 40, CENTERED_TEXT);
+    push_text("collection (" + collection_size + ")", 75, 30, CENTERED_TEXT);
+    push_text("deck (" + deck_size + ") (max 40)", SCREEN_WIDTH - 75, 30, CENTERED_TEXT);
+    push_text("player max hp. " + math.floor(deck_size / 2), SCREEN_WIDTH - 75, 40, SMALL_FONT_AND_CENTERED_TEXT);
 
     render_card_list(5, 50, collection, collection_size, column ? -1 : left_index);
     render_card_list(SCREEN_WIDTH - 140, 50, deck, deck_size, column ? right_index : -1);

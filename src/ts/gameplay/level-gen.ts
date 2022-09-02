@@ -190,6 +190,7 @@ export let generate_level = (chapter: number = 1, floor: number = 0): void =>
   rooms[35]._seen = true;
 
   game_state[GAMESTATE_CURRENT_DUNGEON] = {
+    _chapter: chapter,
     _player_position: [60 * 16, 31 * 16],
     _tile_map: tile_map,
     _rooms: rooms,
@@ -244,7 +245,7 @@ let create_empty_room = (): Room =>
     _peeked: false,
     _enemies: [],
     _exit: false,
-    _events: []
+    _event: []
   };
 };
 
@@ -255,7 +256,7 @@ let create_event_room = (): Room =>
     _peeked: false,
     _enemies: [],
     _exit: false,
-    _events: []
+    _event: []
   };
 };
 
@@ -276,6 +277,6 @@ let create_combat_room = (chapter: number, enemy_level: number, is_boss: boolean
     _peeked: false,
     _enemies: enemies,
     _exit: is_boss,
-    _events: []
+    _event: []
   };
 };
