@@ -1,12 +1,13 @@
 import { V2 } from "@math/vector";
 import { number_sort } from "math";
 import { window_reference } from "./screen";
+import { unpack_number_array_from_string } from "./util";
 
 export type GameState = [
   number[], // GAMESTATE_EVENTS
   Level, // GAMESTATE_CURRENT_DUNGEON
   Player, // GAMESTATE_PLAYER
-  boolean[], // GAMESTATE_RESOURCES_GATHERED
+  number[], // GAMESTATE_RESOURCES_GATHERED
   number[], // GAMESTATE_RESOURCES
   number[], // GAMESTATE_CARD_COLLECTION
   number[], // GAMESTATE_DECK
@@ -82,19 +83,19 @@ export let game_state: GameState;
 export let setup_game_state = () =>
 {
   let events: number[] = [];
-  for (let i = 0; i <= 0; i++)
+  for (let i = 0; i <= 1; i++)
   {
     events[i] = 0;
   }
 
-  let starter_deck: number[] = "00000111112222266778".split("").map(n => +n).sort(number_sort);
+  let starter_deck: number[] = unpack_number_array_from_string("00000111112222266778").sort(number_sort);
 
   game_state = [
     events,
     null_level,
     [10, 10, 0],
-    [false, false, false, false, false, false],
-    [0, 0, 0, 0, 0, 0],
+    unpack_number_array_from_string("000000"),
+    unpack_number_array_from_string("000000"),
     [0, 1, 2],
     starter_deck,
     [0, 0, 0]

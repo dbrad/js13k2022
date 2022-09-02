@@ -1,6 +1,6 @@
 import { assert } from "@debug/assert";
 import { gl_push_textured_quad, gl_restore, gl_save, gl_scale, gl_translate } from "gl";
-import { math } from "math";
+import { floor } from "math";
 import { TEXTURES } from "texture";
 import { WHITE } from "./colour";
 
@@ -40,9 +40,9 @@ export let push_text = (text: string | number, x: number, y: number, parameters:
     let line_length: number = (character_count * letter_size) + ((character_count - 1) * letter_gap);
 
     if (align === TEXT_ALIGN_CENTER)
-      alignment_offset = math.floor(-line_length / 2);
+      alignment_offset = floor(-line_length / 2);
     else if (align === TEXT_ALIGN_RIGHT)
-      alignment_offset = math.floor(-(line_length));
+      alignment_offset = floor(-(line_length));
 
     for (let word of words)
     {

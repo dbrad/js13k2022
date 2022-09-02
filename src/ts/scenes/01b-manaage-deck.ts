@@ -7,7 +7,7 @@ import { render_card_list } from "@root/nodes/card-list";
 import { clear_particle_system } from "@root/particle-system";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
-import { math, number_sort, safe_add, safe_subtract } from "math";
+import { floor, math, number_sort, safe_add, safe_subtract } from "math";
 import { Hub } from "./01-hub";
 import { Dialog } from "./20-dialog";
 
@@ -41,17 +41,17 @@ export namespace ManageDeck
     if (UP_PRESSED)
     {
       if (column)
-        right_index = safe_subtract(right_index, 1);
+        right_index = safe_subtract(right_index);
       else
-        left_index = safe_subtract(left_index, 1);
+        left_index = safe_subtract(left_index);
       clear_particle_system();
     }
     else if (DOWN_PRESSED)
     {
       if (column)
-        right_index = safe_add(deck_size - 1, right_index, 1);
+        right_index = safe_add(deck_size - 1, right_index);
       else
-        left_index = safe_add(collection_size - 1, left_index, 1);
+        left_index = safe_add(collection_size - 1, left_index);
       clear_particle_system();
     }
     else if (LEFT_PRESSED)
@@ -79,14 +79,14 @@ export namespace ManageDeck
       {
         let card_id = collection[left_index];
         if (card_id > 2)
-        {
           collection.splice(left_index, 1);
-        }
         deck.push(card_id);
         deck.sort(number_sort);
       }
       collection_size = collection.length;
       deck_size = deck.length;
+      left_index = math.min(collection_size - 1, left_index);
+      right_index = math.min(deck_size - 1, right_index);
       clear_particle_system();
     }
     else if (B_PRESSED)
@@ -106,7 +106,7 @@ export namespace ManageDeck
     push_text("deck management", SCREEN_WIDTH - 5, 5, { _scale: 3, _align: TEXT_ALIGN_RIGHT });
     push_text("collection (" + collection_size + ")", 75, 30, CENTERED_TEXT);
     push_text("deck (" + deck_size + ") (max 40)", SCREEN_WIDTH - 75, 30, CENTERED_TEXT);
-    push_text("player max hp. " + math.floor(deck_size / 2), SCREEN_WIDTH - 75, 40, SMALL_FONT_AND_CENTERED_TEXT);
+    push_text("player max hp. " + floor(deck_size / 2), SCREEN_WIDTH - 75, 40, SMALL_FONT_AND_CENTERED_TEXT);
 
     render_card_list(5, 50, collection, collection_size, column ? -1 : left_index);
     render_card_list(SCREEN_WIDTH - 140, 50, deck, deck_size, column ? right_index : -1);

@@ -8,18 +8,20 @@ import { CENTERED_TEXT, push_text, SMALL_FONT_AND_CENTERED_TEXT } from "@graphic
 import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
 import { V2 } from "@math/vector";
 import { Enemy, game_state, Level, Player } from "@root/game-state";
+import { lerp } from "@root/interpolate";
 import { get_modifiers, render_card } from "@root/nodes/card";
 import { render_panel } from "@root/nodes/panel";
 import { render_player_status } from "@root/nodes/player-status";
-import { resource_names } from "@root/nodes/resources";
+import { get_resource_name } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { calculate_attack, render_enemy, unit_name_map } from "@root/nodes/unit";
-import { buff_particle } from "@root/particle-definitions";
+import { attack_particle, buff_particle } from "@root/particle-definitions";
 import { clear_particle_system, emit_particles } from "@root/particle-system";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
+import { unpack_number_array_from_string } from "@root/util";
 import { buff_sound, heal_sound, hit, zzfx_play } from "@root/zzfx";
-import { math, safe_add, safe_subtract, shuffle } from "math";
+import { ceil, floor, math, max, safe_add, safe_subtract, shuffle } from "math";
 import { Hub } from "./01-hub";
 import { Dungeon } from "./03-dungeon";
 export namespace Combat
@@ -33,14 +35,14 @@ export namespace Combat
   let current_level: Level;
   let player_room_x: number;
   let player_room_y: number;
-  let enemies: Enemy[] = [];
+  let enemies: Enemy[];
 
-  let loot: [number, number, number, number, number] = [0, 0, 0, 0, 0];
+  let loot: number[];
 
   let wait_timer = 0;
   let next_mode = COMBAT_MODE_WAIT;
 
-  let card_use_menu: string[] = [];
+  let card_use_menu: string[] = ["become my sword", "become my sheild"];
 
   let player: Player;
   let deck: number[] = [];
@@ -52,12 +54,15 @@ export namespace Combat
 
   let hand: number[] = [];
   let hand_size: number = 0;
-  let discarding = [false, false, false, false, false];
+  let discarding = unpack_number_array_from_string("00000");
 
   let player_position: V2 = [1.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32];
+  let player_attack_timer = 0;
+  let damage_fn: (() => void) | null = null;
+
   let enemy_position_index = [0, 0, 0, 0];
   let enemy_positions: V2[] = [[8.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32], [7.5 * 48 + SCREEN_CENTER_X - 264, 0.5 * 48 + 32], [7.5 * 48 + SCREEN_CENTER_X - 264, 3.5 * 48 + 32], [6.5 * 48 + SCREEN_CENTER_X - 264, 2 * 48 + 32]];
-  let enemy_offsets: number[] = [0, 0, 0, 0];
+  let enemy_offsets: number[] = unpack_number_array_from_string("0000");
 
   let target_index: number = 0;
   let target_list: string[] = [];
@@ -100,7 +105,7 @@ export namespace Combat
   let switch_mode_with_delay = (target_mode: number) =>
   {
     next_mode = target_mode;
-    wait_timer = 250;
+    wait_timer = 300;
     mode = COMBAT_MODE_WAIT;
   };
 
@@ -132,7 +137,7 @@ export namespace Combat
       if (enemy && enemy._hp <= 0 && enemy._alive)
       {
         enemy._alive = false;
-        loot[enemy._type] += math.ceil(enemy._level / 20);
+        loot[enemy._type] += ceil(enemy._level / 20);
       }
       enemies_alive = enemies_alive || enemy._alive;
     }
@@ -148,13 +153,13 @@ export namespace Combat
     mode = COMBAT_MODE_POST_COMBAT;
     play_card_mode = 0;
     row = 1;
-    loot = [0, 0, 0, 0, 0];
+    loot = unpack_number_array_from_string("00000");
 
     current_level = game_state[GAMESTATE_CURRENT_DUNGEON];
-    let player_tile_x = math.floor(current_level._player_position[0] / 16);
-    let player_tile_y = math.floor(current_level._player_position[1] / 16);
-    player_room_x = math.floor(player_tile_x / 11);
-    player_room_y = math.floor(player_tile_y / 9);
+    let player_tile_x = floor(current_level._player_position[0] / 16);
+    let player_tile_y = floor(current_level._player_position[1] / 16);
+    player_room_x = floor(player_tile_x / 11);
+    player_room_y = floor(player_tile_y / 9);
     let player_room_index = player_room_y * 10 + player_room_x;
     let player_room = current_level._rooms[player_room_index];
 
@@ -185,13 +190,31 @@ export namespace Combat
     if (selected_card_index < 0)
       selected_card_index = 0;
 
+    // Player Attack Animation
+    if (player_attack_timer > 0)
+    {
+      let target_enemy_position = enemy_positions[target_index_map[target_index]];
+
+      if (player_attack_timer === 300)
+        zzfx_play(buff_sound);
+
+      player_attack_timer -= delta;
+
+      attack_particle._position[0] = lerp(target_enemy_position[0] + 24, player_position[0] + 40, player_attack_timer / 300);
+      attack_particle._position[1] = lerp(target_enemy_position[1] + 24, player_position[1] + 10, player_attack_timer / 300);
+      emit_particles(attack_particle, 5);
+    }
+    else if (damage_fn)
+    {
+      damage_fn();
+      damage_fn = null;
+    }
+
     if (mode === COMBAT_MODE_WAIT)
     {
       wait_timer -= delta;
       if (wait_timer <= 0)
-      {
         mode = next_mode;
-      }
     }
     else if (mode === COMBAT_MODE_DRAW)
     {
@@ -199,8 +222,9 @@ export namespace Combat
       {
         if (discarding[i])
           discard_pile.push(hand.splice(i, 1)[0]);
-        discarding[i] = false;
+        discarding[i] = 0;
       }
+
       for (let i = 0; i < 5; i++)
       {
         if (hand[i] === undefined)
@@ -217,7 +241,7 @@ export namespace Combat
         }
       }
       hand_size = hand.length;
-      switch_mode_with_delay(COMBAT_MODE_CARD_SELECT);
+      mode = COMBAT_MODE_CARD_SELECT;
     }
     else if (mode === COMBAT_MODE_CARD_SELECT)
     {
@@ -244,18 +268,25 @@ export namespace Combat
           {
             selected_action_index = 0;
             casting_spell = false;
-            card_use_menu = ["activate"];
             mode = COMBAT_MODE_ACTION_SELECT;
 
             let card = card_list[hand[selected_card_index]];
             let card_type = card[CARD_TYPE];
             if (card_type === 3) // Buff Card
             {
+              clear_particle_system();
+
               for (let effect of card[CARD_EFFECTS])
                 (effects[effect[EFFECT_APPLY_FUNCTION]] as EffectFunction)(effect);
 
+              buff_particle._position[0] = player_position[0] + 24;
+              buff_particle._position[1] = player_position[1] + 40;
+              buff_particle._colour_begin = [255, 0, 0, 1];
+              buff_particle._colour_end = [255, 0, 0, 0.25];
+              emit_particles(buff_particle, 50);
+              zzfx_play(buff_sound);
+
               hand.splice(selected_card_index, 1);
-              clear_particle_system();
               mode = COMBAT_MODE_CARD_SELECT;
             }
             else if (card_type === 4) // Spell Card
@@ -263,8 +294,6 @@ export namespace Combat
               casting_spell = true;
               go_to_target_mode();
             }
-            else // Minion Card
-              card_use_menu = ["attack!", "protect me!"];
           }
           else
           {
@@ -278,13 +307,13 @@ export namespace Combat
         else // 0 = Discard Mode
         {
           if (row)
-            discarding[selected_card_index] = !discarding[selected_card_index];
+            discarding[selected_card_index] = (discarding[selected_card_index] + 1) % 2;
           else
           {
             row = 1;
             play_card_mode = 1; // SWITCH TO PLAY MODE
             clear_particle_system();
-            switch_mode_with_delay(COMBAT_MODE_DRAW);
+            mode = COMBAT_MODE_DRAW;
           }
         }
       }
@@ -295,9 +324,9 @@ export namespace Combat
 
       // ACTION SELECT
       if (UP_PRESSED)
-        selected_action_index = safe_subtract(selected_action_index, 1);
+        selected_action_index = safe_subtract(selected_action_index);
       else if (DOWN_PRESSED)
-        selected_action_index = safe_add(1, selected_action_index, 1);
+        selected_action_index = safe_add(1, selected_action_index);
       else if (A_PRESSED)
       {
         let card_id = hand.splice(selected_card_index, 1)[0];
@@ -305,8 +334,8 @@ export namespace Combat
         let card_type = card[CARD_TYPE];
 
         let [attack_modifier, defense_modifier] = get_modifiers(card_type);
-        let attack = math.max(0, card[CARD_ATTACK] + attack_modifier);
-        let defense = math.max(0, card[CARD_DEFENSE] + defense_modifier);
+        let attack = max(0, card[CARD_ATTACK] + attack_modifier);
+        let defense = max(0, card[CARD_DEFENSE] + defense_modifier);
         if (selected_action_index)
           total_defense += defense;
         else
@@ -314,10 +343,10 @@ export namespace Combat
 
         discard_pile.push(card_id);
         clear_particle_system();
-        switch_mode_with_delay(COMBAT_MODE_CARD_SELECT);
+        mode = COMBAT_MODE_CARD_SELECT;
       }
       else if (B_PRESSED)
-        switch_mode_with_delay(COMBAT_MODE_CARD_SELECT);
+        mode = COMBAT_MODE_CARD_SELECT;
     }
     else if (mode === COMBAT_MODE_SELECT_TARGET)
     {
@@ -327,73 +356,82 @@ export namespace Combat
         controls_used(D_UP, D_DOWN, A_BUTTON);
 
       if (UP_PRESSED)
-        target_index = safe_subtract(target_index, 1);
+        target_index = safe_subtract(target_index);
       else if (DOWN_PRESSED)
-        target_index = safe_add(target_list.length - 1, target_index, 1);
+        target_index = safe_add(target_list.length - 1, target_index);
       else if (A_PRESSED)
       {
         if (casting_spell)
         {
           clear_particle_system();
 
-          let target_enemy = enemies[target_index_map[target_index]];
-
-          let card_id = hand[selected_card_index];
-          let card = card_list[card_id];
-          for (let effect of card[CARD_EFFECTS])
+          player_attack_timer = 300;
+          damage_fn = () =>
           {
-            let effect_fn_id = effect[EFFECT_APPLY_FUNCTION];
-            if (effect_fn_id >= 0)
-              effects[effect_fn_id](effect, target_enemy);
-            if (effect_fn_id === 2)
+            let target_enemy = enemies[target_index_map[target_index]];
+
+            let card_id = hand[selected_card_index];
+            let card = card_list[card_id];
+            for (let effect of card[CARD_EFFECTS])
             {
-              buff_particle._position[0] = player_position[0] + 24;
-              buff_particle._position[1] = player_position[1] + 40;
-              buff_particle._colour_begin = [0, 255, 0, 1];
-              buff_particle._colour_end = [0, 255, 0, 0.25];
-              emit_particles(buff_particle, 50);
+              let effect_fn_id = effect[EFFECT_APPLY_FUNCTION];
+              if (effect_fn_id >= 0)
+                effects[effect_fn_id](effect, target_enemy);
+              if (effect_fn_id === 2)
+              {
+                buff_particle._position[0] = player_position[0] + 24;
+                buff_particle._position[1] = player_position[1] + 40;
+                buff_particle._colour_begin = [0, 255, 0, 1];
+                buff_particle._colour_end = [0, 255, 0, 0.25];
+                emit_particles(buff_particle, 50);
+                zzfx_play(heal_sound);
+              }
             }
-          }
 
-          target_enemy._hp = math.max(0, target_enemy._hp - card[CARD_ATTACK]);
+            zzfx_play(hit);
+            target_enemy._hp = max(0, target_enemy._hp - card[CARD_ATTACK]);
 
-          hand.splice(selected_card_index, 1);
-          discard_pile.push(card_id);
-          casting_spell = false;
+            hand.splice(selected_card_index, 1);
+            discard_pile.push(card_id);
+            casting_spell = false;
 
-          if (any_enemies_alive(enemies))
-            switch_mode_with_delay(COMBAT_MODE_CARD_SELECT);
-          else
-            switch_mode_with_delay(COMBAT_MODE_POST_COMBAT);
+            if (any_enemies_alive(enemies))
+              mode = COMBAT_MODE_CARD_SELECT;
+            else
+              mode = COMBAT_MODE_POST_COMBAT;
+          };
+          mode = COMBAT_MODE_ATTACK_ACTION;
         }
         else
-          switch_mode_with_delay(COMBAT_MODE_ATTACK_ACTION);
+        {
+          mode = COMBAT_MODE_ATTACK_ACTION;
+          player_attack_timer = 300;
+          damage_fn = () =>
+          {
+            zzfx_play(hit);
+            let target_enemy = enemies[target_index_map[target_index]];
+            target_enemy._hp = max(0, target_enemy._hp - total_attack);
+            any_enemies_alive(enemies);
+
+            total_attack = 0;
+            switch_mode_with_delay(COMBAT_MODE_DEFEND_ACTION);
+          };
+        }
       }
       else if (B_PRESSED && casting_spell)
       {
         casting_spell = false;
-        switch_mode_with_delay(COMBAT_MODE_CARD_SELECT);
+        mode = COMBAT_MODE_CARD_SELECT;
       }
-    }
-    else if (mode === COMBAT_MODE_ATTACK_ACTION)
-    {
-      // TODO: Player attack animation
-      let target_enemy = enemies[target_index_map[target_index]];
-      target_enemy._hp = math.max(0, target_enemy._hp - total_attack);
-      any_enemies_alive(enemies);
-
-      total_attack = 0;
-      switch_mode_with_delay(COMBAT_MODE_DEFEND_ACTION);
     }
     else if (mode === COMBAT_MODE_DEFEND_ACTION)
     {
       queue_index = 0;
-
       for (let index of enemy_position_index)
       {
         let enemy = enemies[index];
         if (enemy && enemy._alive)
-          add_attack(index, enemy._current_intent !== ENEMY_INTENT_TYPE_HEAL ? calculate_attack(enemy) : math.ceil(enemy._attack / 2), enemy._current_intent, 500);
+          add_attack(index, enemy._current_intent !== ENEMY_INTENT_TYPE_HEAL ? calculate_attack(enemy) : ceil(enemy._attack / 2), enemy._current_intent, 500);
       }
 
       switch_mode_with_delay(COMBAT_MODE_ENEMY_ATTACKS);
@@ -431,7 +469,7 @@ export namespace Combat
 
           if (player[PLAYER_HP] <= 0)
           {
-            // set death event
+            game_state[GAMESTATE_EVENTS][1] = EVENT_PENDING;
             switch_to_scene(Hub._scene_id);
             mode = -1;
             return;
@@ -440,7 +478,7 @@ export namespace Combat
 
         action._lifetime_remaining -= delta;
         if (is_attack)
-          enemy_offsets[index] = math.max(0, math.floor((1 - math.abs((action._lifetime_remaining - 300) / 100 - 1)) * 10) / 10);
+          enemy_offsets[index] = max(0, floor((1 - math.abs((action._lifetime_remaining - 300) / 100 - 1)) * 10) / 10);
 
         if (!action._playing)
         {
@@ -483,7 +521,7 @@ export namespace Combat
           if (enemy._alive)
           {
             get_next_enemy_intent(enemy);
-            enemy._attack_debuff_turns = safe_subtract(enemy._attack_debuff_turns, 1);
+            enemy._attack_debuff_turns = safe_subtract(enemy._attack_debuff_turns);
           }
         }
         switch_mode_with_delay(COMBAT_MODE_DRAW);
@@ -500,8 +538,8 @@ export namespace Combat
         {
           if (loot[l] > 0)
           {
-            game_state[GAMESTATE_RESOURCES_GATHERED][l] = true;
-            game_state[GAMESTATE_CURRENT_DUNGEON]._level_resources[l] += loot[l];
+            game_state[GAMESTATE_RESOURCES_GATHERED][l] = 1;
+            current_level._level_resources[l] += loot[l];
           }
         }
         switch_to_scene(Dungeon._scene_id);
@@ -599,14 +637,14 @@ export namespace Combat
     }
     else if (mode === COMBAT_MODE_CARD_SELECT)
     {
-      render_mode_text("play minions and spells from your hard");
+      render_mode_text("play card from your hard");
       render_panel(SCREEN_CENTER_X - 40, SCREEN_CENTER_Y, 80, 28, !row ? WHITE : DARK_GREY);
       push_text("end turn", SCREEN_CENTER_X, SCREEN_CENTER_Y + 10, { _align: TEXT_ALIGN_CENTER, _colour: (row ? LIGHT_GREY : WHITE) });
     }
     else if (mode === COMBAT_MODE_ACTION_SELECT)
     {
-      render_mode_text("select whether to use the minion's attack or defense");
-      render_panel(SCREEN_CENTER_X - 55, SCREEN_CENTER_Y, 110, 40);
+      render_mode_text("choose to use the minion's attack or defense");
+      render_panel(SCREEN_CENTER_X - 90, SCREEN_CENTER_Y, 180, 40);
       render_text_menu(SCREEN_CENTER_X, SCREEN_CENTER_Y + 10, card_use_menu, card_use_menu.length, selected_action_index, 1);
     }
     else if (mode === COMBAT_MODE_SELECT_TARGET)
@@ -626,7 +664,7 @@ export namespace Combat
       {
         if (loot[l] > 0)
         {
-          push_text(`${loot[l]} ${resource_names[l]}`, SCREEN_CENTER_X, 140 + 12 * y, CENTERED_TEXT);
+          push_text(`${loot[l]} ${get_resource_name(l, loot[l])}`, SCREEN_CENTER_X, 140 + 12 * y, CENTERED_TEXT);
           y++;
         }
       }

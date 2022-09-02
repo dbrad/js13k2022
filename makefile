@@ -21,7 +21,7 @@ release:
 	mkdir build/release
 	cp src/html/index.html build/release/index.html
 	node scripts/release-build.js | node_modules/.bin/terser --config-file scripts/terser.config.json -o build/release/game.js
-	yarn roadroller build/release/game.js -O2 -Zab8 -Zlr1333 -Zmc4 -Zmd23 -S0,1,2,3,6,7,13,25,42,53,168,449 -o build/release/game.js
+	yarn roadroller build/release/game.js -O2 -Zab7 -Zlr1333 -Zmc4 -Zmd23 -S0,1,2,3,6,7,13,25,42,53,86,449 -o build/release/game.js
 	rm -rf dist
 	mkdir -p dist/src
 	yarn html-inline -i ./build/release/index.html -o ./dist/src/index.html
@@ -29,3 +29,6 @@ release:
 	tools/ect-0.8.3.exe -9 -zip dist/game.zip
 	node scripts/check-file-size.js
 	tools/cloc-1.86 ./src/ts
+
+netlify-deploy:
+	node_modules\.bin\netlify deploy --dir dist/src --prod

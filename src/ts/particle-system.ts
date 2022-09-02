@@ -4,7 +4,7 @@ import { push_textured_quad } from "@graphics/quad";
 import { add_V2, set_V2, set_V4, V2, V4 } from "@math/vector";
 import { lerp } from "@root/interpolate";
 import { gl_restore, gl_save, gl_scale, gl_translate } from "gl";
-import { math } from "math";
+import { floor, math } from "math";
 
 type Particle = {
   _position: V2;
@@ -109,11 +109,11 @@ export let render_particle_system = () =>
     let alpha = lerp(colour_end[3], colour_begin[3], life_progress);
 
     let size = lerp(particle._size_end, particle._size_begin, life_progress);
-    let halfSize = math.floor(16 * size / 2);
+    let halfSize = floor(16 * size / 2);
 
     gl_save();
     gl_translate(-halfSize, -halfSize);
-    gl_translate(math.floor(particle._position[0]), math.floor(particle._position[1]));
+    gl_translate(floor(particle._position[0]), floor(particle._position[1]));
     gl_scale(size, size);
     push_textured_quad(TEXTURE_WHITE_CIRCLE, 0, 0, { _colour: rgba_to_abgr_number(red, green, blue, alpha) });
     gl_restore();

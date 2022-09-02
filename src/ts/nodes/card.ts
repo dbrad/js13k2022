@@ -3,7 +3,7 @@ import { push_quad, push_textured_quad } from "@graphics/quad";
 import { push_text, SMALL_FONT_AND_CENTERED_TEXT } from "@graphics/text";
 import { V2 } from "@math/vector";
 import { Card, game_state } from "@root/game-state";
-import { math } from "math";
+import { max } from "math";
 import { render_spirit, unit_palette_map, unit_sprite } from "./unit";
 
 let card_type_text = ['minion', 'minion', 'minion', 'buff', 'spell'];
@@ -42,7 +42,7 @@ export let render_card = (x: number, y: number, card: Card, scale: number = 1, h
 
   if (card_type !== 3)
   {
-    let attack = math.max(0, card[CARD_ATTACK] + attack_modifier);
+    let attack = max(0, card[CARD_ATTACK] + attack_modifier);
     if (attack > 0)
     {
       let attack_colour = attack_modifier > 0 ? GREEN : attack_modifier < 0 ? RED : WHITE;
@@ -50,7 +50,7 @@ export let render_card = (x: number, y: number, card: Card, scale: number = 1, h
       push_text(attack, x + 6 + 8 * scale, y + card_height - 3 - 8 * scale, { _colour: attack_colour, _scale: scale });
     }
 
-    let defense = math.max(0, card[CARD_DEFENSE] + defense_modifier);
+    let defense = max(0, card[CARD_DEFENSE] + defense_modifier);
     if (defense > 0)
     {
       let defense_colour = defense_modifier > 0 ? GREEN : defense_modifier < 0 ? RED : WHITE;

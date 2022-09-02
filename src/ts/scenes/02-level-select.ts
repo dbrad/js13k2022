@@ -5,7 +5,7 @@ import { game_state } from "@root/game-state";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
-import { math, safe_add, safe_subtract } from "math";
+import { floor, safe_add, safe_subtract } from "math";
 import { Hub } from "./01-hub";
 import { Dungeon } from "./03-dungeon";
 export namespace LevelSelect
@@ -35,14 +35,14 @@ export namespace LevelSelect
   let _update_fn = (delta: number) =>
   {
     if (UP_PRESSED)
-      selected_option_index = safe_subtract(selected_option_index, 1);
+      selected_option_index = safe_subtract(selected_option_index);
     else if (DOWN_PRESSED)
-      selected_option_index = safe_add(number_of_options - 1, selected_option_index, 1);
+      selected_option_index = safe_add(number_of_options - 1, selected_option_index);
     else if (A_PRESSED)
     {
-      game_state[GAMESTATE_PLAYER][PLAYER_MAX_HP] = math.floor(game_state[GAMESTATE_DECK].length / 2);
+      game_state[GAMESTATE_PLAYER][PLAYER_MAX_HP] = floor(game_state[GAMESTATE_DECK].length / 2);
       game_state[GAMESTATE_PLAYER][PLAYER_HP] = game_state[GAMESTATE_PLAYER][PLAYER_MAX_HP];
-      generate_level(selected_option_index + 1, 0);
+      generate_level(selected_option_index + 1);
       switch_to_scene(Dungeon._scene_id);
     }
     else if (B_PRESSED)

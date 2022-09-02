@@ -9,13 +9,14 @@ import { get_resource_name, render_resources } from "@root/nodes/resources";
 import { clear_particle_system } from "@root/particle-system";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
+import { unpack_number_array_from_string } from "@root/util";
 import { number_sort, safe_add, safe_subtract } from "math";
 import { Hub } from "./01-hub";
 import { Dialog } from "./20-dialog";
 
 export namespace Craft
 {
-  let card_costs: number[][] = "10000|01000|00100|30000|03000|00300|20010|02010|00210|11110|20010|02010|00210|11110|11110|30001|03001|00301|22201|50001|05001|00501".split("|").map(a => a.split("").map(n => +n));
+  let card_costs: number[][] = "10000|01000|00100|30000|03000|00300|20010|02010|00210|11110|20010|02010|00210|11110|11110|30001|03001|00301|22201|50001|05001|00501".split("|").map(a => unpack_number_array_from_string(a));
   let card_index_list: number[] = [...Array(card_list.length).keys()];
   let number_of_cards = card_list.length;
 
@@ -43,12 +44,12 @@ export namespace Craft
     let collection = game_state[GAMESTATE_CARD_COLLECTION];
     if (UP_PRESSED)
     {
-      selection_index = safe_subtract(selection_index, 1);
+      selection_index = safe_subtract(selection_index);
       clear_particle_system();
     }
     else if (DOWN_PRESSED)
     {
-      selection_index = safe_add(number_of_cards - 4, selection_index, 1);
+      selection_index = safe_add(number_of_cards - 4, selection_index);
       clear_particle_system();
     }
     else if (A_PRESSED)
@@ -88,7 +89,7 @@ export namespace Craft
       if (cost > 0)
       {
         let _colour = cost <= player_resources[i] ? WHITE : RED;
-        push_text(cost + " " + get_resource_name(i), SCREEN_CENTER_X, SCREEN_CENTER_Y + 60 + y_offset, { _align: TEXT_ALIGN_CENTER, _colour });
+        push_text(cost + " " + get_resource_name(i, cost), SCREEN_CENTER_X, SCREEN_CENTER_Y + 60 + y_offset, { _align: TEXT_ALIGN_CENTER, _colour });
         y_offset += 15;
       }
     }

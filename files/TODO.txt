@@ -1,25 +1,13 @@
-COMBAT
-  Player Animations / Effects
-
-LICH PALETTE
-CULTIST PALETTE
-
-EVENTS
-  Resource Get
-  Heal Player
-  Hard optional fight for more resources or a whole card
-    Level of fight is current level + 10?
-
-AUDIO
-  Player action sounds
-
-POST DEATH EVENT / MESSAGE
+Final boss fanfare
+Make chapter bosses themed?
+Balance
 
 BUGS
-  Card list index is going beyond list length when moving cards from collection to deck
-  Make sure player doesn't draw forever if they have less than 5 cards total
 
 Nice to Haves
   Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
-  Set control hints
   More Palette swaps for level tiles
+  Chapter Specific bosses
+  Card Level Colours
+
+Optimizations

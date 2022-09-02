@@ -1,36 +1,21 @@
 import { push_quad, push_textured_quad, TextureQuadParameters } from "@graphics/quad";
 import { push_text, TextParameters } from "@graphics/text";
-import { V2 } from "@math/vector";
 import { canvas_reference, document_reference, request_fullscreen, SCREEN_HEIGHT, SCREEN_WIDTH, window_reference } from "@root/screen";
+import { unpack_number_array_from_string } from "@root/util";
 import { boop, boop_good, zzfx_play } from "@root/zzfx";
-import { is_point_in_circle, is_point_in_rect, math } from "math";
+import { floor, is_point_in_circle, is_point_in_rect } from "math";
 
-let hardware_key_state: number[] = [
-    KEY_IS_UP, // D_LEFT
-    KEY_IS_UP, // D_UP
-    KEY_IS_UP, // D_RIGHT
-    KEY_IS_UP, // D_DOWN
-    KEY_IS_UP, // A_BUTTON
-    KEY_IS_UP, // B_BUTTON
-];
+let hardware_key_state = unpack_number_array_from_string("000000");
+let key_state = unpack_number_array_from_string("000000");
+let controls_enabled = unpack_number_array_from_string("000000");
 
-let key_state: number[] = [
-    KEY_IS_UP, // D_LEFT
-    KEY_IS_UP, // D_UP
-    KEY_IS_UP, // D_RIGHT
-    KEY_IS_UP, // D_DOWN
-    KEY_IS_UP, // A_BUTTON
-    KEY_IS_UP, // B_BUTTON
-];
-
-let controls_enabled = [false, false, false, false, false, false];
 export let controls_used = (...keys: number[]) =>
 {
     for (let key = 0; key < 6; key++)
-        controls_enabled[key] = false;
+        controls_enabled[key] = 0;
 
     for (let key of keys)
-        controls_enabled[key] = true;
+        controls_enabled[key] = 1;
 };
 
 export let UP_PRESSED: boolean = false;
@@ -52,7 +37,7 @@ let key_map: Record<string, number> = {
 let gamepad: Gamepad | null = null;
 
 export let is_touch: boolean = false;
-let touches: V2[] = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
+let touches = "00|00|00|00|00|00".split("|").map(a => unpack_number_array_from_string(a));
 
 export let is_touch_event = (e: Event | PointerEvent | TouchEvent): void =>
 {
@@ -65,13 +50,13 @@ let set_touch_position = (e: TouchEvent): void =>
 
     let canvas_bounds = canvas_reference.getBoundingClientRect();
     is_touch_event(e);
-    for (let i = 0; i < 7; i++)
+    for (let i = 0; i < 6; i++)
     {
         let touch = e.touches[i];
         if (touch)
         {
-            touches[i][0] = math.floor((touch.clientX - canvas_bounds.left) / (canvas_bounds.width / SCREEN_WIDTH));
-            touches[i][1] = math.floor((touch.clientY - canvas_bounds.top) / (canvas_bounds.height / SCREEN_HEIGHT));
+            touches[i][0] = floor((touch.clientX - canvas_bounds.left) / (canvas_bounds.width / SCREEN_WIDTH));
+            touches[i][1] = floor((touch.clientY - canvas_bounds.top) / (canvas_bounds.height / SCREEN_HEIGHT));
         }
         else
         {
@@ -122,7 +107,7 @@ export let initialize_input = (): void =>
 
 let dpad_scale = 7;
 let dpad_size = 16 * dpad_scale;
-let dpad_touch_center = math.floor(dpad_size / 3);
+let dpad_touch_center = floor(dpad_size / 3);
 let [dpad_x, dpad_y] = [20, SCREEN_HEIGHT - dpad_size - 100];
 
 let button_scale = 3;
@@ -291,8 +276,8 @@ export let render_controls = (): void =>
     }
 };
 
-let interval_timers: number[] = [0, 0, 0, 0, 0, 0, 0];
-let interval_durations: number[] = [0, 0, 0, 0, 0, 0, 0];
+let interval_timers: number[] = unpack_number_array_from_string("000000");
+let interval_durations: number[] = unpack_number_array_from_string("000000");
 
 export let set_key_pulse_time = (keys: number[], interval_duration: number): void =>
 {

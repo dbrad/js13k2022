@@ -5,24 +5,21 @@ import { set_V2, set_V4, V4 } from "@math/vector";
 import { Enemy } from "@root/game-state";
 import { spirit_particle } from "@root/particle-definitions";
 import { emit_particle } from "@root/particle-system";
-import { math } from "math";
+import { unpack_number_array_from_string } from "@root/util";
+import { ceil } from "math";
 import { render_percentage_bar } from "./percent-bar";
 
-export let unit_sprite = [
-  TEXTURE_SKELETON,
-  TEXTURE_ZOMBIE,
-  0,
-  TEXTURE_BANDIT,
-  TEXTURE_ROBED_MAN,
-];
+export let unit_sprite = unpack_number_array_from_string("34021");
 
 export let unit_palette_map: number[] = [
   PALETTE_SKELETON,
   PALETTE_ZOMBIE,
   0,
-  PALETTE_PLAYER,
-  PALETTE_PLAYER,
+  PALETTE_PLAYER + 3,
+  PALETTE_PLAYER + 3,
 ];
+
+let intent_type_sprite = unpack_number_array_from_string("05589");
 
 let intent_palette = [
   19,
@@ -31,13 +28,7 @@ let intent_palette = [
   PALETTE_PLAYER - 1,
   PALETTE_PLAYER - 1
 ];
-let intent_type_sprite = [
-  0,
-  TEXTURE_SWORD,
-  TEXTURE_SWORD,
-  TEXTURE_CROSS,
-  TEXTURE_ARROW
-];
+
 
 export let unit_name_map = ["skeleton", "zombie", "spirit", "cultist", "lich"];
 
@@ -68,7 +59,7 @@ export let render_enemy = (enemy: Enemy, x: number, y: number) =>
     if (intent_type === ENEMY_INTENT_TYPE_ATTACK || intent_type === ENEMY_INTENT_TYPE_ATTACK_HEAL)
       push_text(attack, x + 8, y - 10, { _colour: attack > enemy._attack ? GREEN : attack < enemy._attack ? RED : WHITE });
     else if (intent_type === ENEMY_INTENT_TYPE_HEAL)
-      push_text(math.ceil(enemy._attack / 2), x + 8, y - 10);
+      push_text(ceil(enemy._attack / 2), x + 8, y - 10);
     else if (intent_type === ENEMY_INTENT_TYPE_BUFF)
       push_textured_quad(TEXTURE_SWORD, x + 8, y - 10);
   }

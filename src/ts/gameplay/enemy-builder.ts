@@ -1,29 +1,23 @@
 import { assert } from "@debug/assert";
-import { V2 } from "@math/vector";
 import { Enemy } from "@root/game-state";
-import { math, random_int } from "math";
+import { unpack_number_array_from_string } from "@root/util";
+import { floor, random_int } from "math";
 
-let enemy_attack_defense: V2[] = [
-  [1, 0], // ENEMY_TYPE_SKELETON
-  [0, 1], // ENEMY_TYPE_ZOMBIE
-  [2, 0], // ENEMY_TYPE_SPIRIT
-  [1, 2], // ENEMY_TYPE_CULTIST
-  [1, 3], // ENEMY_TYPE_LICH
-];
+let enemy_attack_defense = "10|01|20|12|13".split("|").map(a => unpack_number_array_from_string(a));
 
 let enemy_intents: number[][] = [
-  [ENEMY_INTENT_TYPE_ATTACK],
-  [ENEMY_INTENT_TYPE_ATTACK, ENEMY_INTENT_TYPE_ATTACK_HEAL, ENEMY_INTENT_TYPE_ATTACK],
-  [ENEMY_INTENT_TYPE_HEAL, ENEMY_INTENT_TYPE_ATTACK, ENEMY_INTENT_TYPE_ATTACK],
-  [ENEMY_INTENT_TYPE_HEAL, ENEMY_INTENT_TYPE_ATTACK, ENEMY_INTENT_TYPE_BUFF, ENEMY_INTENT_TYPE_ATTACK],
-  [ENEMY_INTENT_TYPE_ATTACK_HEAL, ENEMY_INTENT_TYPE_ATTACK, ENEMY_INTENT_TYPE_BUFF, ENEMY_INTENT_TYPE_ATTACK],
+  unpack_number_array_from_string("4111"),
+  unpack_number_array_from_string("2121"),
+  unpack_number_array_from_string("311"),
+  unpack_number_array_from_string("3141"),
+  unpack_number_array_from_string("2141"),
 ];
 
 export let build_enemy = (_type: number, _level: number): Enemy =>
 {
   let enemy_stats = enemy_attack_defense[_type];
 
-  let level_mod = math.floor(_level / 10);
+  let level_mod = floor(_level / 10);
   let mod_plus_one = level_mod + 1;
 
   let _attack = random_int(mod_plus_one, mod_plus_one + (mod_plus_one * enemy_stats[0]));
@@ -45,7 +39,6 @@ export let build_enemy = (_type: number, _level: number): Enemy =>
 
 export let get_enemy = (chapter: number, level: number) =>
 {
-  // TODO: Change enemy skew based on chapter
   let enemy_type = chapter === 1 ? random_int(0, 2) : random_int(0, 3);
   return build_enemy(enemy_type, level);
 };

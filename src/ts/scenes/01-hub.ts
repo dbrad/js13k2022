@@ -13,7 +13,7 @@ import { LevelSelect } from "./02-level-select";
 import { Dialog } from "./20-dialog";
 export namespace Hub
 {
-  let selected_option_index = 0;
+  let selected_option_index: number;
   let number_of_options = 4;
   let menu_options = [
     "descend",
@@ -28,10 +28,7 @@ export namespace Hub
   };
   let _update_fn = (delta: number) =>
   {
-    if (monetization_reference && monetization_reference.state === "pending")
-    {
-    }
-    else if (monetization_reference && monetization_reference.state === "started")
+    if (monetization_reference && monetization_reference.state === "started")
     {
       if (game_state[GAMESTATE_EVENTS][EVENT_COIL_FIRST_TIME] === EVENT_NOT_DONE)
       {
@@ -49,10 +46,17 @@ export namespace Hub
     {
     }
 
+    if (game_state[GAMESTATE_EVENTS][1] === EVENT_PENDING)
+    {
+      Dialog._push_dialog_text("you have fallen in battle and|you have been brough back to the|entrance of the catacombs.");
+      push_scene(Dialog._scene_id);
+      game_state[GAMESTATE_EVENTS][1] = EVENT_DONE;
+    }
+
     if (UP_PRESSED)
-      selected_option_index = safe_subtract(selected_option_index, 1);
+      selected_option_index = safe_subtract(selected_option_index);
     else if (DOWN_PRESSED)
-      selected_option_index = safe_add(number_of_options - 1, selected_option_index, 1);
+      selected_option_index = safe_add(number_of_options - 1, selected_option_index);
     else if (A_PRESSED)
     {
       if (selected_option_index === 0)

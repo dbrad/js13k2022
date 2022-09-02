@@ -74,7 +74,7 @@ export let gl_init = (context: WebGLRenderingContext): void =>
 
   let shader: WebGLShader = create_shader_program(
     "precision lowp float;attribute vec2 v,t;varying vec2 uv;attribute vec4 c;varying vec4 fc;attribute float po;varying float fpo;uniform mat4 m;void main(){gl_Position=m*vec4(v,1.0,1.0);uv=t;fc=c;fpo=po;}",
-    "precision lowp float;varying vec2 uv;varying vec4 fc;varying float fpo;uniform sampler2D s;uniform sampler2D p;void main(){if(fpo==0.0){gl_FragColor=texture2D(s,uv)*fc;}else{float index=texture2D(s,uv).r*8.0-1.0;gl_FragColor=vec4(texture2D(p,vec2((index+fpo+0.5)/256.0,0.5)).rgb,texture2D(s,uv).a);}}"
+    "precision lowp float;varying vec2 uv;varying vec4 fc;varying float fpo;uniform sampler2D s;uniform sampler2D p;void main(){if(fpo==0.0){gl_FragColor=texture2D(s,uv)*fc;}else{float index=texture2D(s,uv).r*8.0-1.0;gl_FragColor=vec4(texture2D(p,vec2((index+fpo+0.5)/64.0,0.5)).rgb,texture2D(s,uv).a);}}"
   );
 
   index_buffer = create_buffer(34963, index_data.byteLength, 35044);

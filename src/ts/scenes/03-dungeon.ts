@@ -4,15 +4,16 @@ import { push_text } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
 import { V2 } from "@math/vector";
 import { animation_frame } from "@root/animation";
-import { game_state, Level, Room } from "@root/game-state";
+import { game_state, Level, Player, Room } from "@root/game-state";
 import { lerp } from "@root/interpolate";
 import { render_panel } from "@root/nodes/panel";
 import { render_player_status } from "@root/nodes/player-status";
-import { render_resources } from "@root/nodes/resources";
+import { get_resource_name, render_resources } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
-import { math, safe_add, safe_subtract } from "math";
+import { change_track, heal_sound, zzfx_play } from "@root/zzfx";
+import { ceil, floor, math, max, random_int, safe_add, safe_subtract } from "math";
 import { Hub } from "./01-hub";
 import { Combat } from "./04-combat";
 import { Dialog } from "./20-dialog";
@@ -28,8 +29,8 @@ export namespace Dungeon
 
   let camera: V2 = [60 * 16, 31 * 16];
   let camera_pixel_size: V2 = [41 * 16, 25 * 16];
-  let camera_half_width = math.floor(camera_pixel_size[0] / 2);
-  let camera_half_height = math.floor(camera_pixel_size[1] / 2);
+  let camera_half_width = floor(camera_pixel_size[0] / 2);
+  let camera_half_height = floor(camera_pixel_size[1] / 2);
 
   let player_origin: V2 = [0, 0];
   let player_move_time_remaining = 0;
@@ -47,6 +48,7 @@ export namespace Dungeon
   let player_hflip = false;
 
   let mode: number = 0;
+  let player: Player;
   let current_level: Level;
   let rooms: Room[];
   let player_position: V2;
@@ -102,18 +104,21 @@ export namespace Dungeon
 
   let post_area_wrap_up = () =>
   {
-    game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS] = math.max(game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS], current_level._chapter);
+    game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS] = max(game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS], current_level._chapter);
     for (let r = 0; r < 5; r++)
       game_state[GAMESTATE_RESOURCES][r] += current_level._level_resources[r];
+    change_track(0);
   };
 
   let _reset_fn = () =>
   {
+    change_track(1);
     mode = 3;
     selected_option_index = 0;
     boss_defeated = false;
 
     current_level = game_state[GAMESTATE_CURRENT_DUNGEON];
+    player = game_state[GAMESTATE_PLAYER];
     rooms = current_level._rooms;
     player_position = current_level._player_position;
 
@@ -128,22 +133,20 @@ export namespace Dungeon
     camera_top_left = [camera[0] - camera_half_width, camera[1] - camera_half_height];
     camera_bottom_right = [camera[0] + camera_half_width, camera[1] + camera_half_height];
 
-    player_tile_x = math.floor(player_position[0] / 16);
-    player_tile_y = math.floor(player_position[1] / 16);
-    player_room_x = math.floor(player_tile_x / 11);
-    player_room_y = math.floor(player_tile_y / 9);
+    player_tile_x = floor(player_position[0] / 16);
+    player_tile_y = floor(player_position[1] / 16);
+    player_room_x = floor(player_tile_x / 11);
+    player_room_y = floor(player_tile_y / 9);
     player_room_index = player_room_y * 10 + player_room_x;
     player_room = rooms[player_room_index];
     if (player_room)
       player_room._seen = true;
 
-    if (rooms[player_room_index + 10]) rooms[player_room_index + 10]._peeked = true;
-    if (rooms[player_room_index - 10]) rooms[player_room_index - 10]._peeked = true;
-    if (rooms[player_room_index + 1]) rooms[player_room_index + 1]._peeked = true;
-    if (rooms[player_room_index - 1]) rooms[player_room_index - 1]._peeked = true;
+    for (let dir of [10, -10, 1, -1])
+      if (rooms[player_room_index + dir]) rooms[player_room_index + dir]._peeked = true;
 
-    camera[0] += math.ceil((player_position[0] - camera[0]) * 0.5 * (delta / 500));
-    camera[1] += math.ceil((player_position[1] - camera[1]) * 0.5 * (delta / 500));
+    camera[0] += ceil((player_position[0] - camera[0]) * 0.5 * (delta / 500));
+    camera[1] += ceil((player_position[1] - camera[1]) * 0.5 * (delta / 500));
 
     if (player_moving)
     {
@@ -152,8 +155,8 @@ export namespace Dungeon
         player_moving = false;
 
       let time_remaining = player_move_time_remaining / 750;
-      player_position[0] = math.floor(lerp(player_target[0], player_origin[0], time_remaining));
-      player_position[1] = math.floor(lerp(player_target[1], player_origin[1], time_remaining));
+      player_position[0] = floor(lerp(player_target[0], player_origin[0], time_remaining));
+      player_position[1] = floor(lerp(player_target[1], player_origin[1], time_remaining));
     }
     else
     {
@@ -163,9 +166,9 @@ export namespace Dungeon
 
         // MENU MODE
         if (UP_PRESSED)
-          selected_option_index = safe_subtract(selected_option_index, 1);
+          selected_option_index = safe_subtract(selected_option_index);
         else if (DOWN_PRESSED)
-          selected_option_index = safe_add(number_of_options - 1, selected_option_index, 1);
+          selected_option_index = safe_add(number_of_options - 1, selected_option_index);
         else if (A_PRESSED)
         {
           if (!selected_option_index)
@@ -212,7 +215,7 @@ export namespace Dungeon
         }
         if (movement_target)
         {
-          const targetRoom: V2 = [Math.floor(movement_target[0] / 16 / 11), Math.floor(movement_target[1] / 16 / 9)];
+          const targetRoom: V2 = [floor(movement_target[0] / 16 / 11), floor(movement_target[1] / 16 / 9)];
           const room = rooms[targetRoom[1] * 10 + targetRoom[0]];
           if (room)
           {
@@ -251,7 +254,7 @@ export namespace Dungeon
             boss_defeated = true;
             menu_options[1] = "leave area";
             // Offer player exit
-            Dialog._push_yes_no_dialog("boss of the area defeated.|leave this area and return to the entrance?", () => mode = 4);
+            Dialog._push_yes_no_dialog("boss of the area defeated.|leave this area and return to the|entrance?", () => mode = 4);
             push_scene(Dialog._scene_id);
           }
           else if (player_room._event > 0)
@@ -259,12 +262,19 @@ export namespace Dungeon
             switch (player_room._event)
             {
               case 1: // Random Resource Gain
+                let resource = random_int(0, 2);
+                let amount = random_int(1, current_level._chapter);
+                Dialog._push_dialog_text(`you find ${amount} ${get_resource_name(resource, amount)} laying|on the ground.`);
+                current_level._level_resources[resource] += amount;
                 break;
               case 2: // Heal Player
-                break;
-              case 3: // Optional Hard Fight
+                let heal_amount = ceil(player[PLAYER_MAX_HP] * 0.25);
+                Dialog._push_dialog_text(`you find a spring of necrotic energy|in the room, healing you for ${heal_amount}.`);
+                player[PLAYER_HP] = safe_add(player[PLAYER_MAX_HP], player[PLAYER_HP], heal_amount);
+                zzfx_play(heal_sound);
                 break;
             }
+            push_scene(Dialog._scene_id);
             player_room._event = 0;
           }
         }
@@ -286,8 +296,8 @@ export namespace Dungeon
     {
       for (let x = camera_top_left[0]; x <= camera_bottom_right[0]; x += 16)
       {
-        let tile_x = math.floor(x / 16);
-        let tile_y = math.floor(y / 16);
+        let tile_x = floor(x / 16);
+        let tile_y = floor(y / 16);
 
         if (tile_x > 0 && tile_x < 110 && tile_y >= 0 && tile_y < 72)
         {

@@ -7,19 +7,21 @@ let texture_id = 0;
 const TEXTURES = {
   TEXTURE_SINGLE_WHITE_PIXEL: texture_id++,
 
+  TEXTURE_ROBED_MAN: texture_id++,
+  TEXTURE_BANDIT: texture_id++,
+  TEXTURE_SKELETON: texture_id++,
+  TEXTURE_ZOMBIE: texture_id++,
+
   TEXTURE_SWORD: texture_id++,
   TEXTURE_SHEILD: texture_id++,
   TEXTURE_STAIR: texture_id++,
   TEXTURE_CROSS: texture_id++,
   TEXTURE_ARROW: texture_id++,
 
+
   TEXTURE_WHITE_CIRCLE: texture_id++,
   TEXTURE_D_PAD: texture_id++,
 
-  TEXTURE_ROBED_MAN: texture_id++,
-  TEXTURE_BANDIT: texture_id++,
-  TEXTURE_SKELETON: texture_id++,
-  TEXTURE_ZOMBIE: texture_id++,
   TEXTURE_WALL: texture_id++,
   TEXTURE_FLOOR: texture_id++,
 };

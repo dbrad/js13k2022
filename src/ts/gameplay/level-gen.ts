@@ -1,44 +1,36 @@
 import { assert } from "@debug/assert";
-import { math, random_int, shuffle } from "math";
+import { unpack_number_array_from_string } from "@root/util";
+import { ceil, floor, max, random_int, shuffle } from "math";
 import { Enemy, game_state, Room } from "../game-state";
 import { get_boss, get_enemy } from "./enemy-builder";
 
-let base_room_tiles = "122222222211555555555115555555551155555555511555555555115555555551155555555511555555555111111111111".split("").map(n => +n);
+let base_room_tiles = unpack_number_array_from_string("122222222211555555555115555555551155555555511555555555115555555551155555555511555555555111111111111");
 
-let north_door = [5, 0];
-let south_door = [5, 8];
-let west_door = [0, 4];
-let east_door = [10, 4];
-
-let map_room_width = 9;
-let map_room_height = 8;
 let room_tile_width = 11;
-let room_tile_height = 9;
 let map_tile_width = 110;
-let map_tile_height = 72;
 
 let wall_deck: number[] = [];
 let get_next_wall_id = (): number =>
 {
   if (wall_deck.length === 0)
-    wall_deck = shuffle([2, 2, 2, 3, 4]);
+    wall_deck = shuffle(unpack_number_array_from_string("22234"));
   return wall_deck.pop() ?? 2;
 };
 
-let floor_deck: number[] = [];
+let room_floor_deck: number[] = [];
 let get_next_floor_id = (): number =>
 {
-  if (floor_deck.length === 0)
-    floor_deck = shuffle([5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 7, 8]);
-  return floor_deck.pop() ?? 5;
+  if (room_floor_deck.length === 0)
+    room_floor_deck = shuffle(unpack_number_array_from_string("555555555678"));
+  return room_floor_deck.pop() ?? 5;
 };
 
-export let generate_level = (chapter: number = 1, floor: number = 0): void =>
+export let generate_level = (chapter: number = 1): void =>
 {
-  let enemy_level = (chapter * 10) + (floor * 2);
+  let enemy_level = (chapter * 10);
 
   // Generate Room Layout
-  let number_of_rooms = math.floor(random_int(0, 2) + 5 + chapter * 2.6);
+  let number_of_rooms = floor(random_int(0, 2) + 5 + chapter * 2.6);
   let room_layout: number[] = [];
   let dead_end_rooms: number[] = [];
 
@@ -95,17 +87,17 @@ export let generate_level = (chapter: number = 1, floor: number = 0): void =>
   }
 
   // Generate Tile Map for Room Layout
-  let tile_map: Int8Array = new Int8Array(map_tile_width * map_tile_height);
-  for (let ry = 0; ry < map_room_height; ry++)
+  let tile_map: Int8Array = new Int8Array(map_tile_width * 72);
+  for (let ry = 0; ry < 8; ry++)
   {
-    for (let rx = 1; rx <= map_room_width; rx++)
+    for (let rx = 1; rx <= 9; rx++)
     {
       let room_index = ry * 10 + rx;
       if (room_layout[room_index] === 1)
       {
         let x = rx * room_tile_width;
-        let y = ry * room_tile_height;
-        for (let ty = 0; ty < room_tile_height; ty++)
+        let y = ry * 9;
+        for (let ty = 0; ty < 9; ty++)
         {
           for (let tx = 0; tx < room_tile_width; tx++)
           {
@@ -122,8 +114,8 @@ export let generate_level = (chapter: number = 1, floor: number = 0): void =>
         // check for door to north
         if (room_layout[room_index - 10] === 1) 
         {
-          let nx = x + north_door[0];
-          let ny = y + north_door[1];
+          let nx = x + 5;
+          let ny = y + 0;
           let index = ny * map_tile_width + nx;
           tile_map[index] = 5;
         }
@@ -131,8 +123,8 @@ export let generate_level = (chapter: number = 1, floor: number = 0): void =>
         // check for door to east
         if (room_layout[room_index + 1] === 1)
         {
-          let nx = x + east_door[0];
-          let ny = y + east_door[1];
+          let nx = x + 10;
+          let ny = y + 4;
           let index = ny * map_tile_width + nx;
           tile_map[index] = 5;
           tile_map[index - 110] = 2;
@@ -141,8 +133,8 @@ export let generate_level = (chapter: number = 1, floor: number = 0): void =>
         // check for door to south
         if (room_layout[room_index + 10] === 1)
         {
-          let nx = x + south_door[0];
-          let ny = y + south_door[1];
+          let nx = x + 5;
+          let ny = y + 8;
           let index = ny * map_tile_width + nx;
           tile_map[index] = 5;
         }
@@ -150,8 +142,8 @@ export let generate_level = (chapter: number = 1, floor: number = 0): void =>
         // check for door to west
         if (room_layout[room_index - 1] === 1)
         {
-          let nx = x + west_door[0];
-          let ny = y + west_door[1];
+          let nx = x + 0;
+          let ny = y + 4;
           let index = ny * map_tile_width + nx;
           tile_map[index] = 5;
           tile_map[index - 110] = 2;
@@ -173,9 +165,9 @@ export let generate_level = (chapter: number = 1, floor: number = 0): void =>
     }
   }
 
-  for (let ry = 0; ry < map_room_height; ry++)
+  for (let ry = 0; ry < 8; ry++)
   {
-    for (let rx = 1; rx <= map_room_width; rx++)
+    for (let rx = 1; rx <= 9; rx++)
     {
       let room_index = ry * 10 + rx;
       if (room_layout[room_index] === 1 && room_index != 35)
@@ -206,11 +198,11 @@ let create_room_deck = (number_of_roooms: number, number_of_dead_ends: number, c
 
   let dead_end_rooms: Room[] = [];
 
-  let number_of_choice_rooms = math.max(0, math.ceil(number_of_dead_ends * 0.6));
+  let number_of_choice_rooms = max(0, ceil(number_of_dead_ends * 0.6));
   for (let i = 0; i < number_of_choice_rooms; i++)
     dead_end_rooms.push(create_event_room());
 
-  let number_of_dead_end_combat = math.max(0, number_of_dead_ends - number_of_choice_rooms);
+  let number_of_dead_end_combat = max(0, number_of_dead_ends - number_of_choice_rooms);
   for (let i = 0; i < number_of_dead_end_combat; i++)
     dead_end_rooms.push(create_combat_room(chapter, enemy_level));
 
@@ -220,15 +212,15 @@ let create_room_deck = (number_of_roooms: number, number_of_dead_ends: number, c
   let hallway_rooms: Room[] = [];
 
   let rooms_remaining = number_of_roooms - number_of_choice_rooms - number_of_dead_end_combat;
-  let number_of_combat = math.max(0, math.ceil(rooms_remaining * 0.5));
+  let number_of_combat = max(0, ceil(rooms_remaining * 0.5));
   for (let i = 0; i < number_of_combat; i++)
     hallway_rooms.push(create_combat_room(chapter, enemy_level));
 
-  let number_of_empty = math.max(0, math.ceil((rooms_remaining - number_of_combat) * 0.8));
+  let number_of_empty = max(0, ceil((rooms_remaining - number_of_combat) * 0.8));
   for (let i = 0; i < number_of_empty; i++)
     hallway_rooms.push(create_empty_room());
 
-  let number_of_hallway_events = math.max(0, rooms_remaining - number_of_combat - number_of_empty);
+  let number_of_hallway_events = max(0, rooms_remaining - number_of_combat - number_of_empty);
   for (let i = 0; i < number_of_hallway_events; i++)
     hallway_rooms.push(create_event_room());
 
@@ -245,7 +237,7 @@ let create_empty_room = (): Room =>
     _peeked: false,
     _enemies: [],
     _exit: false,
-    _event: []
+    _event: 0
   };
 };
 
@@ -256,14 +248,14 @@ let create_event_room = (): Room =>
     _peeked: false,
     _enemies: [],
     _exit: false,
-    _event: []
+    _event: 2
   };
 };
 
 let create_combat_room = (chapter: number, enemy_level: number, is_boss: boolean = false): Room =>
 {
-  let number_of_enemies = random_int(1, math.ceil(enemy_level / 10) + 1) - (is_boss ? 1 : 0);
-  let level = number_of_enemies >= 3 ? math.ceil(enemy_level / 3) : number_of_enemies === 2 ? enemy_level / 2 : enemy_level;
+  let number_of_enemies = random_int(1, ceil(enemy_level / 10) + 1) - (is_boss ? 1 : 0);
+  let level = number_of_enemies >= 3 ? ceil(enemy_level / 3) : number_of_enemies === 2 ? enemy_level / 2 : enemy_level;
 
   let enemies: Enemy[] = [];
   if (is_boss)
@@ -277,6 +269,6 @@ let create_combat_room = (chapter: number, enemy_level: number, is_boss: boolean
     _peeked: false,
     _enemies: enemies,
     _exit: is_boss,
-    _event: []
+    _event: 0
   };
 };
