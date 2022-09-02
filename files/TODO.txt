@@ -1,13 +1,12 @@
 Final boss fanfare
 Make chapter bosses themed?
 Balance
+Mute "Music"
 
 BUGS
 
 Nice to Haves
-  Enemy placement in overworld room: Remember direction of entrance, place it 1-2 blocks back from center opposite of door
   More Palette swaps for level tiles
-  Chapter Specific bosses
   Card Level Colours
 
 Optimizations

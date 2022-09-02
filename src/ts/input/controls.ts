@@ -132,7 +132,7 @@ export let update_hardware_input = (): void =>
     }
     if (is_touch)
     {
-        for (let i = 0; i < 7; i++)
+        for (let i = 0; i < 6; i++)
         {
             let [x, y] = touches[i];
 
