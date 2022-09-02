@@ -527,21 +527,21 @@ export namespace Combat
         switch_mode_with_delay(COMBAT_MODE_DRAW);
       }
       else
+      {
+        for (let l = 0; l < 5; l++)
+          if (loot[l] > 0)
+            game_state[GAMESTATE_RESOURCES_GATHERED][l] = 1;
         switch_mode_with_delay(COMBAT_MODE_LOOT_AND_LEAVE);
+      }
     }
     else if (mode === COMBAT_MODE_LOOT_AND_LEAVE)
     {
+
       controls_used(A_BUTTON, B_BUTTON);
       if (A_PRESSED || B_PRESSED)
       {
         for (let l = 0; l < 5; l++)
-        {
-          if (loot[l] > 0)
-          {
-            game_state[GAMESTATE_RESOURCES_GATHERED][l] = 1;
-            current_level._level_resources[l] += loot[l];
-          }
-        }
+          current_level._level_resources[l] += loot[l];
         switch_to_scene(Dungeon._scene_id);
       }
     }

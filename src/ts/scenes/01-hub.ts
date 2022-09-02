@@ -5,6 +5,7 @@ import { render_resources } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { monetization_reference, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
+import { change_track } from "@root/zzfx";
 import { number_sort, safe_add, safe_subtract } from "math";
 import { MainMenu } from "./00-main-menu";
 import { Craft } from "./01a-craft";
@@ -25,6 +26,7 @@ export namespace Hub
   {
     controls_used(D_UP, D_DOWN, A_BUTTON);
     selected_option_index = 0;
+    change_track(0);
   };
   let _update_fn = (delta: number) =>
   {

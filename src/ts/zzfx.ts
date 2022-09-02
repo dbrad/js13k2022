@@ -47,7 +47,7 @@ let beat = 0;
 let timer = 1000;
 let track_number = 0;
 let mute_music = false;
-export let change_track = (track: number) => { track_number = track; beat = 0; timer = 1000; };
+export let change_track = (track: number) => { if (track !== track_number) { track_number = track; beat = 0; timer = 1000; } };
 export let play_music = (delta: number) =>
 {
   if (!mute_music)

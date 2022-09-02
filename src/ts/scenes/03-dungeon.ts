@@ -107,7 +107,6 @@ export namespace Dungeon
     game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS] = max(game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS], current_level._chapter);
     for (let r = 0; r < 5; r++)
       game_state[GAMESTATE_RESOURCES][r] += current_level._level_resources[r];
-    change_track(0);
   };
 
   let _reset_fn = () =>
