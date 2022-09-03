@@ -107,6 +107,9 @@ export namespace Dungeon
     game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS] = max(game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS], current_level._chapter);
     for (let r = 0; r < 5; r++)
       game_state[GAMESTATE_RESOURCES][r] += current_level._level_resources[r];
+
+    if (boss_defeated && current_level._chapter === 5 && !game_state[GAMESTATE_EVENTS][2])
+      game_state[GAMESTATE_EVENTS][2] = EVENT_PENDING;
   };
 
   let _reset_fn = () =>
@@ -128,6 +131,8 @@ export namespace Dungeon
   let _update_fn = (delta: number) =>
   {
     controls_used();
+
+    menu_options[1] = boss_defeated ? "exit" : "retreat";
 
     camera_top_left = [camera[0] - camera_half_width, camera[1] - camera_half_height];
     camera_bottom_right = [camera[0] + camera_half_width, camera[1] + camera_half_height];
@@ -178,7 +183,7 @@ export namespace Dungeon
           else
           {
             // Retreat
-            let text = boss_defeated ? "exit this area and take all reagents with you?" : "retreat to the entrance?|you will lose all progress and reagents|from in this area.";
+            let text = boss_defeated ? "exit this area and take all reagents with you?" : "retreat to the entrance?|you will lose all progress and reagents|from this area.";
             Dialog._push_yes_no_dialog(text, () => mode = 4);
             push_scene(Dialog._scene_id);
           }

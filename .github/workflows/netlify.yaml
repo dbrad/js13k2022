@@ -24,7 +24,7 @@ jobs:
         run: make install
         
       - name: Build and Zip the Game
-        run: make release
+        run: make release-web
 
       - name: Deploy to netlify
         run: make netlify-deploy

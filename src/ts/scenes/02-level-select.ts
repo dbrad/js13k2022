@@ -5,7 +5,7 @@ import { game_state } from "@root/game-state";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, Scene, switch_to_scene } from "@root/scene";
 import { SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
-import { floor, safe_add, safe_subtract } from "math";
+import { floor, math, safe_add, safe_subtract } from "math";
 import { Hub } from "./01-hub";
 import { Dungeon } from "./03-dungeon";
 export namespace LevelSelect
@@ -18,6 +18,9 @@ export namespace LevelSelect
     "the flesh mound",
     "the forgotten haunt",
     "first lich's throne",
+    "the depths",
+    "the unknown",
+    "the abyss",
   ];
 
   let menu_options: string[] = [];
@@ -25,7 +28,7 @@ export namespace LevelSelect
   let _reset_fn = () =>
   {
     controls_used(D_UP, D_DOWN, A_BUTTON, B_BUTTON);
-    for (let c = 0; c <= game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS]; c++)
+    for (let c = 0; c <= math.min(8, game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS]); c++)
     {
       menu_options[c] = chapter_names[c];
     }

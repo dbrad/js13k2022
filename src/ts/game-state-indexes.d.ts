@@ -6,6 +6,7 @@ declare const GAMESTATE_RESOURCES: 4;
 declare const GAMESTATE_CARD_COLLECTION: 5;
 declare const GAMESTATE_DECK: 6;
 declare const GAMESTATE_COMBAT: 7;
+declare const GAMESTATE_MUTE_MUSIC: 8;
 
 declare const ATTACK_MODIFIER: 0;
 declare const DEFENSE_MODIFIER: 1;

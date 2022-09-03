@@ -1,6 +1,6 @@
 import { assert } from "@debug/assert";
 import { unpack_number_array_from_string } from "@root/util";
-import { ceil, floor, max, random_int, shuffle } from "math";
+import { ceil, floor, math, max, random_int, shuffle } from "math";
 import { Enemy, game_state, Room } from "../game-state";
 import { get_boss, get_enemy } from "./enemy-builder";
 
@@ -252,17 +252,32 @@ let create_event_room = (): Room =>
   };
 };
 
+let boss_minions = [
+  unpack_number_array_from_string("012",),
+  unpack_number_array_from_string("000",),
+  unpack_number_array_from_string("111",),
+  unpack_number_array_from_string("222",),
+  unpack_number_array_from_string("012",),
+  unpack_number_array_from_string("020",),
+  unpack_number_array_from_string("101",),
+  unpack_number_array_from_string("212",),
+];
 let create_combat_room = (chapter: number, enemy_level: number, is_boss: boolean = false): Room =>
 {
-  let number_of_enemies = random_int(1, ceil(enemy_level / 10) + 1) - (is_boss ? 1 : 0);
+  let number_of_enemies = is_boss ? 3 : math.min(4, random_int(1, ceil(enemy_level / 10) + 1));
   let level = number_of_enemies >= 3 ? ceil(enemy_level / 3) : number_of_enemies === 2 ? enemy_level / 2 : enemy_level;
 
   let enemies: Enemy[] = [];
   if (is_boss)
+  {
     enemies.push(get_boss(chapter, level));
-
-  for (let i = 0; i < number_of_enemies; i++)
-    enemies.push(get_enemy(chapter, level));
+    let minions = boss_minions[chapter - 1];
+    for (let minion of minions)
+      enemies.push(get_enemy(chapter, level, minion));
+  }
+  else
+    for (let i = 0; i < number_of_enemies; i++)
+      enemies.push(get_enemy(chapter, level));
 
   return {
     _seen: false,

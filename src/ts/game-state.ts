@@ -83,7 +83,7 @@ export let game_state: GameState;
 export let setup_game_state = () =>
 {
   let events: number[] = [];
-  for (let i = 0; i <= 1; i++)
+  for (let i = 0; i <= 2; i++)
   {
     events[i] = 0;
   }
@@ -98,7 +98,7 @@ export let setup_game_state = () =>
     unpack_number_array_from_string("000000"),
     [0, 1, 2],
     starter_deck,
-    [0, 0, 0]
+    [0, 0, 0],
   ];
 };
 

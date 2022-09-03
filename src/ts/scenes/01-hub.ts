@@ -5,7 +5,7 @@ import { render_resources } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
 import { monetization_reference, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
-import { change_track } from "@root/zzfx";
+import { change_track, toggle_mute_music } from "@root/zzfx";
 import { number_sort, safe_add, safe_subtract } from "math";
 import { MainMenu } from "./00-main-menu";
 import { Craft } from "./01a-craft";
@@ -15,11 +15,12 @@ import { Dialog } from "./20-dialog";
 export namespace Hub
 {
   let selected_option_index: number;
-  let number_of_options = 4;
+  let number_of_options = 5;
   let menu_options = [
     "descend",
     "craft cards",
     "manage deck",
+    "mute music",
     "save and quit"
   ];
   let _reset_fn = () =>
@@ -35,24 +36,29 @@ export namespace Hub
       if (game_state[GAMESTATE_EVENTS][EVENT_COIL_FIRST_TIME] === EVENT_NOT_DONE)
       {
         Dialog._push_dialog_text("thank you for supporting this game|through web monetization!");
-        Dialog._push_dialog_text("as a bonus a few extra cards have been|added to you collection!");
-        Dialog._push_dialog_text("death coil added!|level 1 skeleton, zombie,|and spirit added!");
+        Dialog._push_dialog_text("a few extra cards have been added|to your collection!");
+        push_scene(Dialog._scene_id);
         game_state[GAMESTATE_CARD_COLLECTION].push(3, 4, 5, 12);
         game_state[GAMESTATE_CARD_COLLECTION].sort(number_sort);
-        push_scene(Dialog._scene_id);
         game_state[GAMESTATE_EVENTS][EVENT_COIL_FIRST_TIME] = EVENT_DONE;
         return;
       }
     }
-    else
-    {
-    }
 
     if (game_state[GAMESTATE_EVENTS][1] === EVENT_PENDING)
     {
-      Dialog._push_dialog_text("you have fallen in battle and|you have been brough back to the|entrance of the catacombs.");
+      Dialog._push_dialog_text("you have fallen in battle and|have been brough back to the entrance.");
       push_scene(Dialog._scene_id);
       game_state[GAMESTATE_EVENTS][1] = EVENT_DONE;
+    }
+    else if (game_state[GAMESTATE_EVENTS][2] === EVENT_NOT_DONE)
+    {
+      Dialog._push_dialog_text("you have defeated the first lich and|taken his heart.");
+      Dialog._push_dialog_text("you notice the stairs go deeper...");
+      Dialog._push_dialog_text("there would be no shame in stopping now|surely the horrors deeper down would|only spell diaster");
+      Dialog._push_dialog_text("(challenge levels await you)");
+      push_scene(Dialog._scene_id);
+      game_state[GAMESTATE_EVENTS][2] = EVENT_DONE;
     }
 
     if (UP_PRESSED)
@@ -67,7 +73,14 @@ export namespace Hub
         switch_to_scene(Craft._scene_id);
       else if (selected_option_index === 2)
         switch_to_scene(ManageDeck._scene_id);
-      else if (selected_option_index === number_of_options - 1)
+      else if (selected_option_index === 3)
+      {
+        if (toggle_mute_music())
+          menu_options[3] = "enable music";
+        else
+          menu_options[3] = "mute music";
+      }
+      else if (selected_option_index === 4)
         switch_to_scene(MainMenu._scene_id);
     }
   };

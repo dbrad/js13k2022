@@ -37,16 +37,16 @@ export let build_enemy = (_type: number, _level: number): Enemy =>
   };
 };
 
-export let get_enemy = (chapter: number, level: number) =>
+export let get_enemy = (chapter: number, level: number, force_enemy_type: number = -1) =>
 {
-  let enemy_type = chapter === 1 ? random_int(0, 2) : random_int(0, 3);
+  let enemy_type = force_enemy_type < 0 ? (chapter === 1 ? random_int(0, 2) : random_int(0, 3)) : force_enemy_type;
   return build_enemy(enemy_type, level);
 };
 
 export let get_boss = (chapter: number, level: number) =>
 {
-  let enemy_type = chapter === 4 ? 4 : 3;
-  return build_enemy(enemy_type, level + 5);
+  let enemy_type = chapter >= 5 ? 4 : 3;
+  return build_enemy(enemy_type, level + 10);
 };
 
 export let get_next_enemy_intent = (enemy: Enemy) =>
