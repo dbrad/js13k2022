@@ -15,18 +15,18 @@ export let unit_palette_map: number[] = [
   PALETTE_SKELETON,
   PALETTE_ZOMBIE,
   0,
-  PALETTE_PLAYER + 3,
-  PALETTE_PLAYER + 3,
+  PALETTE_ENEMY,
+  PALETTE_ENEMY,
 ];
 
 let intent_type_sprite = unpack_number_array_from_string("05589");
 
 let intent_palette = [
-  19,
+  29,
   0,
   0,
-  PALETTE_PLAYER - 1,
-  PALETTE_PLAYER - 1
+  20,
+  20
 ];
 
 

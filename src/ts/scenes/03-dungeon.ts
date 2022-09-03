@@ -268,6 +268,7 @@ export namespace Dungeon
               case 1: // Random Resource Gain
                 let resource = random_int(0, 2);
                 let amount = random_int(1, current_level._chapter);
+                game_state[GAMESTATE_RESOURCES_GATHERED][resource] = 1;
                 Dialog._push_dialog_text(`you find ${amount} ${get_resource_name(resource, amount)} laying|on the ground.`);
                 current_level._level_resources[resource] += amount;
                 break;
@@ -316,14 +317,14 @@ export namespace Dungeon
             push_quad(render_x, render_y, 16, 16, BLACK);
 
           if (tile_id > 5)
-            push_textured_quad(TEXTURE_FLOOR, render_x, render_y, { _palette_offset: 12 + (tile_id - 6) * 3 });
+            push_textured_quad(TEXTURE_FLOOR, render_x, render_y, { _palette_offset: PALETTE_FLOOR + (tile_id - 6) * 3 });
           else if (tile_id > 1 && tile_id < 5)
-            push_textured_quad(TEXTURE_WALL, render_x, render_y, { _palette_offset: 3 * (tile_id - 1) });
+            push_textured_quad(TEXTURE_WALL, render_x, render_y, { _palette_offset: PALETTE_WALL * (tile_id - 1) });
 
           // Lighting
           let distance = math.sqrt((player_tile_x - tile_x) ** 2 + (player_tile_y - tile_y) ** 2);
           if (distance >= 8)
-            push_quad(render_x, render_y, 16, 16, BLACK);
+            push_quad(render_x, render_y, 16, 16, BLACK_T75);
           else if (distance >= 6)
             push_quad(render_x, render_y, 16, 16, BLACK_T75);
           else if (distance >= 4)

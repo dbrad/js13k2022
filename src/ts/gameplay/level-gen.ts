@@ -248,7 +248,7 @@ let create_event_room = (): Room =>
     _peeked: false,
     _enemies: [],
     _exit: false,
-    _event: 2
+    _event: random_int(1, 2)
   };
 };
 
