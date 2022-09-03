@@ -51,7 +51,7 @@ export namespace Hub
       push_scene(Dialog._scene_id);
       game_state[GAMESTATE_EVENTS][1] = EVENT_DONE;
     }
-    else if (game_state[GAMESTATE_EVENTS][2] === EVENT_NOT_DONE)
+    else if (game_state[GAMESTATE_EVENTS][2] === EVENT_PENDING)
     {
       Dialog._push_dialog_text("you have defeated the first lich and|taken his heart.");
       Dialog._push_dialog_text("you notice the stairs go deeper...");
