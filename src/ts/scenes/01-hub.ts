@@ -38,7 +38,7 @@ export namespace Hub
     {
       if (game_state[GAMESTATE_EVENTS][EVENT_COIL_FIRST_TIME] === EVENT_NOT_DONE)
       {
-        Dialog._push_dialog_text("thank you for supporting this game|through web monetization!");
+        Dialog._push_dialog_text("thank you for supporting this game|through coil!");
         Dialog._push_dialog_text("a few extra cards have been added|to your collection!");
         push_scene(Dialog._scene_id);
         game_state[GAMESTATE_CARD_COLLECTION].push(3, 4, 5, 12);
@@ -50,13 +50,13 @@ export namespace Hub
 
     if (game_state[GAMESTATE_EVENTS][1] === EVENT_PENDING)
     {
-      Dialog._push_dialog_text("you have fallen in battle and|have been brough back to the entrance.");
+      Dialog._push_dialog_text("you have fallen in battle and|have awakened back at the entrance.");
       push_scene(Dialog._scene_id);
       game_state[GAMESTATE_EVENTS][1] = EVENT_DONE;
     }
     else if (game_state[GAMESTATE_EVENTS][2] === EVENT_PENDING)
     {
-      Dialog._push_dialog_text("you have defeated the a lich and|taken its heart.");
+      Dialog._push_dialog_text("you have defeated a lich and|taken its heart as your own.");
       Dialog._push_dialog_text("there would be no shame in stopping now|surely the horrors deeper down would|only spell diaster");
       Dialog._push_dialog_text("(challenge floors unlock)");
       push_scene(Dialog._scene_id);

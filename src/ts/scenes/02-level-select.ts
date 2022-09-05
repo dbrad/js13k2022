@@ -17,7 +17,7 @@ export namespace LevelSelect
     "the bone zone",
     "the flesh mound",
     "the forgotten haunt",
-    "first lich's throne",
+    "the lich's throne",
     "the depths",
     "the unknown",
     "the abyss",

@@ -1,4 +1,4 @@
-import { BLACK, BLACK_T25, BLACK_T50, BLACK_T75, DARK_GREY, FLOOR_COLOUR, LIGHT_GREY, RED, YELLOW } from "@graphics/colour";
+import { BLACK, BLACK_T25, BLACK_T50, BLACK_T75, BLACK_T99, DARK_GREY, FLOOR_COLOUR, LIGHT_GREY, RED, YELLOW } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
 import { push_text } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
@@ -183,7 +183,7 @@ export namespace Dungeon
           else
           {
             // Retreat
-            let text = boss_defeated ? "exit this area and take all reagents with you?" : "retreat to the entrance?|you will lose all progress and reagents|from this area.";
+            let text = boss_defeated ? "exit this area and take all reagents|with you?" : "retreat to the entrance?|you will leave behind all reagents|from this area.";
             Dialog._push_yes_no_dialog(text, () => mode = 4);
             push_scene(Dialog._scene_id);
           }
@@ -274,7 +274,7 @@ export namespace Dungeon
                 break;
               case 2: // Heal Player
                 let heal_amount = ceil(player[PLAYER_MAX_HP] * 0.25);
-                Dialog._push_dialog_text(`you find a spring of necrotic energy|in the room, healing you for ${heal_amount}.`);
+                Dialog._push_dialog_text(`you feel necrotic energy filling the|room, healing you for ${heal_amount}.`);
                 player[PLAYER_HP] = safe_add(player[PLAYER_MAX_HP], player[PLAYER_HP], heal_amount);
                 zzfx_play(heal_sound);
                 break;
@@ -323,8 +323,10 @@ export namespace Dungeon
 
           // Lighting
           let distance = math.sqrt((player_tile_x - tile_x) ** 2 + (player_tile_y - tile_y) ** 2);
-          if (distance >= 8)
-            push_quad(render_x, render_y, 16, 16, BLACK_T75);
+          if (distance >= 10)
+            push_quad(render_x, render_y, 16, 16, BLACK);
+          else if (distance >= 8)
+            push_quad(render_x, render_y, 16, 16, BLACK_T99);
           else if (distance >= 6)
             push_quad(render_x, render_y, 16, 16, BLACK_T75);
           else if (distance >= 4)

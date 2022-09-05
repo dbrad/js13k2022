@@ -636,13 +636,13 @@ export namespace Combat
     }
     else if (mode === COMBAT_MODE_CARD_SELECT)
     {
-      render_mode_text("play card from your hard");
+      render_mode_text("play cards from your hand");
       render_panel(SCREEN_CENTER_X - 40, SCREEN_CENTER_Y, 80, 28, !row ? WHITE : DARK_GREY);
       push_text("end turn", SCREEN_CENTER_X, SCREEN_CENTER_Y + 10, { _align: TEXT_ALIGN_CENTER, _colour: (row ? LIGHT_GREY : WHITE) });
     }
     else if (mode === COMBAT_MODE_ACTION_SELECT)
     {
-      render_mode_text("choose to use the minion's attack or defense");
+      render_mode_text("use the minion's attack or defense?");
       render_panel(SCREEN_CENTER_X - 90, SCREEN_CENTER_Y, 180, 40);
       render_text_menu(SCREEN_CENTER_X, SCREEN_CENTER_Y + 10, card_use_menu, card_use_menu.length, selected_action_index, 1);
     }

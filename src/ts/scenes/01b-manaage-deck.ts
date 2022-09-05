@@ -93,7 +93,7 @@ export namespace ManageDeck
     {
       if (deck_size < 10 || deck_size > 40)
       {
-        Dialog._push_dialog_text("deck must contain at least 10 card|and no more than 40 cards.");
+        Dialog._push_dialog_text("deck must contain at least 10 cards|and no more than 40.");
         push_scene(Dialog._scene_id);
       }
       else

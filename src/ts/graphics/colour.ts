@@ -52,6 +52,7 @@ export let abgr_number_to_rgba_v4 = (abgr: number): V4 =>
 
 export const WHITE = 0xffffffff;
 export const BLACK = 0xff000000;
+export const BLACK_T99 = rgba_to_abgr_number(0, 0, 0, 0.99);
 export const BLACK_T75 = rgba_to_abgr_number(0, 0, 0, 0.75);
 export const BLACK_T50 = rgba_to_abgr_number(0, 0, 0, 0.50);
 export const BLACK_T25 = rgba_to_abgr_number(0, 0, 0, 0.25);
