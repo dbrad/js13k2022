@@ -67,4 +67,5 @@ export let push_text = (text: string | number, x: number, y: number, parameters:
 };
 
 export let CENTERED_TEXT: TextParameters = { _align: TEXT_ALIGN_CENTER };
+export let RIGHT_ALGIN_TEXT: TextParameters = { _align: TEXT_ALIGN_RIGHT };
 export let SMALL_FONT_AND_CENTERED_TEXT: TextParameters = { _align: TEXT_ALIGN_CENTER, _font: FONT_SMALL };

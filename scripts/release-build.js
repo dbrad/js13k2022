@@ -1,7 +1,8 @@
 const esbuild = require('esbuild');
 const { DEFINITIONS } = require('./definitions');
+const { stringsPlugin } = require('./strings-plugin');
 
-const result = esbuild.buildSync({
+esbuild.build({
   entryPoints: ["src/ts/game.ts"],
   bundle: true,
   format: 'iife',
@@ -12,10 +13,13 @@ const result = esbuild.buildSync({
   },
   loader: {
     ".webp": "dataurl"
+  },
+  plugins: [stringsPlugin]
+}).then(result =>
+{
+
+  for (let out of result.outputFiles)
+  {
+    console.log(out.text);
   }
 });
-
-for (let out of result.outputFiles)
-{
-  console.log(out.text);
-}

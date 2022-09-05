@@ -36,7 +36,7 @@ export let render_card = (x: number, y: number, card: Card, scale: number = 1, h
   let defense_modifier = 0;
 
   if (card_type <= 2)
-    [attack_modifier, defense_modifier] = get_modifiers(card_type);
+    [attack_modifier, defense_modifier] = get_modifiers();
 
   push_text(card_type_text[card_type], x + card_width_half, y + card_height - 4 - 5 * scale, { ...SMALL_FONT_AND_CENTERED_TEXT, _scale: scale });
 
@@ -60,7 +60,7 @@ export let render_card = (x: number, y: number, card: Card, scale: number = 1, h
   }
 };
 
-export let get_modifiers = (card_type: number): V2 =>
+export let get_modifiers = (): V2 =>
 {
   let attack_modifier = game_state[GAMESTATE_COMBAT][ATTACK_MODIFIER];
   let defense_modifier = game_state[GAMESTATE_COMBAT][DEFENSE_MODIFIER];

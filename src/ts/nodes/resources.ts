@@ -1,4 +1,4 @@
-import { push_text } from "@graphics/text";
+import { push_text, RIGHT_ALGIN_TEXT } from "@graphics/text";
 import { is_touch } from "@input/controls";
 import { game_state } from "@root/game-state";
 import { SCREEN_WIDTH } from "@root/screen";
@@ -15,8 +15,8 @@ export let render_resources = (resources: number[]) =>
     {
       let y_offset = 40 * i + (i >= 3 && is_touch ? 85 : 0);
       render_panel(SCREEN_WIDTH - 125, 50 + y_offset, 120, 30);
-      push_text(get_resource_name(r, resources[r]), SCREEN_WIDTH - 10, 55 + y_offset, { _align: TEXT_ALIGN_RIGHT });
-      push_text(resources[r], SCREEN_WIDTH - 10, 67 + y_offset, { _align: TEXT_ALIGN_RIGHT });
+      push_text(get_resource_name(r, resources[r]), SCREEN_WIDTH - 10, 55 + y_offset, RIGHT_ALGIN_TEXT);
+      push_text(resources[r], SCREEN_WIDTH - 10, 67 + y_offset, RIGHT_ALGIN_TEXT);
       i++;
     }
   }

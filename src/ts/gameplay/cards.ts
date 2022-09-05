@@ -17,7 +17,7 @@ export let card_list: Card[] = [
   minion(2, 2),
   spell("death coil", 1, [build_heal(2)]),
   buff("bone barbs", [build_barbs(2)]),
-  buff("unyielding", [build_heal(5)]),
+  buff("unyielding", [build_heal(10)]),
   spell("curse", 0, [build_weaken(3)]),
   buff("necrotic|power", [build_attack_modifier(2), build_defense_modifier(-1)]),
   buff("necrotic|vigor", [build_defense_modifier(2), build_attack_modifier(-1)]),

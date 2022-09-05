@@ -1,10 +1,10 @@
-import { push_text } from "@graphics/text";
+import { push_text, SMALL_FONT_AND_CENTERED_TEXT } from "@graphics/text";
 import { A_PRESSED, controls_used, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
 import { game_state } from "@root/game-state";
 import { render_resources } from "@root/nodes/resources";
 import { render_text_menu } from "@root/nodes/text-menu";
 import { get_next_scene_id, push_scene, Scene, switch_to_scene } from "@root/scene";
-import { monetization_reference, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_WIDTH } from "@root/screen";
+import { monetization_reference, SCREEN_CENTER_X, SCREEN_CENTER_Y, SCREEN_HEIGHT, SCREEN_WIDTH } from "@root/screen";
 import { change_track, toggle_mute_music } from "@root/zzfx";
 import { number_sort, safe_add, safe_subtract } from "math";
 import { MainMenu } from "./00-main-menu";
@@ -16,6 +16,8 @@ export namespace Hub
 {
   let selected_option_index: number;
   let number_of_options = 5;
+  let coil_on = false;
+
   let menu_options = [
     "descend",
     "craft cards",
@@ -31,7 +33,8 @@ export namespace Hub
   };
   let _update_fn = (delta: number) =>
   {
-    if (monetization_reference && monetization_reference.state === "started")
+    coil_on = monetization_reference && monetization_reference.state === "started";
+    if (coil_on)
     {
       if (game_state[GAMESTATE_EVENTS][EVENT_COIL_FIRST_TIME] === EVENT_NOT_DONE)
       {
@@ -53,10 +56,9 @@ export namespace Hub
     }
     else if (game_state[GAMESTATE_EVENTS][2] === EVENT_PENDING)
     {
-      Dialog._push_dialog_text("you have defeated the first lich and|taken his heart.");
-      Dialog._push_dialog_text("you notice the stairs go deeper...");
+      Dialog._push_dialog_text("you have defeated the a lich and|taken its heart.");
       Dialog._push_dialog_text("there would be no shame in stopping now|surely the horrors deeper down would|only spell diaster");
-      Dialog._push_dialog_text("(challenge levels await you)");
+      Dialog._push_dialog_text("(challenge floors unlock)");
       push_scene(Dialog._scene_id);
       game_state[GAMESTATE_EVENTS][2] = EVENT_DONE;
     }
@@ -86,6 +88,8 @@ export namespace Hub
   };
   let _render_fn = () =>
   {
+    if (!coil_on)
+      push_text("support this game via coil to get a head start with some extra cards", SCREEN_CENTER_X, SCREEN_HEIGHT - 30, SMALL_FONT_AND_CENTERED_TEXT);
     push_text("catacombs entrance", SCREEN_WIDTH - 5, 5, { _scale: 3, _align: TEXT_ALIGN_RIGHT });
     render_text_menu(SCREEN_CENTER_X, SCREEN_CENTER_Y - 50, menu_options, number_of_options, selected_option_index);
     render_resources(game_state[GAMESTATE_RESOURCES]);

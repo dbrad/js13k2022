@@ -18,6 +18,11 @@ declare module '*.txt' {
   export default content;
 }
 
+declare module '*.strings' {
+  let content: string;
+  export default content;
+}
+
 declare module '*.webp' {
   let content: string;
   export default content;

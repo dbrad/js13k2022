@@ -15,7 +15,6 @@ export let render_card_list = (x: number, y: number, card_id_list: number[], lis
 
     let touch_offset = render_index >= 6 && is_touch ? 116 : 0;
     let y_offset = (render_index) * 16 + touch_offset;
-
     let _colour = (card_index - skip) === selected_index ? WHITE : DARK_GREY;
 
     render_panel(x, y + y_offset, 140, 16, _colour);

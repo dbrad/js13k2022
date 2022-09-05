@@ -1,6 +1,7 @@
 const esbuild = require('esbuild');
 const http = require('http');
 const { DEFINITIONS } = require('./definitions');
+const { stringsPlugin } = require('./strings-plugin');
 
 esbuild.serve({
   servedir: "build/debug",
@@ -17,7 +18,8 @@ esbuild.serve({
   },
   loader: {
     ".webp": "dataurl"
-  }
+  },
+  plugins: [stringsPlugin]
 }).then(result =>
 {
   const { host, port } = result;

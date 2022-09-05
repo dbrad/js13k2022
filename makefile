@@ -21,7 +21,7 @@ release:
 	mkdir build/release
 	cp src/html/index.html build/release/index.html
 	node scripts/release-build.js | node_modules/.bin/terser --config-file scripts/terser.config.json -o build/release/game.js
-	yarn roadroller build/release/game.js -O2 -Zab7 -Zlr1333 -Zmc4 -Zmd21 -S0,1,2,3,6,7,13,25,42,53,86,449 -o build/release/game.js
+	yarn roadroller build/release/game.js -O2 -Zab7 -Zlr1411 -Zmc4 -Zmd21 -S0,1,2,3,6,7,13,25,42,53,86,449 -o build/release/game.js
 	rm -rf dist
 	mkdir -p dist/src
 	yarn html-inline -i ./build/release/index.html -o ./dist/src/index.html
@@ -35,7 +35,7 @@ release-web:
 	mkdir build/release
 	cp src/html/index.html build/release/index.html
 	node scripts/release-build.js | node_modules/.bin/terser --config-file scripts/terser.config.json -o build/release/game.js
-	yarn roadroller build/release/game.js -O1 -Zab7 -Zlr1333 -Zmc4 -Zmd21 -S0,1,2,3,6,7,13,25,42,53,86,449 -o build/release/game.js
+	yarn roadroller build/release/game.js -O1 -Zab7 -Zlr1411 -Zmc4 -Zmd21 -S0,1,2,3,6,7,13,25,42,53,86,449 -o build/release/game.js
 	rm -rf dist
 	mkdir -p dist/src
 	yarn html-inline -i ./build/release/index.html -o ./dist/src/index.html

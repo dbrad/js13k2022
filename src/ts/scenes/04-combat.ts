@@ -4,7 +4,7 @@ import { EffectFunction, effects } from "@gameplay/effects";
 import { get_next_enemy_intent } from "@gameplay/enemy-builder";
 import { BLACK, BLACK_T25, BLACK_T50, BLACK_T75, DARK_GREY, FLOOR_COLOUR, LIGHT_GREY, RED, WHITE } from "@graphics/colour";
 import { push_quad, push_textured_quad } from "@graphics/quad";
-import { CENTERED_TEXT, push_text, SMALL_FONT_AND_CENTERED_TEXT } from "@graphics/text";
+import { CENTERED_TEXT, push_text, RIGHT_ALGIN_TEXT, SMALL_FONT_AND_CENTERED_TEXT } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, LEFT_PRESSED, RIGHT_PRESSED, UP_PRESSED } from "@input/controls";
 import { V2 } from "@math/vector";
 import { Enemy, game_state, Level, Player } from "@root/game-state";
@@ -331,9 +331,8 @@ export namespace Combat
       {
         let card_id = hand.splice(selected_card_index, 1)[0];
         let card = card_list[card_id];
-        let card_type = card[CARD_TYPE];
 
-        let [attack_modifier, defense_modifier] = get_modifiers(card_type);
+        let [attack_modifier, defense_modifier] = get_modifiers();
         let attack = max(0, card[CARD_ATTACK] + attack_modifier);
         let defense = max(0, card[CARD_DEFENSE] + defense_modifier);
         if (selected_action_index)
@@ -590,13 +589,13 @@ export namespace Combat
 
     if (total_attack > 0)
     {
-      push_text(total_attack, player_position[0] + 8, player_position[1], { _align: TEXT_ALIGN_RIGHT });
+      push_text(total_attack, player_position[0] + 8, player_position[1], RIGHT_ALGIN_TEXT);
       push_textured_quad(TEXTURE_SWORD, player_position[0] + 10, player_position[1]);
     }
 
     if (total_defense > 0)
     {
-      push_text(total_defense, player_position[0] + 46, player_position[1], { _align: TEXT_ALIGN_RIGHT });
+      push_text(total_defense, player_position[0] + 46, player_position[1], RIGHT_ALGIN_TEXT);
       push_textured_quad(TEXTURE_SHEILD, player_position[0] + 48, player_position[1]);
     }
 

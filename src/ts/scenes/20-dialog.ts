@@ -1,6 +1,6 @@
 import { BLACK_T75 } from "@graphics/colour";
 import { push_quad } from "@graphics/quad";
-import { push_text } from "@graphics/text";
+import { push_text, RIGHT_ALGIN_TEXT } from "@graphics/text";
 import { A_PRESSED, B_PRESSED, controls_used, DOWN_PRESSED, UP_PRESSED } from "@input/controls";
 import { animation_frame } from "@root/animation";
 import { render_panel } from "@root/nodes/panel";
@@ -29,7 +29,7 @@ export namespace Dialog
 
   export let _push_yes_no_dialog = (text: string, confirm_handler: () => void): void =>
   {
-    dialogQueue.push(text);
+    _push_dialog_text(text);
     choice_handler = confirm_handler;
   };
 
@@ -123,7 +123,7 @@ export namespace Dialog
         render_text_menu(SCREEN_CENTER_X, SCREEN_CENTER_Y + 5, ["yes", "no"], 2, choice_index);
       }
       else if (animation_frame)
-        push_text("continue", SCREEN_WIDTH - 5, box_y - 13, { _align: TEXT_ALIGN_RIGHT });
+        push_text("continue", SCREEN_WIDTH - 5, box_y - 13, RIGHT_ALGIN_TEXT);
     }
   };
 
