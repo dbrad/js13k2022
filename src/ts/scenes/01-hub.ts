@@ -30,6 +30,7 @@ export namespace Hub
     controls_used(D_UP, D_DOWN, A_BUTTON);
     selected_option_index = 0;
     change_track(0);
+    game_state[GAMESTATE_COMBAT] = [0, 0, 0];
   };
   let _update_fn = (delta: number) =>
   {
