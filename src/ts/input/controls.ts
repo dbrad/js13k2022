@@ -162,16 +162,16 @@ export let update_hardware_input = (): void =>
         let buttons = gamepad.buttons;
         let axes = gamepad.axes;
 
-        if (buttons[12].pressed || axes[1] < -0.1)
+        if (buttons[12].pressed || axes[1] < -0.2)
             hardware_key_state[D_UP] = KEY_IS_DOWN;
 
-        if (buttons[13].pressed || axes[1] > 0.1)
+        if (buttons[13].pressed || axes[1] > 0.2)
             hardware_key_state[D_DOWN] = KEY_IS_DOWN;
 
-        if (buttons[14].pressed || axes[0] > 0.1)
+        if (buttons[14].pressed || axes[0] < -0.2)
             hardware_key_state[D_LEFT] = KEY_IS_DOWN;
 
-        if (buttons[15].pressed || axes[0] < -0.1)
+        if (buttons[15].pressed || axes[0] > 0.2)
             hardware_key_state[D_RIGHT] = KEY_IS_DOWN;
 
         if (buttons[0].pressed)
