@@ -27,7 +27,7 @@ let get_next_floor_id = (): number =>
 
 export let generate_level = (chapter: number = 1): void =>
 {
-  let enemy_level = (chapter * 10);
+  let enemy_level = (chapter * 5) + 5;
 
   // Generate Room Layout
   let number_of_rooms = floor(random_int(0, 2) + 5 + chapter * 2.6);

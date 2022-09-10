@@ -454,17 +454,17 @@ export namespace Combat
         if (action._lifetime_remaining <= 0)
         {
           action._done = true;
+          if (intent === ENEMY_INTENT_TYPE_HEAL || intent === ENEMY_INTENT_TYPE_ATTACK_HEAL)
+            enemy._hp = safe_add(enemy._max_hp, enemy._hp, action._action_value);
+          else if (intent === ENEMY_INTENT_TYPE_BUFF)
+            enemy._attack_buff++;
+
           if (is_attack)
           {
             player[PLAYER_HP] = safe_subtract(player[PLAYER_HP], safe_subtract(action._action_value, total_defense));
             total_defense = safe_subtract(total_defense, action._action_value);
             enemy._hp = safe_subtract(enemy._hp, game_state[GAMESTATE_COMBAT][2]);
           }
-
-          if (intent === ENEMY_INTENT_TYPE_HEAL || intent === ENEMY_INTENT_TYPE_ATTACK_HEAL)
-            enemy._hp = safe_add(enemy._max_hp, enemy._hp, action._action_value);
-          else if (intent === ENEMY_INTENT_TYPE_BUFF)
-            enemy._attack_buff++;
 
           if (player[PLAYER_HP] <= 0)
           {
