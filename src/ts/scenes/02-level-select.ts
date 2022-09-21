@@ -28,7 +28,7 @@ export namespace LevelSelect
   let _reset_fn = () =>
   {
     controls_used(D_UP, D_DOWN, A_BUTTON, B_BUTTON);
-    for (let c = 0; c <= math.min(8, game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS]); c++)
+    for (let c = 0; c <= math.min(7, game_state[GAMESTATE_PLAYER][PLAYER_GAME_PROGRESS]); c++)
     {
       menu_options[c] = chapter_names[c];
     }
