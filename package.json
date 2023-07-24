@@ -7,7 +7,7 @@
     "name": "David Brad",
     "url": "https://davidbrad.ca"
   },
-  "license": "MIT",
+  "license": "CC-BY-NC-SA-4.0",
   "devDependencies": {
     "express": "^4.17.1",
     "path": "^0.12.7"
